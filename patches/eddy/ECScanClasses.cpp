@@ -28,6 +28,7 @@
 #include "LSResampler.h"
 #include "ECScanClasses.h"
 #include "CPUStackResampler.h"
+#include "tipl/tipl.hpp"
 #ifdef COMPILE_GPU
 #include "cuda/EddyGpuUtils.h"
 #include "cuda/EddyCudaHelperFunctions.h"
@@ -2032,20 +2033,17 @@ void ECScanManager::write_lsr_registered_images(const std::string& fname, double
   NEWIMAGE::volume4D<float> ovol(Scan(0,st).GetIma().xsize(),Scan(0,st).GetIma().ysize(),Scan(0,st).GetIma().zsize(),NLSRPairs(st));
   NEWIMAGE::copybasicproperties(Scan(0,st).GetIma(),ovol);
   NEWIMAGE::volume<float> omask = Scan(0,st).GetIma(); omask = 1.0;
-  #ifndef COMPILE_GPU
-  # pragma omp parallel for shared(ovol)
-  #endif
-  for (unsigned int i=0; i<NLSRPairs(st); i++) {
+  std::mutex m;
+  tipl::par_for (NLSRPairs(st),[&](unsigned int i) {
     std::pair<unsigned int,unsigned int> par = GetLSRPair(i,st);
     LSResampler lsr(Scan(par.first,st),Scan(par.second,st),GetSuscHzOffResField(),lambda);
-    #ifndef COMPILE_GPU
-    # pragma omp critical
-    #endif
     {
+      std::lock_guard<std::mutex> lock(m);
       ovol[i] = lsr.GetResampledVolume() / ScaleFactor();
       omask *= lsr.GetMask();
     }
   }
+  );
   ovol *= omask;
   NEWIMAGE::write_volume(ovol,fname);
 } EddyCatch
