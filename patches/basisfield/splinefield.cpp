@@ -355,13 +355,11 @@ const
 
   std::shared_ptr<BFMatrix> tmp;
   if (deriv[0]==0 && deriv[1]==0 && deriv[2]==0) {
-    if (_nthr==1) tmp = make_fully_symmetric_jtj(_sp,csz,prodima,isz,prec);
-    else tmp = make_fully_symmetric_jtj_para(_sp,csz,prodima,isz,prec,_nthr);
+    tmp = make_fully_symmetric_jtj_para(_sp,csz,prodima,isz,prec,std::thread::hardware_concurrency());
   }
   else {
     Spline3D<double>   sp(_sp.Order(),_sp.KnotSpacing(),deriv);
-    if (_nthr==1) tmp = make_fully_symmetric_jtj(sp,csz,prodima,isz,prec);
-    else tmp = make_fully_symmetric_jtj_para(sp,csz,prodima,isz,prec,_nthr);
+    tmp = make_fully_symmetric_jtj_para(sp,csz,prodima,isz,prec,std::thread::hardware_concurrency());
   }
 
   delete[] prodima;
@@ -394,8 +392,7 @@ const
     csz[0] = CoefSz_x(); csz[1] = CoefSz_y(); csz[2] = CoefSz_z();
     Spline3D<double>           sp1(_sp.Order(),_sp.KnotSpacing(),deriv1);
     Spline3D<double>           sp2(_sp.Order(),_sp.KnotSpacing(),deriv2);
-    if (_nthr==1) tmp = make_asymmetric_jtj(sp1,csz,sp2,csz,prodima,isz,prec);
-    else tmp = make_asymmetric_jtj_para(sp1,csz,sp2,csz,prodima,isz,prec,_nthr);
+    tmp = make_asymmetric_jtj_para(sp1,csz,sp2,csz,prodima,isz,prec,std::thread::hardware_concurrency());
     delete[] prodima;
   }
   return(tmp);
