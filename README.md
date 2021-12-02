@@ -2,7 +2,7 @@
 A simplified redistribution of FSL package
 
 ## License
-TinyFSL is redistributed under the original FSL license https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence given non-commercial usage.
+TinyFSL follows the original FSL license https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence given non-commercial usage.
 
 ## Currently Available Programs
 
