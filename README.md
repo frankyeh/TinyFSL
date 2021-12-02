@@ -12,7 +12,7 @@ The eddy in TinyFSL have more multi-core support than the original eddy_openmp v
   
 - [x] [topup](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/topup/TopupUsersGuide)
 
-The topup in TidyFSL supports multi-core. (The one in original FSL does not)
+The topup in TidyFSL is modified to partially supports multi-core. (The one in original FSL does not)
 
 - [x] [applytopup](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/topup/ExampleTopupFollowedByApplytopup)
 
