@@ -7,7 +7,7 @@
 // Copyright (C) 2009 University of Oxford
 //
 /*  CCOPYRIGHT  */
-
+#include "tipl/tipl.hpp"
 #include <cstdlib>
 #include <iostream>
 #include <string>
@@ -251,7 +251,7 @@ NEWIMAGE::volume<float> TopupScan::GetMovementDerivative(unsigned int i,
 
   NEWMAT::ColumnVector x(4);
   x(4) = 1.0;
-  for (int k=0; k<rval.zsize(); k++) {
+  tipl::par_for(rval.zsize(),[&](int k) {
     x(3) = k;
     for (int j=0; j<rval.ysize(); j++) {
       x(2) = j;
@@ -262,7 +262,7 @@ NEWIMAGE::volume<float> TopupScan::GetMovementDerivative(unsigned int i,
         rval(i,j,k) = float(sf[0]*(y2(1)-y1(1))*_derivs[0](i,j,k) + sf[1]*(y2(2)-y1(2))*_derivs[1](i,j,k) + sf[2]*(y2(3)-y1(3))*_derivs[2](i,j,k));
       }
     }
-  }
+  });
   rval /= tiny;
   rval *= GetJacobian(field);
 
