@@ -5,7 +5,7 @@ on:
       tag:
         description: 'Tag'
         required: true
-        default: '2021.11.00'
+        default: '2021.12.00'
         
 jobs:
   build:
