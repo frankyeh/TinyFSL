@@ -1,0 +1,73 @@
+name: BUILD
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag'
+        required: true
+        default: '2021.11.00'
+        
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download FSL
+        run: ./download/download_fsl.bat
+      - name: Patch FSL
+        run: |
+          for /f "delims=" %%x in ('dir patches /b ') do (call patches\%%x)
+        shell: cmd
+        
+      - name: Download TIPL
+        run: |
+          git clone https://github.com/frankyeh/TIPL.git
+          move TIPL include
+          
+      - name: Download Boost
+        run: ./download/download_boost.bat
+        
+      - name: Download OpenBLAS
+        run: ./download/download_openblas.bat
+        
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v2
+        with:
+          version: 5.12.0
+
+      - name: Compile Programs 
+        run: |
+          for /f "usebackq delims=#" %%a in (`"%programfiles(x86)%\Microsoft Visual Studio\Installer\vswhere" -latest -property installationPath`) do call "%%a\Common7\Tools\VsDevCmd.bat" -arch=x64
+          mkdir -p build
+          cd build
+          qmake ../eddy.pro QMAKE_LIBDIR=${{ github.workspace }}/lib
+          nmake
+          qmake ../topup.pro QMAKE_LIBDIR=${{ github.workspace }}/lib
+          nmake
+          qmake ../applytopup.pro QMAKE_LIBDIR=${{ github.workspace }}/lib
+          nmake
+          qmake ../bet2.pro QMAKE_LIBDIR=${{ github.workspace }}/lib
+          nmake
+        shell: cmd
+        
+      - name: Packaging
+        run: |
+          mkdir win_fsl
+          move build\release\*.exe win_fsl
+          move bin\*.dll win_fsl
+          windeployqt win_fsl\eddy.exe
+          
+      - name: Zip Package
+        uses: TheDoctor0/zip-release@0.6.0
+        with:
+          filename: win_fsl.zip
+          exclusions: .git
+          path: win_fsl          
+          
+      - name: Create Release
+        uses: ncipollo/release-action@v1.8.9
+        with:
+          allowUpdates: true
+          artifacts: "*.zip"
+          tag: ${{ github.event.inputs.tag }}
+          prerelease: false  
