@@ -278,7 +278,8 @@ namespace NEWIMAGE {
   ShadowVolume<T> volume<T>::operator[](const int64_t t) {
     if ( !in_bounds(t) )
        imthrow("Invalid t index in [] operator",61);
-    ShadowVolume<T> newShadowVolume(constSubVolume(t));
+    ShadowVolume<T> newShadowVolume;
+    ((volume<T>*)&newShadowVolume)->initialize(xsize(),ysize(),zsize(),Data+t*nvoxels(),false);
     newShadowVolume.copyproperties(*this);
     return newShadowVolume;
   }
@@ -287,7 +288,8 @@ namespace NEWIMAGE {
   const ShadowVolume<T> volume<T>::operator[](const int64_t t) const {
     if ( !in_bounds(t) )
        imthrow("Invalid t index in [] operator",61);
-    ShadowVolume<T> newShadowVolume(constSubVolume(t));
+    ShadowVolume<T> newShadowVolume;
+    ((volume<T>*)&newShadowVolume)->initialize(xsize(),ysize(),zsize(),Data+t*nvoxels(),false);
     newShadowVolume.copyproperties(*this);
     return newShadowVolume;
   }

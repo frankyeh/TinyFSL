@@ -191,7 +191,8 @@ int readGeneralVolume(volume<T>& target, const std::string& filename,
 #ifdef EXPOSE_TREACHEROUS
   public:
 #endif
-    // sampling_mat should now be avoided - use newimagevox2mm_mat instead
+  public:
+    //sampling_mat should now be avoided - use newimagevox2mm_mat instead
     std::vector<NiftiIO::NiftiExtension> extensions;
     bool RadiologicalFile;
     NEWMAT::Matrix sampling_mat() const;
@@ -608,10 +609,10 @@ class ShadowVolume : public volume<T> {
     void setinterpolationmethod(interpolation interp) const { imthrow("Called private shadow method",101); }
     void setextrapolationmethod(extrapolation extrapmethod) const { imthrow("Called private shadow method",101); }
     bool assigned;
-    ShadowVolume() : assigned(false) {};
     virtual int initialize(int64_t xsize, int64_t ysize, int64_t zsize, int64_t tsize, int64_t d5, int64_t d6, int64_t d7, T *d, bool d_owner);
   public:
     const volume<T>& equals(const volume<T>& source);
+    ShadowVolume() : assigned(false) {};
     ShadowVolume(const ShadowVolume<T>& source) : assigned(false) { this->reinitialize(source,ALIAS); }
     ShadowVolume(const volume<T>& source) : assigned(false) { this->reinitialize(source,ALIAS); }
 };
