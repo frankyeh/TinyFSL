@@ -16,7 +16,7 @@ jobs:
         run: ./download/download_fsl.bat
       - name: Patch FSL
         run: |
-          for /f "delims=" %%x in ('dir patches /b ') do (call patches\%%x)
+          for /f "delims=" %%x in ('dir patches\*.bat /b ') do (call patches\%%x)
         shell: cmd
         
       - name: Download TIPL
