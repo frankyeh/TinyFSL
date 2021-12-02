@@ -1,6 +1,8 @@
 # Tiny FSL
 A simplified redistribution of FSL package
 
+Parent package: FMRIB Software Library v6.0 (version 2111)
+
 ## License
 TinyFSL follows the original FSL license https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence given non-commercial usage.
 
