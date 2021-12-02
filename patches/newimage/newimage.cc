@@ -98,6 +98,22 @@ namespace NEWIMAGE {
  template <class T>
   int volume<T>::initialize(int64_t xsize, int64_t ysize, int64_t zsize, int64_t tsize, int64_t d5, int64_t d6, int64_t d7, T *d, bool d_owner)
   {
+    size_t new_size = xsize*ysize*zsize*tsize*d5*d6*d7;
+    // not need to reallocate memory
+    if(Data && !d && data_owner && new_size == nElements && nElements)
+    {
+        SlicesZ = zsize;
+        RowsY = ysize;
+        ColumnsX = xsize;
+        dim4=tsize;
+        dim5=d5;
+        dim6=d6;
+        dim7=d7;
+        nElements= new_size;
+        no_voxels = xsize*ysize*zsize;
+        setdefaultproperties();
+        return 0;
+    }
     this->destroy(); //Destroy will NULL Data/End and data_owner
     SlicesZ = zsize;
     RowsY = ysize;
@@ -106,7 +122,7 @@ namespace NEWIMAGE {
     dim5=d5;
     dim6=d6;
     dim7=d7;
-    nElements=xsize*ysize*zsize*tsize*d5*d6*d7;
+    nElements= new_size;
     no_voxels = xsize*ysize*zsize;
     // decide whether to allocate new memory or not, depending on validity of pointer
     if (nElements > 0) {
