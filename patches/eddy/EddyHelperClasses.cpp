@@ -19,7 +19,7 @@
 #include "miscmaths/miscmaths.h"
 #include "EddyHelperClasses.h"
 #include "EddyUtils.h"
-
+#include "tipl/tipl.hpp"
 using namespace std;
 using namespace EDDY;
 
@@ -190,8 +190,7 @@ std::vector<unsigned int> AcqPara::BinarisedPhaseEncodeVector() const EddyTry
 DiffStats::DiffStats(const NEWIMAGE::volume<float>& diff, const NEWIMAGE::volume<float>& mask) EddyTry
 : _md(diff.zsize(),0.0), _msd(diff.zsize(),0.0), _n(mask.zsize(),0)
 {
-#pragma omp parallel for // shared(diff,mask,_md,_msd,_n) private(j,k)
-  for (int k=0; k<diff.zsize(); k++) {
+  tipl::par_for (diff.zsize(),[&](int k) {
     for (int j=0; j<diff.ysize(); j++) {
       for (int i=0; i<diff.xsize(); i++) {
 	if (mask(i,j,k)) {
@@ -202,7 +201,7 @@ DiffStats::DiffStats(const NEWIMAGE::volume<float>& diff, const NEWIMAGE::volume
       }
     }
     if (_n[k]) { _md[k] /= double(_n[k]); _msd[k] /= double(_n[k]); }
-  }
+  });
 } EddyCatch
 
 MultiBandGroups::MultiBandGroups(unsigned int nsl,
