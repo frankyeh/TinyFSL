@@ -1945,17 +1945,16 @@ void ECScanManager::write_jac_registered_images(const std::string& fname,
     if (maskfname.size()) mask_4D[s] = tmpmask;
   }
   #else
-  // For some reason the omp parallel below can cause a multiple free() race condition
-  // # pragma omp parallel for shared(ovol,mask_4D)
-  for (unsigned int i=0; i<NScans(st); i++) {
+  std::mutex m;
+  tipl::par_for (NScans(st),[&](unsigned int i) {
     NEWIMAGE::volume<float> tmp = GetUnwarpedScan(i,tmpmask,st) / ScaleFactor();
-    // # pragma omp critical
     {
+      std::lock_guard<std::mutex> lock(m);
       ovol[i] = tmp;
       omask *= tmpmask;
       if (maskfname.size()) mask_4D[i] = tmpmask;
     }
-  }
+  });
   #endif
   if (mask_output) ovol *= omask;
   NEWIMAGE::write_volume(ovol,fname);
@@ -1997,30 +1996,28 @@ void ECScanManager::write_jac_registered_images(const std::string&              
   }
   #else
   if (this->IsSliceToVol()) { // Use predictions to support slice-to-vol resampling
-    // For some reason the omp parallel below can cause a multiple free() race condition
-    // # pragma omp parallel for shared(ovol,mask_4D)
-    for (unsigned int s=0; s<NScans(st); s++) {
+    std::mutex m;
+    tipl::par_for (NScans(st),[&](unsigned int s) {
       NEWIMAGE::volume<float> tmp = GetUnwarpedScan(s,pred[s],tmpmask,st) / ScaleFactor();
-      // # pragma omp critical
       {
+        std::lock_guard<std::mutex> lock(m);
 	ovol[s] = tmp;
 	omask *= tmpmask;
 	if (maskfname.size()) mask_4D[s] = tmpmask;
       }
-    }
+    });
   }
   else {
-    // For some reason the omp parallel below can cause a multiple free() race condition
-    // # pragma omp parallel for shared(ovol)
-    for (unsigned int s=0; s<NScans(st); s++) {
+    std::mutex m;
+    tipl::par_for (NScans(st),[&](unsigned int s) {
       NEWIMAGE::volume<float> tmp = GetUnwarpedScan(s,tmpmask,st) / ScaleFactor();
-      // # pragma omp critical
       {
-	ovol[s] = tmp;
+          std::lock_guard<std::mutex> lock(m);
+    ovol[s] = tmp;
 	omask *= tmpmask;
 	if (maskfname.size()) mask_4D[s] = tmpmask;
       }
-    }
+    });
   }
   #endif
   if (mask_output) ovol *= omask;
