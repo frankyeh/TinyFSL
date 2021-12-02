@@ -38,7 +38,7 @@ namespace NEWIMAGE {
                        boundsassert, boundsexception, userextrapolation };
 
   enum interpolation { nearestneighbour, trilinear, sinc, userkernel,
-		       userinterpolation, spline };
+                       userinterpolation, spline };
 
   enum threshtype { inclusive , exclusive };
 
@@ -87,9 +87,9 @@ template<class T> class volume;
 
 template <class T>
 int readGeneralVolume(volume<T>& target, const std::string& filename,
-		  short& dtype, const bool swap2radiological=true,
-		  int64_t x0 = -1, int64_t y0 = -1, int64_t z0 = -1, int64_t t0 = -1, int64_t d50 = -1, int64_t d60 = -1, int64_t d70 = -1,
-		  int64_t x1 = -1, int64_t y1 = -1, int64_t z1 = -1, int64_t t1 = -1, int64_t d51 = -1, int64_t d61 = -1, int64_t d71 = -1,
+                  short& dtype, const bool swap2radiological=true,
+                  int64_t x0 = -1, int64_t y0 = -1, int64_t z0 = -1, int64_t t0 = -1, int64_t d50 = -1, int64_t d60 = -1, int64_t d70 = -1,
+                  int64_t x1 = -1, int64_t y1 = -1, int64_t z1 = -1, int64_t t1 = -1, int64_t d51 = -1, int64_t d61 = -1, int64_t d71 = -1,
       const bool readAs4D=false);
 
 #pragma interface
@@ -168,7 +168,7 @@ int readGeneralVolume(volume<T>& target, const std::string& filename,
     void enforcelimits(std::vector<int>& lims) const;
     const T& extrapolate(int64_t x, int64_t y, int64_t z) const;
     float kernelinterpolation(const float x, const float y,
-			      const float z) const;
+                              const float z) const;
     float splineinterpolate(float x, float y, float z) const;
     float spline_interp1partial(float x, float y, float z, int dir, float *deriv) const;
     float spline_interp3partial(float x, float y, float z, float *dfdx, float *dfdy, float *dfdz) const;
@@ -178,10 +178,10 @@ int readGeneralVolume(volume<T>& target, const std::string& filename,
 
     template <class S> friend
     int readGeneralVolume(volume<S>& target, const std::string& filename,
-		    short& dtype, const bool swap2radiological,
-		    int64_t x0, int64_t y0, int64_t z0, int64_t t0, int64_t d50, int64_t d60, int64_t d70,
-		    int64_t x1, int64_t y1, int64_t z1, int64_t t1, int64_t d51, int64_t d61, int64_t d71,
-		    const bool readAs4D);
+                    short& dtype, const bool swap2radiological,
+                    int64_t x0, int64_t y0, int64_t z0, int64_t t0, int64_t d50, int64_t d60, int64_t d70,
+                    int64_t x1, int64_t y1, int64_t z1, int64_t t1, int64_t d51, int64_t d61, int64_t d71,
+                    const bool readAs4D);
 
     template <class S> friend
       int read_volume_hdr_only(volume<S>&, const std::string&);
@@ -313,7 +313,7 @@ int readGeneralVolume(volume<T>& target, const std::string& filename,
     NEWMAT::ReturnMatrix matrix(const volume<T>& mask, std::vector<int64_t>& voxelLabels) const;
     NEWMAT::ReturnMatrix matrix() const;
     void setmatrix(const NEWMAT::Matrix& newmatrix, const volume<T>& mask,
-		   const T pad=0, bool using_mask=true);
+                   const T pad=0, bool using_mask=true);
     void setmatrix(const NEWMAT::Matrix& newmatrix);
     volume<int> vol2matrixkey(const volume<T>& mask); //returns a volume with numbers in relating to matrix colnumbers
     NEWMAT::ReturnMatrix matrix2volkey(volume<T>& mask);
@@ -336,7 +336,7 @@ int readGeneralVolume(volume<T>& target, const std::string& filename,
     double sumsquares() const;
     double mean() const { return sum()/(MISCMATHS::Max(1.0,(double)totalElements()));}
     double variance() const { double n(totalElements());
-		return (n/(n-1))*(sumsquares()/n - mean()*mean()); }
+                return (n/(n-1))*(sumsquares()/n - mean()*mean()); }
     double stddev() const { return sqrt(variance()); }
     T robustmin() const;
     T robustmax() const;
@@ -378,7 +378,7 @@ int readGeneralVolume(volume<T>& target, const std::string& filename,
     template<class A, class B, class C>
     inline bool in_bounds( A x, B y, C z) const {
       if ( boost::is_integral<A>::value && boost::is_integral<B>::value && boost::is_integral<C>::value )
-	return ( (x>=0) && (y>=0) && (z>=0) && (x<ColumnsX) && (y<RowsY) && (z<SlicesZ) );
+        return ( (x>=0) && (y>=0) && (z>=0) && (x<ColumnsX) && (y<RowsY) && (z<SlicesZ) );
       return ( (floor(x)>=0) && (floor(y)>=0) && (floor(z)>=0) && (ceil(x)<ColumnsX) && (ceil(y)<RowsY) && (ceil(z)<SlicesZ) );
     }
 
@@ -416,20 +416,20 @@ int readGeneralVolume(volume<T>& target, const std::string& filename,
 
     inline T& operator()(int64_t x, int64_t y, int64_t z) {
       this->invalidateSplines();
-	    if (in_bounds(x,y,z)) return *(basicptr(x,y,z));
-	    else                  return const_cast<T& > (extrapolate(x,y,z));
+            if (in_bounds(x,y,z)) return *(basicptr(x,y,z));
+            else                  return const_cast<T& > (extrapolate(x,y,z));
     }
 
     inline const T& operator()(int64_t x, int64_t y, int64_t z) const {
       if (in_bounds(x,y,z)) return *(basicptr(x,y,z));
-	        else                  return extrapolate(x,y,z);
+                else                  return extrapolate(x,y,z);
     }
 
    inline T& operator()(int64_t x, int64_t y, int64_t z, int64_t t) {
       this->invalidateSplines();
       if (!in_bounds(t)) imthrow("Out of Bounds (time index)",5);
       else if (!in_bounds(x,y,z)) return const_cast<T& > (operator[](t).extrapolate(x,y,z));
-	    return *(Data + ((zsize()*t + z)*ysize() + y)*xsize() + x);
+            return *(Data + ((zsize()*t + z)*ysize() + y)*xsize() + x);
     }
 
     inline const T& operator()(int64_t x, int64_t y, int64_t z, int64_t t) const
@@ -522,23 +522,23 @@ int readGeneralVolume(volume<T>& target, const std::string& filename,
     void defineuserinterpolation(float (*interp)(
              const volume<T>& , float, float, float)) const;
     void definekernelinterpolation(const NEWMAT::ColumnVector& kx,
-				   const NEWMAT::ColumnVector& ky,
-				   const NEWMAT::ColumnVector& kz,
-				   int wx, int wy, int wz) const;  // full-width
+                                   const NEWMAT::ColumnVector& ky,
+                                   const NEWMAT::ColumnVector& kz,
+                                   int wx, int wy, int wz) const;  // full-width
     void definekernelinterpolation(const volume<T>& vol) const;
     void definesincinterpolation(const std::string& sincwindowtype,
-				 int w, int nstore=1201) const;  // full-width
+                                 int w, int nstore=1201) const;  // full-width
     void definesincinterpolation(const std::string& sincwindowtype,
-				 int wx, int wy, int wz, int nstore=1201) const;
+                                 int wx, int wy, int wz, int nstore=1201) const;
                                   // full-width
 
     inline void getneighbours(int64_t x, int64_t y, int64_t z,
-			      T &v000, T &v001, T &v010,
-			      T &v011, T &v100, T &v101,
-			      T &v110, T &v111) const;
+                              T &v000, T &v001, T &v010,
+                              T &v011, T &v100, T &v101,
+                              T &v110, T &v111) const;
     inline void getneighbours(int64_t x, int64_t y, int64_t z,
-			      T &v000, T &v010,
-			      T &v100, T &v110) const;
+                              T &v000, T &v010,
+                              T &v100, T &v110) const;
 
 
 
@@ -729,9 +729,9 @@ public:
 
   template <class T>
   inline void volume<T>::getneighbours(int64_t x, int64_t y, int64_t z,
-					    T &v000, T &v001, T &v010,
-					    T &v011, T &v100, T &v101,
-					    T &v110, T &v111) const {
+                                            T &v000, T &v001, T &v010,
+                                            T &v011, T &v100, T &v101,
+                                            T &v110, T &v111) const {
     T *ptr = basicptr(x,y,z);
     v000 = *ptr;
     ptr++;
@@ -753,8 +753,8 @@ public:
 
   template <class T>
   inline void volume<T>::getneighbours(int64_t x, int64_t y, int64_t z,
-					    T &v000, T &v010,
-					    T &v100, T &v110) const {
+                                            T &v000, T &v010,
+                                            T &v100, T &v110) const {
     T *ptr = basicptr(x,y,z);
     v000 = *ptr;
     ptr++;
@@ -944,7 +944,7 @@ public:
 
   template <class S>
   bool operator==(const volume<S>& v1,
-		  const volume<S>& v2)
+                  const volume<S>& v2)
   {
     // Check relevant parts of header
     if (!samesize(v1,v2,true)) return(false);
