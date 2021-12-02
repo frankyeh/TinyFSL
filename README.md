@@ -4,12 +4,23 @@ A simplified redistribution of FSL package
 ## License
 TinyFSL is redistributed under the original FSL license https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence given non-commercial usage.
 
-## Currently available programs
+## Currently Available Programs
 
-* eddy.exe (improved multi-core version)
-* topup.exe
-* applytopup.exe
-* bet2.exe
+- [x] [eddy](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/eddy)
+
+The eddy in TinyFSL have more multi-core support than the original eddy_openmp version. There are four places in eddy_openmp that cannot be parallelized due to free() error. The one in TidyFSL does not have this problem.
+  
+- [x] [topup](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/topup/TopupUsersGuide)
+
+The topup in TidyFSL supports multi-core. (The one in original FSL does not)
+
+- [x] [applytopup](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/topup/ExampleTopupFollowedByApplytopup)
+
+Same as the original package
+
+- [x] [bet2](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/BET/UserGuide)
+
+Same as the original package
 
 ## Installation
 
