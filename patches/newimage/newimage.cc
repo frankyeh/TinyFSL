@@ -45,15 +45,15 @@ namespace NEWIMAGE {
 
   template < class T, class V>
   std::vector<T> calc_percentiles(const volume<T>& vol, const volume<T>& mask,
-				  const std::vector<float>& percentilepvals);
+                                  const std::vector<float>& percentilepvals);
 
   template <class T, class V>
   int64_t imageHistogram(const volume<T>& vol, const int bins,
-			 const T min, const T max, ColumnVector& hist, const volume<V>& mask);
+                         const T min, const T max, ColumnVector& hist, const volume<V>& mask);
 
   template <class T, class V>
   int64_t imageHistogram(const volume<T>& vol, const int bins,
-			 const T min, const T max, ColumnVector& hist);
+                         const T min, const T max, ColumnVector& hist);
 
   // Declaration of helper functions.
 
@@ -111,16 +111,16 @@ namespace NEWIMAGE {
     // decide whether to allocate new memory or not, depending on validity of pointer
     if (nElements > 0) {
       if (d != NULL) {
-	      Data = d;
-	      DataEnd = d+nElements;
-	      data_owner = d_owner;
+              Data = d;
+              DataEnd = d+nElements;
+              data_owner = d_owner;
       } else {
-	      try {
-	        Data = new T[nElements];
-	        DataEnd = Data+nElements;
-	      } catch(...) { Data=NULL; DataEnd=NULL;}
-	      if (Data==NULL) { imthrow("Out of memory",99); }
-	      data_owner = true;
+              try {
+                Data = new T[nElements];
+                DataEnd = Data+nElements;
+              } catch(...) { Data=NULL; DataEnd=NULL;}
+              if (Data==NULL) { imthrow("Out of memory",99); }
+              data_owner = true;
       }
     }
     setdefaultproperties();
@@ -260,7 +260,7 @@ namespace NEWIMAGE {
       sourcePtr=source.Data;
     this->initialize(source.xsize(),source.ysize(),source.zsize(),source.tsize(),source.size5(),source.size6(),source.size7(),sourcePtr,false);
     if ( mode == CLONE )
-	    this->copydata(source);
+            this->copydata(source);
     this->copyproperties(source);
   }
 
@@ -432,10 +432,10 @@ namespace NEWIMAGE {
     ColumnVector ovec(xsize()*ysize()*zsize());
     for (int vindx=0,k=0; k<zsize(); k++) {
       for (int j=0; j<ysize(); j++) {
-	for (int i=0; i<xsize(); i++) {
+        for (int i=0; i<xsize(); i++) {
           ovec.element(vindx) = (mask(i,j,k)>0) ? (*this)(i,j,k) : 0.0;
           vindx++;
-	}
+        }
       }
     }
     ovec.Release();
@@ -451,10 +451,10 @@ namespace NEWIMAGE {
     ColumnVector ovec(xsize()*ysize()*zsize());
     for (int vindx=0, k=0; k<zsize(); k++) {
       for (int j=0; j<ysize(); j++) {
-	for (int i=0; i<xsize(); i++) {
+        for (int i=0; i<xsize(); i++) {
           ovec.element(vindx) = (*this)(i,j,k);
           vindx++;
-	}
+        }
       }
     }
     ovec.Release();
@@ -477,10 +477,10 @@ namespace NEWIMAGE {
     }
     for (int vindx=0, k=0; k<zsize(); k++) {
       for (int j=0; j<ysize(); j++) {
-	for (int i=0; i<xsize(); i++) {
-	  (*this)(i,j,k) = (mask(i,j,k) > 0) ? ((T) pvec.element(vindx)) : ((T) 0);
+        for (int i=0; i<xsize(); i++) {
+          (*this)(i,j,k) = (mask(i,j,k) > 0) ? ((T) pvec.element(vindx)) : ((T) 0);
           vindx++;
-	}
+        }
       }
     }
   }
@@ -493,10 +493,10 @@ namespace NEWIMAGE {
     }
     for (int vindx=0, k=0; k<zsize(); k++) {
       for (int j=0; j<ysize(); j++) {
-	for (int i=0; i<xsize(); i++) {
-	  (*this)(i,j,k) = ((T) pvec.element(vindx));
+        for (int i=0; i<xsize(); i++) {
+          (*this)(i,j,k) = ((T) pvec.element(vindx));
           vindx++;
-	}
+        }
       }
     }
   }
@@ -518,8 +518,8 @@ namespace NEWIMAGE {
       p_interpmethod = interpmethod;
       // define a default sinc kernel if no kernel has previously been defined
       if ( (interpmethod == sinc) && (interpkernel.kernelvals()==0) ) {
-	string sincwindowtype = "blackman";
-	this->definesincinterpolation(sincwindowtype,7);
+        string sincwindowtype = "blackman";
+        this->definesincinterpolation(sincwindowtype,7);
       }
     }
 
@@ -535,13 +535,13 @@ namespace NEWIMAGE {
   template <class T>
   bool in_neigh_bounds(const volume<T>& vol, int64_t x, int64_t y, int64_t z)
     {  return ( (x>=0) && (y>=0) && (z>=0) &&
-		(x<(vol.xsize()-1)) && (y<(vol.ysize()-1)) &&
-		(z<(vol.zsize()-1)) ); }
+                (x<(vol.xsize()-1)) && (y<(vol.ysize()-1)) &&
+                (z<(vol.zsize()-1)) ); }
 
   inline float q_tri_interpolation(float v000, float v001, float v010,
-				   float v011, float v100, float v101,
-				   float v110, float v111,
-				   float dx, float dy, float dz)
+                                   float v011, float v100, float v101,
+                                   float v110, float v111,
+                                   float dx, float dy, float dz)
 
     {
       float temp1, temp2, temp3, temp4, temp5, temp6;
@@ -560,13 +560,13 @@ namespace NEWIMAGE {
 
   template <class T>
   float volume<T>::kernelinterpolation(const float x, const float y,
-				       const float z) const
+                                       const float z) const
   {
     const kernelstorage* storedkernel = interpkernel.kernelvals();
     // sanity check on kernel
     if (storedkernel==0) {
       cerr << "ERROR: Must set kernel parameters before using interpolation!"
-	   << endl;
+           << endl;
       return (float) extrapolate(0,0,0);
     }
 
@@ -602,15 +602,15 @@ namespace NEWIMAGE {
     for (int64_t z1=iz0-wz; z1<=iz0+wz; z1++) {
       zj=iz0-z1+wz;
       for (int64_t y1=iy0-wy; y1<=iy0+wy; y1++) {
-	yj=iy0-y1+wy;
-	for (int64_t x1=ix0-wx; x1<=ix0+wx; x1++) {
-	  if (in_bounds(x1,y1,z1)) {
-	    xj=ix0-x1+wx;
-	    float kerfac = storex[xj] * storey[yj] * storez[zj];
-	    convsum += this->operator()(x1,y1,z1) * kerfac;
-	    kersum += kerfac;
-	  }
-	}
+        yj=iy0-y1+wy;
+        for (int64_t x1=ix0-wx; x1<=ix0+wx; x1++) {
+          if (in_bounds(x1,y1,z1)) {
+            xj=ix0-x1+wx;
+            float kerfac = storex[xj] * storey[yj] * storez[zj];
+            convsum += this->operator()(x1,y1,z1) * kerfac;
+            kersum += kerfac;
+          }
+        }
       }
     }
 
@@ -653,21 +653,21 @@ namespace NEWIMAGE {
       float dz = z - ((float) iz);
       float v000, v001, v010, v011, v100, v101, v110, v111;
       if (!in_neigh_bounds(*this,ix,iy,iz)) {   // We'll have to do some extrapolation
-	v000 = (float) this->operator()(ix,iy,iz);
-	v001 = (float) this->operator()(ix,iy,iz+1);
-	v010 = (float) this->operator()(ix,iy+1,iz);
-	v011 = (float) this->operator()(ix,iy+1,iz+1);
-	v100 = (float) this->operator()(ix+1,iy,iz);
-	v101 = (float) this->operator()(ix+1,iy,iz+1);
-	v110 = (float) this->operator()(ix+1,iy+1,iz);
-	v111 = (float) this->operator()(ix+1,iy+1,iz+1);
+        v000 = (float) this->operator()(ix,iy,iz);
+        v001 = (float) this->operator()(ix,iy,iz+1);
+        v010 = (float) this->operator()(ix,iy+1,iz);
+        v011 = (float) this->operator()(ix,iy+1,iz+1);
+        v100 = (float) this->operator()(ix+1,iy,iz);
+        v101 = (float) this->operator()(ix+1,iy,iz+1);
+        v110 = (float) this->operator()(ix+1,iy+1,iz);
+        v111 = (float) this->operator()(ix+1,iy+1,iz+1);
       }
       else {
-	T t000, t001, t010, t011, t100, t101, t110, t111;
-	this->getneighbours(ix,iy,iz,t000,t001,t010,t011,t100,t101,t110,t111);
-	v000 = ((float) t000); v001 = ((float) t001); v010 = ((float) t010);
-	v011 = ((float) t011); v100 = ((float) t100); v101 = ((float) t101);
-	v110 = ((float) t110); v111 = ((float) t111);
+        T t000, t001, t010, t011, t100, t101, t110, t111;
+        this->getneighbours(ix,iy,iz,t000,t001,t010,t011,t100,t101,t110,t111);
+        v000 = ((float) t000); v001 = ((float) t001); v010 = ((float) t010);
+        v011 = ((float) t011); v100 = ((float) t100); v101 = ((float) t101);
+        v110 = ((float) t110); v111 = ((float) t111);
       }
       // The (seemingly silly) code multiplication below is to
       // ensure that in no case does calculating one of the partials
@@ -676,37 +676,37 @@ namespace NEWIMAGE {
       float tmp11, tmp12, tmp13, tmp14;
       float tmp21, tmp22;
       if (dir == 0) {            // df/dx
-	float onemdz = 1.0-dz;
-	tmp11 = onemdz*v000 + dz*v001;
-	tmp12 = onemdz*v010 + dz*v011;
-	tmp13 = onemdz*v100 + dz*v101;
-	tmp14 = onemdz*v110 + dz*v111;
-	tmp21 = (1.0-dy)*tmp11 + dy*tmp12;
-	tmp22 = (1.0-dy)*tmp13 + dy*tmp14;
-	*pderiv = tmp22 - tmp21;
-	return((1.0-dx)*tmp21 + dx*tmp22);
+        float onemdz = 1.0-dz;
+        tmp11 = onemdz*v000 + dz*v001;
+        tmp12 = onemdz*v010 + dz*v011;
+        tmp13 = onemdz*v100 + dz*v101;
+        tmp14 = onemdz*v110 + dz*v111;
+        tmp21 = (1.0-dy)*tmp11 + dy*tmp12;
+        tmp22 = (1.0-dy)*tmp13 + dy*tmp14;
+        *pderiv = tmp22 - tmp21;
+        return((1.0-dx)*tmp21 + dx*tmp22);
       }
       else if (dir == 1) {       // df/dy
-	float onemdz = 1.0-dz;
-	tmp11 = onemdz*v000 + dz*v001;
-	tmp12 = onemdz*v010 + dz*v011;
-	tmp13 = onemdz*v100 + dz*v101;
-	tmp14 = onemdz*v110 + dz*v111;
-	tmp21 = (1.0-dx)*tmp11 + dx*tmp13;
-	tmp22 = (1.0-dx)*tmp12 + dx*tmp14;
-	*pderiv = tmp22 - tmp21;
-	return((1.0-dy)*tmp21 + dy*tmp22);
+        float onemdz = 1.0-dz;
+        tmp11 = onemdz*v000 + dz*v001;
+        tmp12 = onemdz*v010 + dz*v011;
+        tmp13 = onemdz*v100 + dz*v101;
+        tmp14 = onemdz*v110 + dz*v111;
+        tmp21 = (1.0-dx)*tmp11 + dx*tmp13;
+        tmp22 = (1.0-dx)*tmp12 + dx*tmp14;
+        *pderiv = tmp22 - tmp21;
+        return((1.0-dy)*tmp21 + dy*tmp22);
       }
       else if (dir == 2) {       // df/dz
-	float onemdy = 1.0-dy;
-	tmp11 = onemdy*v000 + dy*v010;
-	tmp12 = onemdy*v001 + dy*v011;
-	tmp13 = onemdy*v100 + dy*v110;
-	tmp14 = onemdy*v101 + dy*v111;
-	tmp21 = (1.0-dx)*tmp11 + dx*tmp13;
-	tmp22 = (1.0-dx)*tmp12 + dx*tmp14;
-	*pderiv = tmp22 - tmp21;
-	return((1.0-dz)*tmp21 + dz*tmp22);
+        float onemdy = 1.0-dy;
+        tmp11 = onemdy*v000 + dy*v010;
+        tmp12 = onemdy*v001 + dy*v011;
+        tmp13 = onemdy*v100 + dy*v110;
+        tmp14 = onemdy*v101 + dy*v111;
+        tmp21 = (1.0-dx)*tmp11 + dx*tmp13;
+        tmp22 = (1.0-dx)*tmp12 + dx*tmp14;
+        *pderiv = tmp22 - tmp21;
+        return((1.0-dz)*tmp21 + dz*tmp22);
       }
     }
     else if (getinterpolationmethod() == spline) {
@@ -734,21 +734,21 @@ namespace NEWIMAGE {
       float dz = z - ((float) iz);
       float v000, v001, v010, v011, v100, v101, v110, v111;
       if (!in_neigh_bounds(*this,ix,iy,iz)) {   // We'll have to do some extrapolation
-	v000 = (float) this->operator()(ix,iy,iz);
-	v001 = (float) this->operator()(ix,iy,iz+1);
-	v010 = (float) this->operator()(ix,iy+1,iz);
-	v011 = (float) this->operator()(ix,iy+1,iz+1);
-	v100 = (float) this->operator()(ix+1,iy,iz);
-	v101 = (float) this->operator()(ix+1,iy,iz+1);
-	v110 = (float) this->operator()(ix+1,iy+1,iz);
-	v111 = (float) this->operator()(ix+1,iy+1,iz+1);
+        v000 = (float) this->operator()(ix,iy,iz);
+        v001 = (float) this->operator()(ix,iy,iz+1);
+        v010 = (float) this->operator()(ix,iy+1,iz);
+        v011 = (float) this->operator()(ix,iy+1,iz+1);
+        v100 = (float) this->operator()(ix+1,iy,iz);
+        v101 = (float) this->operator()(ix+1,iy,iz+1);
+        v110 = (float) this->operator()(ix+1,iy+1,iz);
+        v111 = (float) this->operator()(ix+1,iy+1,iz+1);
       }
       else {
-	T t000, t001, t010, t011, t100, t101, t110, t111;
-	this->getneighbours(ix,iy,iz,t000,t001,t010,t011,t100,t101,t110,t111);
-	v000 = ((float) t000); v001 = ((float) t001); v010 = ((float) t010);
-	v011 = ((float) t011); v100 = ((float) t100); v101 = ((float) t101);
-	v110 = ((float) t110); v111 = ((float) t111);
+        T t000, t001, t010, t011, t100, t101, t110, t111;
+        this->getneighbours(ix,iy,iz,t000,t001,t010,t011,t100,t101,t110,t111);
+        v000 = ((float) t000); v001 = ((float) t001); v010 = ((float) t010);
+        v011 = ((float) t011); v100 = ((float) t100); v101 = ((float) t101);
+        v110 = ((float) t110); v111 = ((float) t111);
       }
       //
       // And do linear interpolation with calculation of all partials
@@ -856,42 +856,42 @@ namespace NEWIMAGE {
       int64_t ix, iy, iz;
       switch (p_interpmethod) {
       case userinterpolation:
-	if (p_userinterp == 0) {
-	  imthrow("No user interpolation method set",7);
-	} else {
-	  return (*p_userinterp)(*this,x,y,z);
-	}
+        if (p_userinterp == 0) {
+          imthrow("No user interpolation method set",7);
+        } else {
+          return (*p_userinterp)(*this,x,y,z);
+        }
       case nearestneighbour:
-	ix=MISCMATHS::round(x); iy=MISCMATHS::round(y); iz=MISCMATHS::round(z);
-	return this->operator()(ix,iy,iz);
+        ix=MISCMATHS::round(x); iy=MISCMATHS::round(y); iz=MISCMATHS::round(z);
+        return this->operator()(ix,iy,iz);
       case trilinear:
-	{
-	  ix=(int64_t) floor(x); iy=(int64_t) floor(y); iz=(int64_t) floor(z);
-	  if (in_neigh_bounds(*this,ix,iy,iz)) return interpolatevalue(x,y,z);
-	  float dx=x-ix, dy=y-iy, dz=z-iz;
-	  float v000=0, v001=0, v010=0, v011=0, v100=0, v101=0, v110=0, v111=0;
-	  v000 = (float) this->operator()(ix,iy,iz);
-	  v001 = (float) this->operator()(ix,iy,iz+1);
-	  v010 = (float) this->operator()(ix,iy+1,iz);
-	  v011 = (float) this->operator()(ix,iy+1,iz+1);
-	  v100 = (float) this->operator()(ix+1,iy,iz);
-	  v101 = (float) this->operator()(ix+1,iy,iz+1);
-	  v110 = (float) this->operator()(ix+1,iy+1,iz);
-	  v111 = (float) this->operator()(ix+1,iy+1,iz+1);
-	  return q_tri_interpolation(v000,v001,v010,v011,v100,v101,v110,v111,
-				     dx,dy,dz);
-	}
+        {
+          ix=(int64_t) floor(x); iy=(int64_t) floor(y); iz=(int64_t) floor(z);
+          if (in_neigh_bounds(*this,ix,iy,iz)) return interpolatevalue(x,y,z);
+          float dx=x-ix, dy=y-iy, dz=z-iz;
+          float v000=0, v001=0, v010=0, v011=0, v100=0, v101=0, v110=0, v111=0;
+          v000 = (float) this->operator()(ix,iy,iz);
+          v001 = (float) this->operator()(ix,iy,iz+1);
+          v010 = (float) this->operator()(ix,iy+1,iz);
+          v011 = (float) this->operator()(ix,iy+1,iz+1);
+          v100 = (float) this->operator()(ix+1,iy,iz);
+          v101 = (float) this->operator()(ix+1,iy,iz+1);
+          v110 = (float) this->operator()(ix+1,iy+1,iz);
+          v111 = (float) this->operator()(ix+1,iy+1,iz+1);
+          return q_tri_interpolation(v000,v001,v010,v011,v100,v101,v110,v111,
+                                     dx,dy,dz);
+        }
       case sinc:
       case userkernel:
-	{
-	  return kernelinterpolation(x,y,z);
-	}
+        {
+          return kernelinterpolation(x,y,z);
+        }
       case spline:
         {
           return(splineinterpolate(x,y,z));
-	}
+        }
       default:
-	imthrow("Invalid interpolation method",6);
+        imthrow("Invalid interpolation method",6);
       }
       return 0.0;  // Should never get to here
     }
@@ -904,38 +904,38 @@ namespace NEWIMAGE {
       int64_t ix, iy, iz;
       switch (p_interpmethod) {
       case userinterpolation:
-	if (p_userinterp == 0) {
-	  imthrow("No user interpolation method set",7);
-	} else {
-	  return (*p_userinterp)(*this,x,y,z);
-	}
+        if (p_userinterp == 0) {
+          imthrow("No user interpolation method set",7);
+        } else {
+          return (*p_userinterp)(*this,x,y,z);
+        }
       case nearestneighbour:
-	ix=MISCMATHS::round(x); iy=MISCMATHS::round(y); iz=MISCMATHS::round(z);
-	return value(ix,iy,iz);
+        ix=MISCMATHS::round(x); iy=MISCMATHS::round(y); iz=MISCMATHS::round(z);
+        return value(ix,iy,iz);
       case trilinear:
-	{
-	  ix=(int64_t) floor(x); iy=(int64_t) floor(y); iz=(int64_t) floor(z);
-	  float dx=x-ix, dy=y-iy, dz=z-iz;
-	  T t000=0, t001=0, t010=0, t011=0, t100=0, t101=0, t110=0, t111=0;
-	  float v000, v001, v010, v011, v100, v101, v110, v111;
-	  this->getneighbours(ix,iy,iz,t000,t001,t010,t011,t100,t101,t110,t111);
-	  v000=(float) t000; v001=(float) t001; v010=(float) t010;
-	  v011=(float) t011; v100=(float) t100; v101=(float) t101;
-	  v110=(float) t110; v111=(float) t111;
-	  return q_tri_interpolation(v000,v001,v010,v011,v100,v101,v110,v111,
-				     dx,dy,dz);
-	}
+        {
+          ix=(int64_t) floor(x); iy=(int64_t) floor(y); iz=(int64_t) floor(z);
+          float dx=x-ix, dy=y-iy, dz=z-iz;
+          T t000=0, t001=0, t010=0, t011=0, t100=0, t101=0, t110=0, t111=0;
+          float v000, v001, v010, v011, v100, v101, v110, v111;
+          this->getneighbours(ix,iy,iz,t000,t001,t010,t011,t100,t101,t110,t111);
+          v000=(float) t000; v001=(float) t001; v010=(float) t010;
+          v011=(float) t011; v100=(float) t100; v101=(float) t101;
+          v110=(float) t110; v111=(float) t111;
+          return q_tri_interpolation(v000,v001,v010,v011,v100,v101,v110,v111,
+                                     dx,dy,dz);
+        }
       case sinc:
       case userkernel:
-	{
-	  return kernelinterpolation(x,y,z);
-	}
+        {
+          return kernelinterpolation(x,y,z);
+        }
       case spline:
         {
           return(splineinterpolate(x,y,z));
-	}
+        }
       default:
-	imthrow("Invalid interpolation method",6);
+        imthrow("Invalid interpolation method",6);
       }
       return 0.0;  // Should never get to here
     }
@@ -1064,9 +1064,9 @@ namespace NEWIMAGE {
 
   template <class T>
   void volume<T>::definekernelinterpolation(const ColumnVector& kx,
-					    const ColumnVector& ky,
-					    const ColumnVector& kz,
-					    int wx, int wy, int wz) const
+                                            const ColumnVector& ky,
+                                            const ColumnVector& kz,
+                                            int wx, int wy, int wz) const
   {
     // takes full-widths and converts all to half-widths
     int hwx = (wx-1)/2;
@@ -1086,7 +1086,7 @@ namespace NEWIMAGE {
 
   template <class T>
   void volume<T>::definesincinterpolation(const string& sincwindowtype,
-					  int w, int nstore) const
+                                          int w, int nstore) const
   {
     // full width
     this->definesincinterpolation(sincwindowtype,w,w,w,nstore);
@@ -1094,8 +1094,8 @@ namespace NEWIMAGE {
 
   template <class T>
   void volume<T>::definesincinterpolation(const string& sincwindowtype,
-					  int wx, int wy, int wz,
-					  int nstore) const
+                                          int wx, int wy, int wz,
+                                          int nstore) const
   {
     // full widths
     if (nstore<1) nstore=1;
@@ -1231,9 +1231,9 @@ namespace NEWIMAGE {
     while (idx < (int) pvals.size()) {
       // success if p is near pvals[idx] by a relative factor of 0.001 or less
       if ( fabs((p-pvals[idx])/Max(1e-5,Min(pvals[idx],1-pvals[idx]))) < 0.001 )
-	return idx;
+        return idx;
       else
-	idx++;
+        idx++;
     }
     return pval_index_end();
   }
@@ -1266,7 +1266,7 @@ namespace NEWIMAGE {
 
   template <class T>
   std::vector<T> percentile_vec(std::vector<T>& hist,
-				const std::vector<float>& percentilepvals)
+                                const std::vector<float>& percentilepvals)
   {
     unsigned int numbins = hist.size();
     if (numbins==0) {
@@ -1279,7 +1279,7 @@ namespace NEWIMAGE {
     std::vector<T> outputvals(percentilepvals.size());
     for (unsigned int n=0; n<percentilepvals.size(); n++) {
       unsigned int percentile =
-	(unsigned int) (((float) numbins) * percentilepvals[n]);
+        (unsigned int) (((float) numbins) * percentilepvals[n]);
       if (percentile>=numbins)  percentile=numbins-1;
       outputvals[n] = hist[percentile];
     }
@@ -1289,7 +1289,7 @@ namespace NEWIMAGE {
 
   template < class T, class V>
   std::vector<T> calc_percentiles(const volume<T>& vol, const volume<V>& mask,
-				  const std::vector<float>& percentilepvals)
+                                  const std::vector<float>& percentilepvals)
   {
     bool usingMask( mask.totalElements() != 0 );
     if ( usingMask && !samesize(vol,mask,SUBSET) )
@@ -1300,10 +1300,10 @@ namespace NEWIMAGE {
     typename volume<V>::fast_const_iterator maskIt( mask.fbegin() ), maskEnd( mask.fend() );
     for ( typename volume<T>::fast_const_iterator it=vol.fbegin(), itEnd=vol.fend(); it < itEnd; it++ ) {
       if ( !usingMask || *(maskIt++) > 0.5 ) {
-	hist.push_back(*it);
+        hist.push_back(*it);
       }
       if ( usingMask && maskIt == maskEnd )
-	maskIt=mask.fbegin(); //reset mask for 3D mask applied to a 4D volume
+        maskIt=mask.fbegin(); //reset mask for 3D mask applied to a 4D volume
     }
     return percentile_vec(hist,percentilepvals);
   }
@@ -1333,7 +1333,7 @@ namespace NEWIMAGE {
 
   template <class T>
   ColumnVector volume<T>::histogram(int nbins, T minval, T maxval,
-				    const volume<T>& mask) const
+                                    const volume<T>& mask) const
   {
     ColumnVector hist;
     imageHistogram(*this,nbins,minval,maxval,hist,mask);
@@ -1413,30 +1413,30 @@ namespace NEWIMAGE {
       // put in the faces
       // xy faces (small lids of the box)
       for (int64_t e=0; e<ewz; e++) {
-	for (int64_t x=ewx; x<xb-ewx; x++) {
-	  for (int64_t y=ewy; y<yb-ewy; y++) {
-	    hist[hindx++] = vol.value(x,y,e);
-	    hist[hindx++] = vol.value(x,y,zb-1-e);
-	  }
-	}
+        for (int64_t x=ewx; x<xb-ewx; x++) {
+          for (int64_t y=ewy; y<yb-ewy; y++) {
+            hist[hindx++] = vol.value(x,y,e);
+            hist[hindx++] = vol.value(x,y,zb-1-e);
+          }
+        }
       }
       // xz faces (smallish edge faces)
       for (int64_t e=0; e<ewy; e++) {
-	for (int64_t x=ewx; x<xb-ewx; x++) {
-	  for (int64_t z=0; z<zb; z++) {
-	    hist[hindx++] = vol.value(x,e,z);
-	    hist[hindx++] = vol.value(x,yb-1-e,z);
-	  }
-	}
+        for (int64_t x=ewx; x<xb-ewx; x++) {
+          for (int64_t z=0; z<zb; z++) {
+            hist[hindx++] = vol.value(x,e,z);
+            hist[hindx++] = vol.value(x,yb-1-e,z);
+          }
+        }
       }
       // yz faces (large edge faces)
       for (int64_t e=0; e<ewx; e++) {
-	for (int64_t y=0; y<yb; y++) {
-	  for (int64_t z=0; z<zb; z++) {
-	    hist[hindx++] = vol.value(e,y,z);
-	    hist[hindx++] = vol.value(xb-1-e,y,z);
-	  }
-	}
+        for (int64_t y=0; y<yb; y++) {
+          for (int64_t z=0; z<zb; z++) {
+            hist[hindx++] = vol.value(e,y,z);
+            hist[hindx++] = vol.value(xb-1-e,y,z);
+          }
+        }
       }
       sort(hist.begin(),hist.end());
       int64_t percentile10 = numbins / 10;
@@ -1529,36 +1529,36 @@ namespace NEWIMAGE {
       nlim = (int64_t) sqrt((double) vol.nvoxels());
       if (nlim<1000) nlim=1000;
       for (int64_t z=0; z<vol.zsize(); z++) {
-	for (int64_t y=0; y<vol.ysize(); y++) {
-	  for (int64_t x=0; x<vol.xsize(); x++) {
-	    val = (double) (vol(x,y,z) - vmin);
-	    mxx += val*x*x;
-	    mxy += val*x*y;
-	    mxz += val*x*z;
-	    myy += val*y*y;
-	    myz += val*y*z;
-	    mzz += val*z*z;
-	    mx += val*x;
-	    my += val*y;
-	    mz += val*z;
-	    tot += val;
-	    n++;
-	    if (n>nlim) {
-	      n=0; total+=tot; m2(1,1)+=mxx; m2(1,2)+=mxy; m2(1,3)+=mxz;
-	      m2(2,2)+=myy; m2(2,3)+=myz; m2(3,3)+=mzz;
-	      mean(1)+=mx; mean(2)+=my; mean(3)+=mz;
-	      tot=0; mxx=0; mxy=0; mxz=0; myy=0; myz=0; mzz=0; mx=0; my=0; mz=0;
-	    }
-	  }
-	}
+        for (int64_t y=0; y<vol.ysize(); y++) {
+          for (int64_t x=0; x<vol.xsize(); x++) {
+            val = (double) (vol(x,y,z) - vmin);
+            mxx += val*x*x;
+            mxy += val*x*y;
+            mxz += val*x*z;
+            myy += val*y*y;
+            myz += val*y*z;
+            mzz += val*z*z;
+            mx += val*x;
+            my += val*y;
+            mz += val*z;
+            tot += val;
+            n++;
+            if (n>nlim) {
+              n=0; total+=tot; m2(1,1)+=mxx; m2(1,2)+=mxy; m2(1,3)+=mxz;
+              m2(2,2)+=myy; m2(2,3)+=myz; m2(3,3)+=mzz;
+              mean(1)+=mx; mean(2)+=my; mean(3)+=mz;
+              tot=0; mxx=0; mxy=0; mxz=0; myy=0; myz=0; mzz=0; mx=0; my=0; mz=0;
+            }
+          }
+        }
       }
       total+=tot; m2(1,1)+=mxx; m2(1,2)+=mxy; m2(1,3)+=mxz;
       m2(2,2)+=myy; m2(2,3)+=myz; m2(3,3)+=mzz;
       mean(1)+=mx; mean(2)+=my; mean(3)+=mz;
 
       if (fabs(total) < 1e-5) {
-	cerr << "WARNING::in calculating Principle Axes, total = 0.0" << endl;
-	total = 1.0;
+        cerr << "WARNING::in calculating Principle Axes, total = 0.0" << endl;
+        total = 1.0;
       }
       m2 /= total;
       mean /= total;
@@ -1570,9 +1570,9 @@ namespace NEWIMAGE {
       // Now make it central (taking off the cog)
       Matrix meanprod(3,3);
       for (int k1=1; k1<=3; k1++) {
-	for (int k2=1; k2<=3; k2++) {
-	  meanprod(k1,k2) = mean(k1)*mean(k2);
-	}
+        for (int k2=1; k2<=3; k2++) {
+          meanprod(k1,k2) = mean(k1)*mean(k2);
+        }
       }
       m2 << m2 - meanprod;
 
@@ -1586,7 +1586,7 @@ namespace NEWIMAGE {
       // find inedx of least e-value
       int kmin=1;
       for (int k=2; k<=3; k++) {
-	if (evals(k,k) < evals(kmin,kmin)) kmin = k;
+        if (evals(k,k) < evals(kmin,kmin)) kmin = k;
       }
       // put the least in position 1
       etemp = evals(1,1);
@@ -1597,12 +1597,12 @@ namespace NEWIMAGE {
       paxes.SubMatrix(1,3,kmin,kmin) = ptemp;
       // check if remaining ones require swapping
       if (evals(3,3) < evals(2,2)) {
-	etemp = evals(2,2);
-	ptemp = paxes.SubMatrix(1,3,2,2);
-	evals(2,2) = evals(3,3);
-	paxes.SubMatrix(1,3,2,2) = paxes.SubMatrix(1,3,3,3);
-	evals(3,3) = etemp;
-	paxes.SubMatrix(1,3,3,3) = ptemp;
+        etemp = evals(2,2);
+        ptemp = paxes.SubMatrix(1,3,2,2);
+        evals(2,2) = evals(3,3);
+        paxes.SubMatrix(1,3,2,2) = paxes.SubMatrix(1,3,3,3);
+        evals(3,3) = etemp;
+        paxes.SubMatrix(1,3,3,3) = ptemp;
       }
       return paxes;
     }
@@ -1610,7 +1610,7 @@ namespace NEWIMAGE {
 
   template <class T, class V>
   int64_t imageHistogram(const volume<T>& vol, const int bins,
-			 const T min, const T max, ColumnVector& hist, const volume<V>& mask)
+                         const T min, const T max, ColumnVector& hist, const volume<V>& mask)
   {
     maskedIterator<T,V> it(vol,mask,"imageHistogram: ");
     if ( !it.isValid() )
@@ -1631,7 +1631,7 @@ namespace NEWIMAGE {
 
   template <class T>
   int64_t imageHistogram(const volume<T>& vol, int bins,
-			 T& min, T& max, ColumnVector& hist)
+                         T& min, T& max, ColumnVector& hist)
   {
     return imageHistogram(vol,bins,min,max,hist,volume<char>());
   }
@@ -1657,60 +1657,60 @@ namespace NEWIMAGE {
   if (hist.Nrows()!=HISTOGRAM_BINS) { hist.ReSize(HISTOGRAM_BINS); }
 
   while ( (pass==1) ||
-	  ( (double) (thresh98 - thresh2) < (((double) (max - min)) / 10.0) ) ) // test for very long tails
+          ( (double) (thresh98 - thresh2) < (((double) (max - min)) / 10.0) ) ) // test for very long tails
     // find histogram and thresholds
     {
       if (pass>1) // redo histogram with new min and max
-	{
-	  // increase range slightly from the 2-98% range found
-	  bottom_bin=Max(bottom_bin-1,0);
-	  top_bin=Min(top_bin+1,HISTOGRAM_BINS-1);
+        {
+          // increase range slightly from the 2-98% range found
+          bottom_bin=Max(bottom_bin-1,0);
+          top_bin=Min(top_bin+1,HISTOGRAM_BINS-1);
 
-	  // now set new min and max on the basis of this new range
-	  T tmpmin = (T)( min + ((double)bottom_bin/(double)(HISTOGRAM_BINS))*(max-min) );
-	  max = (T)( min + ((double)(top_bin+1)/(double)(HISTOGRAM_BINS))*(max-min) );
-	  min=tmpmin;
-	}
+          // now set new min and max on the basis of this new range
+          T tmpmin = (T)( min + ((double)bottom_bin/(double)(HISTOGRAM_BINS))*(max-min) );
+          max = (T)( min + ((double)(top_bin+1)/(double)(HISTOGRAM_BINS))*(max-min) );
+          min=tmpmin;
+        }
 
       if (pass==MAX_PASSES || min==max)  // give up and revert to full range ...
-	{
-	  if (use_mask) { min=vol.min(mask); max=vol.max(mask); }
- 	  else { min=vol.min();  max=vol.max(); }
-	}
+        {
+          if (use_mask) { min=vol.min(mask); max=vol.max(mask); }
+          else { min=vol.min();  max=vol.max(); }
+        }
 
       if (use_mask) validsize = imageHistogram(vol,HISTOGRAM_BINS,min,max,hist,mask);
       else validsize = imageHistogram(vol,HISTOGRAM_BINS,min,max,hist);
 
       if (validsize<1)
-	{
+        {
           minval=thresh2=min;
-	  maxval=thresh98=max;
-	  return;
-	}
+          maxval=thresh98=max;
+          return;
+        }
 
       if (pass==MAX_PASSES)  /* ... _but_ ignore end bins */
-	{
-	  validsize-= MISCMATHS::round(hist(lowest_bin+1)) +
-	    MISCMATHS::round(hist(highest_bin+1));
-	  lowest_bin++;
-	  highest_bin--;
-	}
+        {
+          validsize-= MISCMATHS::round(hist(lowest_bin+1)) +
+            MISCMATHS::round(hist(highest_bin+1));
+          lowest_bin++;
+          highest_bin--;
+        }
 
       if (validsize<0) /* ie zero range */
-	{
-	  thresh2=thresh98=min;
-	  break;
-	}
+        {
+          thresh2=thresh98=min;
+          break;
+        }
 
       double fA = (max-min)/(double)(HISTOGRAM_BINS);
 
       for(count=0, bottom_bin=lowest_bin; count<validsize/50; bottom_bin++)
-	count+=MISCMATHS::round(hist(bottom_bin + 1));
+        count+=MISCMATHS::round(hist(bottom_bin + 1));
       bottom_bin--;
       thresh2 =  min + (T)((double)bottom_bin*fA);
 
       for(count=0, top_bin=highest_bin; count<validsize/50; top_bin--)
-	count+=MISCMATHS::round(hist(top_bin + 1));
+        count+=MISCMATHS::round(hist(top_bin + 1));
       top_bin++;
       thresh98 = min + (T)((double)(top_bin+1)*fA);
 
@@ -1838,12 +1838,12 @@ namespace NEWIMAGE {
   void volume<T>::threshold(T lowerth, T upperth, threshtype tt)
   {
       for (nonsafe_fast_iterator it=nsfbegin(), itend=nsfend();
-	   it!=itend; ++it) {
-	if ( ! ( ((tt==inclusive) && ((*it)>= lowerth) && ((*it)<= upperth))
-		 || ((tt==exclusive) && ((*it)> lowerth) && ((*it)< upperth)) ) )
-	{
-	  *it = 0;
-	}
+           it!=itend; ++it) {
+        if ( ! ( ((tt==inclusive) && ((*it)>= lowerth) && ((*it)<= upperth))
+                 || ((tt==exclusive) && ((*it)> lowerth) && ((*it)< upperth)) ) )
+        {
+          *it = 0;
+        }
       }
   }
 
@@ -1853,14 +1853,14 @@ namespace NEWIMAGE {
   void volume<T>::binarise(T lowerth, T upperth, threshtype tt, bool invert)
   {
       for (nonsafe_fast_iterator it=nsfbegin(), itend=nsfend();
-	   it!=itend; ++it) {
-	if ( ((tt==inclusive) && ((*it)>= lowerth) && ((*it)<= upperth))
-	  || ((tt==exclusive) && ((*it)> lowerth) && ((*it)< upperth)) )
-	{
-	  *it = !invert;
-	} else {
-	  *it = invert;
-	}
+           it!=itend; ++it) {
+        if ( ((tt==inclusive) && ((*it)>= lowerth) && ((*it)<= upperth))
+          || ((tt==exclusive) && ((*it)> lowerth) && ((*it)< upperth)) )
+        {
+          *it = !invert;
+        } else {
+          *it = invert;
+        }
       }
   }
 
@@ -1994,16 +1994,16 @@ namespace NEWIMAGE {
   {
     // valid entries for dims are +/- 1, 2, 3 (corresponding to +/- x,y,z)
     if ( (dim1>3) || (dim1<-3) || (dim1==0) ||
-	 (dim2<-3) || (dim2>3) || (dim2==0) ||
-	 (dim3<-3) || (dim3>3) || (dim3==0) )
+         (dim2<-3) || (dim2>3) || (dim2==0) ||
+         (dim3<-3) || (dim3>3) || (dim3==0) )
       {
-	imthrow("Invalid dimension numbers entered to swapdimensions",8);
+        imthrow("Invalid dimension numbers entered to swapdimensions",8);
       }
 
     if ( (std::abs(dim1)==std::abs(dim2)) || (std::abs(dim1)==std::abs(dim3))
-	 || (std::abs(dim2)==std::abs(dim3)) )
+         || (std::abs(dim2)==std::abs(dim3)) )
       {
-	imthrow("Dimension numbers were not a permutation in swapdimensions",8);
+        imthrow("Dimension numbers were not a permutation in swapdimensions",8);
       }
     int64_t sx = std::abs(swapval(this->xsize(),this->ysize(),this->zsize(),dim1));
     int64_t sy = std::abs(swapval(this->xsize(),this->ysize(),this->zsize(),dim2));
@@ -2013,18 +2013,18 @@ namespace NEWIMAGE {
       volume<T> swapvol(sx,sy,sz);
       for(int64_t d7=0;d7<this->size7() && swapvol.totalElements() > 1;d7++)
         for(int64_t d6=0;d6<this->size6();d6++)
-	        for(int64_t d5=0;d5<this->size5();d5++)
-	          for(int64_t t=0;t<this->tsize();t++) { //For each 3D subvolume copy across the individual voxels to their new location and then copy entire data block back
-	            for (int64_t z=0; z<this->zsize(); z++)
-	              for (int64_t y=0; y<this->ysize(); y++)
-		              for (int64_t x=0; x<this->xsize(); x++) {
-		                int64_t nx = coordval(*this,x,y,z,dim1);
-		                int64_t ny = coordval(*this,x,y,z,dim2);
-		                int64_t nz = coordval(*this,x,y,z,dim3);
-		                swapvol(nx,ny,nz)=this->value(x,y,z,t,d5,d6,d7);
-		              }
-	                copy(swapvol.fbegin(),swapvol.fend(),&this->value(0,0,0,t,d5,d6,d7));
-	          }
+                for(int64_t d5=0;d5<this->size5();d5++)
+                  for(int64_t t=0;t<this->tsize();t++) { //For each 3D subvolume copy across the individual voxels to their new location and then copy entire data block back
+                    for (int64_t z=0; z<this->zsize(); z++)
+                      for (int64_t y=0; y<this->ysize(); y++)
+                              for (int64_t x=0; x<this->xsize(); x++) {
+                                int64_t nx = coordval(*this,x,y,z,dim1);
+                                int64_t ny = coordval(*this,x,y,z,dim2);
+                                int64_t nz = coordval(*this,x,y,z,dim3);
+                                swapvol(nx,ny,nz)=this->value(x,y,z,t,d5,d6,d7);
+                              }
+                        copy(swapvol.fbegin(),swapvol.fend(),&this->value(0,0,0,t,d5,d6,d7));
+                  }
     }
     // now fix up the spatial properties
     // if a LR flip has happened then for all properties retain the unflipped values
@@ -2075,7 +2075,7 @@ namespace NEWIMAGE {
     else order=FSL_NEUROLOGICAL;
     /* check for inconsistency if both are set */
     if ( (sform_code()!=NIFTI_XFORM_UNKNOWN) &&
-	 (qform_code()!=NIFTI_XFORM_UNKNOWN) ) {
+         (qform_code()!=NIFTI_XFORM_UNKNOWN) ) {
       if (dets * detq < 0.0) order=FSL_INCONSISTENT;
       if (fabs(dets * detq)<1e-12)  order=FSL_ZERODET;
     }
@@ -2113,7 +2113,7 @@ namespace NEWIMAGE {
     Matrix vox2vox=IdentityMatrix(4);
     if ((!RadiologicalFile) && (this->left_right_order()==FSL_RADIOLOGICAL)) {
       vox2vox = (this->sampling_mat()).i() * this->swapmat(-1,2,3) *
-	(this->sampling_mat());
+        (this->sampling_mat());
     }
     return vox2vox;
   }
@@ -2168,7 +2168,7 @@ namespace NEWIMAGE {
   const volume<T>& volume<T>::operator+=(T val)
   {
     for (nonsafe_fast_iterator it=nsfbegin(), itend=nsfend();
-	 it!=itend; ++it) {
+         it!=itend; ++it) {
       *it += val;
     }
     return *this;
@@ -2178,8 +2178,8 @@ namespace NEWIMAGE {
   const volume<T>& volume<T>::operator-=(T val)
   {
       for (nonsafe_fast_iterator it=nsfbegin(), itend=nsfend();
-	   it!=itend; ++it) {
-	*it -= val;
+           it!=itend; ++it) {
+        *it -= val;
       }
     return *this;
   }
@@ -2188,8 +2188,8 @@ namespace NEWIMAGE {
   const volume<T>& volume<T>::operator*=(T val)
   {
       for (nonsafe_fast_iterator it=nsfbegin(), itend=nsfend();
-	   it!=itend; ++it) {
-	*it *= val;
+           it!=itend; ++it) {
+        *it *= val;
       }
     return *this;
   }
@@ -2198,8 +2198,8 @@ namespace NEWIMAGE {
   const volume<T>& volume<T>::operator/=(T val)
   {
       for (nonsafe_fast_iterator it=nsfbegin(), itend=nsfend();
-	   it!=itend; ++it) {
-	*it /= val;
+           it!=itend; ++it) {
+        *it /= val;
       }
     return *this;
   }
@@ -2329,8 +2329,8 @@ void volume<T>::copyROI(const volume<T>& source,const int64_t minx, const int64_
   for ( int64_t t=mint;t<=maxt;t++)
     for (int64_t z=minz; z<=maxz; z++)
       for (int64_t y=miny; y<=maxy; y++)
-	for (int64_t x=minx; x<=maxx; x++)
-	  (*this)(x,y,z,t)=source(x - minx, y - miny, z - minz, t - mint);
+        for (int64_t x=minx; x<=maxx; x++)
+          (*this)(x,y,z,t)=source(x - minx, y - miny, z - minz, t - mint);
 }
 
 
@@ -2344,8 +2344,8 @@ volume<T> volume<T>::ROI(const int64_t minx, const int64_t miny, const int64_t m
   for ( int64_t t=mint;t<=maxt;t++)
     for (int64_t z=minz; z<=maxz; z++)
       for (int64_t y=miny; y<=maxy; y++)
-	for (int64_t x=minx; x<=maxx; x++)
-	  roivol(x - minx, y - miny, z - minz, t - mint) = (*this)(x,y,z,t);
+        for (int64_t x=minx; x<=maxx; x++)
+          roivol(x - minx, y - miny, z - minz, t - mint) = (*this)(x,y,z,t);
 
   roivol.copyproperties(*this);
   // set sform and qform matrices appropriately (if set)
@@ -2392,10 +2392,10 @@ volume<T> volume<T>::ROI(const int64_t minx, const int64_t miny, const int64_t m
     double sum=0, sum2=0;
     for ( maskedIterator<T,V> it(inputVolume,mask,"calculateSums: ");it.isValid(); ++it ) {
         double value=(*it);
-	sum += value;
-	sum2 += value*value;
-	n++;
-	if (n>nlim) { nn++; sums[0]+=sum; sums[1]+=sum2; sum=sum2=n=0; }
+        sum += value;
+        sum2 += value*value;
+        n++;
+        if (n>nlim) { nn++; sums[0]+=sum; sums[1]+=sum2; sum=sum2=n=0; }
     }
     if (n + nn == 0)
      cerr << "ERROR:: Empty mask image" << endl;
@@ -2454,10 +2454,10 @@ vector<T> calculateExtrema(const volume<T>& inputVolume, vector<int64_t>& coordi
     matv.ReSize(this->tsize(), ncols);
     for (int64_t z(0); z < zsize(); z++)
       for (int64_t y(0); y < ysize(); y++)
-	      for (int64_t x(0); x < xsize(); x++)
-	        if (!using_mask || (mask(x,y,z)>mask.maskThreshold())) {
-	          for (int64_t t(0); t < this->tsize(); t++)
-	            matv(t+1,cidx) = this->value(x,y,z,t);
+              for (int64_t x(0); x < xsize(); x++)
+                if (!using_mask || (mask(x,y,z)>mask.maskThreshold())) {
+                  for (int64_t t(0); t < this->tsize(); t++)
+                    matv(t+1,cidx) = this->value(x,y,z,t);
             cidx++;
           }
     matv.Release();
@@ -2484,13 +2484,13 @@ vector<T> calculateExtrema(const volume<T>& inputVolume, vector<int64_t>& coordi
 
     for (int64_t z=0; z<mask.zsize(); z++)
       for (int64_t y=0; y<mask.ysize(); y++)
-	      for (int64_t x=0; x<mask.xsize(); x++)
-	          if (mask(x,y,z)>mask.maskThreshold()) {
-	            voxelLabels.push_back(x+y*mask.xsize()+z*mask.xsize()*mask.ysize());
-	            for (int64_t t=0; t<this->tsize(); t++)
-	              matv(t+1,cidx) = this->value(x,y,z,t);
+              for (int64_t x=0; x<mask.xsize(); x++)
+                  if (mask(x,y,z)>mask.maskThreshold()) {
+                    voxelLabels.push_back(x+y*mask.xsize()+z*mask.xsize()*mask.ysize());
+                    for (int64_t t=0; t<this->tsize(); t++)
+                      matv(t+1,cidx) = this->value(x,y,z,t);
               cidx++;
-	          }
+                  }
     matv.Release();
     return matv;
   }
@@ -2505,16 +2505,16 @@ vector<T> calculateExtrema(const volume<T>& inputVolume, vector<int64_t>& coordi
 
   template <class T>
   void volume<T>::setmatrix(const Matrix& newmatrix, const volume<T>& mask,
-			    const T pad, bool using_mask) {
+                            const T pad, bool using_mask) {
     if (using_mask && (mask.dimensionality()>3))
       imthrow("Cannot use setmatrix() with masks with more than 3 dimensions",77);
     int64_t tsz(this->tsize());
     if (using_mask) {
       if ( (tsz==0) || (tsz!=newmatrix.Nrows()) || (!samesize(mask,*this,3)) )
-	      this->reinitialize(mask.xsize(),mask.ysize(),mask.zsize(),newmatrix.Nrows());
+              this->reinitialize(mask.xsize(),mask.ysize(),mask.zsize(),newmatrix.Nrows());
         this->copyproperties(mask);
     } else if ( (tsz==0) || (tsz!=newmatrix.Nrows()) )
-	      imthrow("Mismatch in number of timepoints in setmatrix()",4);
+              imthrow("Mismatch in number of timepoints in setmatrix()",4);
 
     this->operator=(pad);
     int64_t nvox=this->nvoxels();
@@ -2525,10 +2525,10 @@ vector<T> calculateExtrema(const volume<T>& inputVolume, vector<int64_t>& coordi
     size_t cidx(1);
     for (int64_t z=0; z<this->zsize(); z++)
       for (int64_t y=0; y<this->ysize(); y++)
-	      for (int64_t x=0; x<this->xsize(); x++)
-	        if (!using_mask || (mask(x,y,z)>mask.maskThreshold())) {
-	          for (int64_t t=0; t<this->tsize(); t++)
-	            this->value(x,y,z,t) = (T) newmatrix(t+1,cidx);
+              for (int64_t x=0; x<this->xsize(); x++)
+                if (!using_mask || (mask(x,y,z)>mask.maskThreshold())) {
+                  for (int64_t t=0; t<this->tsize(); t++)
+                    this->value(x,y,z,t) = (T) newmatrix(t+1,cidx);
             cidx++;
           }
   }
@@ -2551,15 +2551,15 @@ vector<T> calculateExtrema(const volume<T>& inputVolume, vector<int64_t>& coordi
     copybasicproperties(*this,tmp);
     for(int64_t z=0;z< this->zsize();z++){
       for(int64_t y=0;y<this->ysize();y++){
-	for(int64_t x=0;x<this->xsize();x++){
-	  if (mask(x,y,z)>mask.maskThreshold()){
-	    tmp(x,y,z)=count;
-	    count++;
-	  }
-	  else{
-	    tmp(x,y,z)=0;
-	  }
-	}
+        for(int64_t x=0;x<this->xsize();x++){
+          if (mask(x,y,z)>mask.maskThreshold()){
+            tmp(x,y,z)=count;
+            count++;
+          }
+          else{
+            tmp(x,y,z)=0;
+          }
+        }
       }
     }
     return tmp;
@@ -2574,13 +2574,13 @@ vector<T> calculateExtrema(const volume<T>& inputVolume, vector<int64_t>& coordi
     count=1;
     for(int64_t z=0;z< this->zsize();z++)
       for(int64_t y=0;y<this->ysize();y++)
-	for(int64_t x=0;x<this->xsize();x++)
-	  if(mask(x,y,z)>mask.maskThreshold()){
-	    key(count,1)=x;
-	    key(count,2)=y;
-	    key(count,3)=z;
-	    count++;
-	  }
+        for(int64_t x=0;x<this->xsize();x++)
+          if(mask(x,y,z)>mask.maskThreshold()){
+            key(count,1)=x;
+            key(count,2)=y;
+            key(count,3)=z;
+            count++;
+          }
     key.Release();
     return key;
   }
