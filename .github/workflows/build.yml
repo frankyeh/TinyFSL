@@ -52,17 +52,17 @@ jobs:
         
       - name: Packaging
         run: |
-          mkdir win_fsl
-          move build\release\*.exe win_fsl
-          move bin\*.dll win_fsl
-          windeployqt win_fsl\eddy.exe
+          mkdir tiny_fsl
+          move build\release\*.exe tiny_fsl
+          move bin\*.dll tiny_fsl
+          windeployqt tiny_fsl\eddy.exe
           
       - name: Zip Package
         uses: TheDoctor0/zip-release@0.6.0
         with:
-          filename: win_fsl.zip
+          filename: tiny_fsl_win64.zip
           exclusions: .git
-          path: win_fsl          
+          path: tiny_fsl          
           
       - name: Create Release
         uses: ncipollo/release-action@v1.8.9
