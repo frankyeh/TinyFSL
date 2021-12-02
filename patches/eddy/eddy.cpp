@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) try
   if (clo.Verbose()) cout << "Reading images" << endl;
   ECScanManager sm(clo.ImaFname(),clo.MaskFname(),clo.AcqpFname(),clo.TopupFname(),clo.FieldFname(),clo.FieldMatFname(),
                    clo.BVecsFname(),clo.BValsFname(),clo.FirstLevelModel(),clo.b0_FirstLevelModel(),clo.Indicies(),
-		   clo.PolationParameters(),clo.MultiBand(),clo.DontCheckShelling()); // Scan Manager
+                   clo.PolationParameters(),clo.MultiBand(),clo.DontCheckShelling()); // Scan Manager
   if (clo.FillEmptyPlanes()) { if (clo.Verbose()) cout << "Filling empty planes" << endl; sm.FillEmptyPlanes(); }
   if (clo.ResamplingMethod() == LSR) {
     if (!sm.CanDoLSRResampling()) throw EddyException("These data do not support least-squares resampling");
@@ -115,22 +115,22 @@ int main(int argc, char *argv[]) try
     if (clo.RegisterDWI()) {
       double peas_key = prof.StartEntry("Calling PostEddyAlignShells");
       if (!clo.SeparateOffsetFromMovement() && !clo.AlignShellsPostEddy()) {
-	if (clo.Verbose()) cout << "Checking shell alignment along PE-direction (running PostEddyAlignShellsAlongPE)" << endl;
-	PEASUtils::PostEddyAlignShellsAlongPE(clo,false,sm);
-	if (clo.Verbose()) cout << "Checking shell alignment (running PostEddyAlignShells)" << endl;
-	PEASUtils::PostEddyAlignShells(clo,false,sm);
+        if (clo.Verbose()) cout << "Checking shell alignment along PE-direction (running PostEddyAlignShellsAlongPE)" << endl;
+        PEASUtils::PostEddyAlignShellsAlongPE(clo,false,sm);
+        if (clo.Verbose()) cout << "Checking shell alignment (running PostEddyAlignShells)" << endl;
+        PEASUtils::PostEddyAlignShells(clo,false,sm);
       }
       else if (clo.SeparateOffsetFromMovement() && !clo.AlignShellsPostEddy()) {
-	if (clo.Verbose()) cout << "Aligning shells along PE-direction (running PostEddyAlignShellsAlongPE)" << endl;
-	PEASUtils::PostEddyAlignShellsAlongPE(clo,true,sm);
-	if (clo.Verbose()) cout << "Checking shell alignment (running PostEddyAlignShells)" << endl;
-	PEASUtils::PostEddyAlignShells(clo,false,sm);
+        if (clo.Verbose()) cout << "Aligning shells along PE-direction (running PostEddyAlignShellsAlongPE)" << endl;
+        PEASUtils::PostEddyAlignShellsAlongPE(clo,true,sm);
+        if (clo.Verbose()) cout << "Checking shell alignment (running PostEddyAlignShells)" << endl;
+        PEASUtils::PostEddyAlignShells(clo,false,sm);
       }
       else if (clo.AlignShellsPostEddy()) {
-	if (clo.Verbose()) cout << "Checking shell alignment along PE-direction (running PostEddyAlignShellsAlongPE)" << endl;
-	PEASUtils::PostEddyAlignShellsAlongPE(clo,false,sm);
-	if (clo.Verbose()) cout << "Aligning shells (running PostEddyAlignShells)" << endl;
-	PEASUtils::PostEddyAlignShells(clo,true,sm);
+        if (clo.Verbose()) cout << "Checking shell alignment along PE-direction (running PostEddyAlignShellsAlongPE)" << endl;
+        PEASUtils::PostEddyAlignShellsAlongPE(clo,false,sm);
+        if (clo.Verbose()) cout << "Aligning shells (running PostEddyAlignShells)" << endl;
+        PEASUtils::PostEddyAlignShells(clo,true,sm);
       }
       prof.EndEntry(peas_key);
     }
@@ -163,22 +163,22 @@ int main(int argc, char *argv[]) try
       clo.Set_b0_SecondLevelModel(EDDY::Linear_2nd_lvl_mdl);
       clo.SetSecondLevelModel(EDDY::Linear_2nd_lvl_mdl);
       for (unsigned int i=0; i<clo.NumOfNonZeroMovementModelOrder(); i++) {
-	if (clo.Verbose()) cout << "Setting slice-to-volume order to " << clo.MovementModelOrder(i) << endl;
-	sm.SetMovementModelOrder(clo.MovementModelOrder(i));
-	sm.Set_S2V_Lambda(clo.S2V_Lambda(i));
-	dwi_rm = DoSliceToVolumeRegistration(clo,i,false,sm,dwi_rm);
-	sm.ApplyLocationReference();
+        if (clo.Verbose()) cout << "Setting slice-to-volume order to " << clo.MovementModelOrder(i) << endl;
+        sm.SetMovementModelOrder(clo.MovementModelOrder(i));
+        sm.Set_S2V_Lambda(clo.S2V_Lambda(i));
+        dwi_rm = DoSliceToVolumeRegistration(clo,i,false,sm,dwi_rm);
+        sm.ApplyLocationReference();
       }
       clo.Set_b0_SecondLevelModel(b0_slm);
       clo.SetSecondLevelModel(dwi_slm);
     }
     else {
       for (unsigned int i=0; i<clo.NumOfNonZeroMovementModelOrder(); i++) {
-	if (clo.Verbose()) cout << "Setting slice-to-volume order to " << clo.MovementModelOrder(i) << endl;
-	sm.SetMovementModelOrder(clo.MovementModelOrder(i));
-	sm.Set_S2V_Lambda(clo.S2V_Lambda(i));
-	dwi_rm = DoSliceToVolumeRegistration(clo,i,false,sm,dwi_rm);
-	sm.ApplyLocationReference();
+        if (clo.Verbose()) cout << "Setting slice-to-volume order to " << clo.MovementModelOrder(i) << endl;
+        sm.SetMovementModelOrder(clo.MovementModelOrder(i));
+        sm.Set_S2V_Lambda(clo.S2V_Lambda(i));
+        dwi_rm = DoSliceToVolumeRegistration(clo,i,false,sm,dwi_rm);
+        sm.ApplyLocationReference();
       }
     }
     prof.EndEntry(s2v_key);
@@ -187,22 +187,22 @@ int main(int argc, char *argv[]) try
     if (clo.RegisterDWI()) {
       double peas_key = prof.StartEntry("Calling PostEddyAlignShells after S2V");
       if (!clo.SeparateOffsetFromMovement() && !clo.AlignShellsPostEddy()) {
-	if (clo.Verbose()) cout << "Checking shell alignment along PE-direction (running PostEddyAlignShellsAlongPE)" << endl;
-	PEASUtils::PostEddyAlignShellsAlongPE(clo,false,sm);
-	if (clo.Verbose()) cout << "Checking shell alignment (running PostEddyAlignShells)" << endl;
-	PEASUtils::PostEddyAlignShells(clo,false,sm);
+        if (clo.Verbose()) cout << "Checking shell alignment along PE-direction (running PostEddyAlignShellsAlongPE)" << endl;
+        PEASUtils::PostEddyAlignShellsAlongPE(clo,false,sm);
+        if (clo.Verbose()) cout << "Checking shell alignment (running PostEddyAlignShells)" << endl;
+        PEASUtils::PostEddyAlignShells(clo,false,sm);
       }
       else if (clo.SeparateOffsetFromMovement() && !clo.AlignShellsPostEddy()) {
-	if (clo.Verbose()) cout << "Aligning shells along PE-direction (running PostEddyAlignShellsAlongPE)" << endl;
-	PEASUtils::PostEddyAlignShellsAlongPE(clo,true,sm);
-	if (clo.Verbose()) cout << "Checking shell alignment (running PostEddyAlignShells)" << endl;
-	PEASUtils::PostEddyAlignShells(clo,false,sm);
+        if (clo.Verbose()) cout << "Aligning shells along PE-direction (running PostEddyAlignShellsAlongPE)" << endl;
+        PEASUtils::PostEddyAlignShellsAlongPE(clo,true,sm);
+        if (clo.Verbose()) cout << "Checking shell alignment (running PostEddyAlignShells)" << endl;
+        PEASUtils::PostEddyAlignShells(clo,false,sm);
       }
       else if (clo.AlignShellsPostEddy()) {
-	if (clo.Verbose()) cout << "Checking shell alignment along PE-direction (running PostEddyAlignShellsAlongPE)" << endl;
-	PEASUtils::PostEddyAlignShellsAlongPE(clo,false,sm);
-	if (clo.Verbose()) cout << "Aligning shells (running PostEddyAlignShells)" << endl;
-	PEASUtils::PostEddyAlignShells(clo,true,sm);
+        if (clo.Verbose()) cout << "Checking shell alignment along PE-direction (running PostEddyAlignShellsAlongPE)" << endl;
+        PEASUtils::PostEddyAlignShellsAlongPE(clo,false,sm);
+        if (clo.Verbose()) cout << "Aligning shells (running PostEddyAlignShells)" << endl;
+        PEASUtils::PostEddyAlignShells(clo,true,sm);
       }
       prof.EndEntry(peas_key);
     }
@@ -237,41 +237,41 @@ int main(int argc, char *argv[]) try
       unsigned int mbs_niter = (clo.MoveBySuscNiter() / clo.N_MBS_Interleaves()) + 1;
       unsigned int niter, s2vi=0;
       if (clo.IsSliceToVol()) {
-	s2vi = clo.NumOfNonZeroMovementModelOrder()-1;
-	niter = clo.S2V_NIter(s2vi);
-	sm.SetMovementModelOrder(clo.MovementModelOrder(s2vi));
-	sm.Set_S2V_Lambda(clo.S2V_Lambda(s2vi));
-	clo.SetS2VParam(clo.MovementModelOrder(s2vi),clo.S2V_Lambda(s2vi),0.0,(niter/clo.N_MBS_Interleaves())+1);
+        s2vi = clo.NumOfNonZeroMovementModelOrder()-1;
+        niter = clo.S2V_NIter(s2vi);
+        sm.SetMovementModelOrder(clo.MovementModelOrder(s2vi));
+        sm.Set_S2V_Lambda(clo.S2V_Lambda(s2vi));
+        clo.SetS2VParam(clo.MovementModelOrder(s2vi),clo.S2V_Lambda(s2vi),0.0,(niter/clo.N_MBS_Interleaves())+1);
       }
       else { niter = clo.NIter(); clo.SetNIterAndFWHM((niter/clo.N_MBS_Interleaves())+1,std::vector<float>(1,0.0)); }
       NEWMAT::ColumnVector spar;
       EDDY::MoveBySuscCF cf(sm,clo,b0s,dwis,clo.MoveBySuscParam(),clo.MoveBySuscOrder(),clo.MoveBySuscKsp());
 
       for (unsigned int i=0; i<clo.N_MBS_Interleaves(); i++) {
-	if (clo.Verbose()) cout << "Running interleave " << i+1 << " of MBS" << endl;
-	if (!i) spar = cf.Par(); // Start guesses all zeros for first iteration
-	cf.SetLambda(clo.MoveBySuscLambda());
-	MISCMATHS::NonlinParam nlp(cf.NPar(),MISCMATHS::NL_LM,spar);
-	nlp.SetMaxIter(mbs_niter);
-	nlp.SetGaussNewtonType(MISCMATHS::LM_GN);
-	double mbs_key = prof.StartEntry("Calling nonlin for MBS");
-	MISCMATHS::nonlin(nlp,cf);
-	prof.EndEntry(mbs_key);
-	spar = cf.Par(); // Save for next iteration
-	if (clo.IsSliceToVol()) {
-	  if (clo.Verbose()) cout << "Running slice-to-vol interleaved with MBS" << endl;
-	  double s2v_key = prof.StartEntry("Calling DoSliceToVolumeRegistration as part of MBS");
-	  dwi_rm = DoSliceToVolumeRegistration(clo,s2vi,false,sm,dwi_rm);
-	  sm.ApplyLocationReference();
-	  prof.EndEntry(s2v_key);
-	}
-	else {
-	  if (clo.Verbose()) cout << "Running vol-to-vol interleaved with MBS" << endl;
-	  double v2v_key = prof.StartEntry("Calling DoVolumeToVolumeRegistration as part of MBS");
-	  dwi_rm = DoVolumeToVolumeRegistration(clo,sm);
-	  sm.ApplyLocationReference();
-	  prof.EndEntry(v2v_key);
-	}
+        if (clo.Verbose()) cout << "Running interleave " << i+1 << " of MBS" << endl;
+        if (!i) spar = cf.Par(); // Start guesses all zeros for first iteration
+        cf.SetLambda(clo.MoveBySuscLambda());
+        MISCMATHS::NonlinParam nlp(cf.NPar(),MISCMATHS::NL_LM,spar);
+        nlp.SetMaxIter(mbs_niter);
+        nlp.SetGaussNewtonType(MISCMATHS::LM_GN);
+        double mbs_key = prof.StartEntry("Calling nonlin for MBS");
+        MISCMATHS::nonlin(nlp,cf);
+        prof.EndEntry(mbs_key);
+        spar = cf.Par(); // Save for next iteration
+        if (clo.IsSliceToVol()) {
+          if (clo.Verbose()) cout << "Running slice-to-vol interleaved with MBS" << endl;
+          double s2v_key = prof.StartEntry("Calling DoSliceToVolumeRegistration as part of MBS");
+          dwi_rm = DoSliceToVolumeRegistration(clo,s2vi,false,sm,dwi_rm);
+          sm.ApplyLocationReference();
+          prof.EndEntry(s2v_key);
+        }
+        else {
+          if (clo.Verbose()) cout << "Running vol-to-vol interleaved with MBS" << endl;
+          double v2v_key = prof.StartEntry("Calling DoVolumeToVolumeRegistration as part of MBS");
+          dwi_rm = DoVolumeToVolumeRegistration(clo,sm);
+          sm.ApplyLocationReference();
+          prof.EndEntry(v2v_key);
+        }
       }
       cf.WriteFirstOrderFields(clo.MoveBySuscFirstOrderFname());
       if (clo.MoveBySuscOrder() > 1) cf.WriteSecondOrderFields(clo.MoveBySuscSecondOrderFname());
@@ -295,22 +295,22 @@ int main(int argc, char *argv[]) try
     if (clo.RegisterDWI()) {
       double peas_key = prof.StartEntry("Calling PostEddyAlignShells after MBS");
       if (!clo.SeparateOffsetFromMovement() && !clo.AlignShellsPostEddy()) {
-	if (clo.Verbose()) cout << "Checking shell alignment along PE-direction (running PostEddyAlignShellsAlongPE)" << endl;
-	PEASUtils::PostEddyAlignShellsAlongPE(clo,false,sm);
-	if (clo.Verbose()) cout << "Checking shell alignment (running PostEddyAlignShells)" << endl;
-	PEASUtils::PostEddyAlignShells(clo,false,sm);
+        if (clo.Verbose()) cout << "Checking shell alignment along PE-direction (running PostEddyAlignShellsAlongPE)" << endl;
+        PEASUtils::PostEddyAlignShellsAlongPE(clo,false,sm);
+        if (clo.Verbose()) cout << "Checking shell alignment (running PostEddyAlignShells)" << endl;
+        PEASUtils::PostEddyAlignShells(clo,false,sm);
       }
       else if (clo.SeparateOffsetFromMovement() && !clo.AlignShellsPostEddy()) {
-	if (clo.Verbose()) cout << "Aligning shells along PE-direction (running PostEddyAlignShellsAlongPE)" << endl;
-	PEASUtils::PostEddyAlignShellsAlongPE(clo,true,sm);
-	if (clo.Verbose()) cout << "Checking shell alignment (running PostEddyAlignShells)" << endl;
-	PEASUtils::PostEddyAlignShells(clo,false,sm);
+        if (clo.Verbose()) cout << "Aligning shells along PE-direction (running PostEddyAlignShellsAlongPE)" << endl;
+        PEASUtils::PostEddyAlignShellsAlongPE(clo,true,sm);
+        if (clo.Verbose()) cout << "Checking shell alignment (running PostEddyAlignShells)" << endl;
+        PEASUtils::PostEddyAlignShells(clo,false,sm);
       }
       else if (clo.AlignShellsPostEddy()) {
-	if (clo.Verbose()) cout << "Checking shell alignment along PE-direction (running PostEddyAlignShellsAlongPE)" << endl;
-	PEASUtils::PostEddyAlignShellsAlongPE(clo,false,sm);
-	if (clo.Verbose()) cout << "Aligning shells (running PostEddyAlignShells)" << endl;
-	PEASUtils::PostEddyAlignShells(clo,true,sm);
+        if (clo.Verbose()) cout << "Checking shell alignment along PE-direction (running PostEddyAlignShellsAlongPE)" << endl;
+        PEASUtils::PostEddyAlignShellsAlongPE(clo,false,sm);
+        if (clo.Verbose()) cout << "Aligning shells (running PostEddyAlignShells)" << endl;
+        PEASUtils::PostEddyAlignShells(clo,true,sm);
       }
       prof.EndEntry(peas_key);
     }
@@ -412,7 +412,7 @@ int main(int argc, char *argv[]) try
       hypar = GetPredictionsForResampling(clo,st,sm,pred);
       pred /= sm.ScaleFactor();
       for (int s=0; s<pred.tsize(); s++) {
-	pred[s] = EddyUtils::TransformModelToScanSpace(pred[s],sm.Scan(s,st),sm.GetSuscHzOffResField(s,st));
+        pred[s] = EddyUtils::TransformModelToScanSpace(pred[s],sm.Scan(s,st),sm.GetSuscHzOffResField(s,st));
       }
       NEWIMAGE::write_volume(pred,clo.PredictionsInScanSpaceOutFname());
       prof.EndEntry(wpred_key);
@@ -530,9 +530,9 @@ namespace EDDY {
 *
 ********************************************************************/
 ReplacementManager *DoVolumeToVolumeRegistration(// Input
-						 const EddyCommandLineOptions&  clo,
-						 // Input/Output
-						 ECScanManager&                 sm) EddyTry
+                                                 const EddyCommandLineOptions&  clo,
+                                                 // Input/Output
+                                                 ECScanManager&                 sm) EddyTry
 {
   static Utilities::FSLProfiler prof("_"+string(__FILE__)+"_"+string(__func__));
   double total_key = prof.StartEntry("Total");
@@ -547,7 +547,7 @@ ReplacementManager *DoVolumeToVolumeRegistration(// Input
       double minmss=1e20;
       unsigned int mindx=0;
       for (unsigned int i=0; i<sm.NScans(B0); i++) {
-	if (b0_mss(b0_mss.Nrows(),i+1) < minmss) { minmss=b0_mss(b0_mss.Nrows(),i+1); mindx=i; }
+        if (b0_mss(b0_mss.Nrows(),i+1) < minmss) { minmss=b0_mss(b0_mss.Nrows(),i+1); mindx=i; }
       }
       if (clo.Verbose()) cout << "Setting scan " << sm.Getb02GlobalIndexMapping(mindx) << " as b0 shape-reference."<< endl;
       sm.SetB0ShapeReference(sm.Getb02GlobalIndexMapping(mindx));
@@ -573,28 +573,28 @@ ReplacementManager *DoVolumeToVolumeRegistration(// Input
       std::vector<double> bvals;
       std::vector<std::vector<unsigned int> > shindx = sm.GetShellIndicies(bvals);
       for (unsigned int shell=0; shell<shindx.size(); shell++) {
-	double minmss=1e20;
-	unsigned int mindx=0;
-	bool found_vol_with_no_outliers=false;
-	for (unsigned int i=0; i<shindx[shell].size(); i++) {
-	  if (!sm.Scan(shindx[shell][i]).HasOutliers()) { // Only consider scans without outliers
-	    found_vol_with_no_outliers=true;
-	    if (dwi_mss(dwi_mss.Nrows(),sm.GetGlobal2DWIIndexMapping(shindx[shell][i])+1) < minmss) {
-	      minmss=dwi_mss(dwi_mss.Nrows(),sm.GetGlobal2DWIIndexMapping(shindx[shell][i])+1);
-	      mindx=shindx[shell][i];
-	    }
-	  }
-	}
-	if (!found_vol_with_no_outliers) {
-	  std::vector<unsigned int> i2i = sm.GetDwi2GlobalIndexMapping();
-	  dwi_rm->WriteReport(i2i,clo.OLReportFname());
-	  dwi_rm->WriteMatrixReport(i2i,sm.NScans(),clo.OLMapReportFname(true),clo.OLNStDevMapReportFname(true),clo.OLNSqrStDevMapReportFname(true));
-	  std::ostringstream errtxt;
-	  errtxt << "DoVolumeToVolumeRegistration: Unable to find volume with no outliers in shell " << shell << " with b-value=" << bvals[shell];
-	  throw EddyException(errtxt.str());
-	}
-	if (clo.Verbose()) cout << "Setting scan " << mindx << " as shell shape-reference for shell "<< shell << " with b-value= " << bvals[shell] << endl;
-	sm.SetShellShapeReference(shell,mindx);
+        double minmss=1e20;
+        unsigned int mindx=0;
+        bool found_vol_with_no_outliers=false;
+        for (unsigned int i=0; i<shindx[shell].size(); i++) {
+          if (!sm.Scan(shindx[shell][i]).HasOutliers()) { // Only consider scans without outliers
+            found_vol_with_no_outliers=true;
+            if (dwi_mss(dwi_mss.Nrows(),sm.GetGlobal2DWIIndexMapping(shindx[shell][i])+1) < minmss) {
+              minmss=dwi_mss(dwi_mss.Nrows(),sm.GetGlobal2DWIIndexMapping(shindx[shell][i])+1);
+              mindx=shindx[shell][i];
+            }
+          }
+        }
+        if (!found_vol_with_no_outliers) {
+          std::vector<unsigned int> i2i = sm.GetDwi2GlobalIndexMapping();
+          dwi_rm->WriteReport(i2i,clo.OLReportFname());
+          dwi_rm->WriteMatrixReport(i2i,sm.NScans(),clo.OLMapReportFname(true),clo.OLNStDevMapReportFname(true),clo.OLNSqrStDevMapReportFname(true));
+          std::ostringstream errtxt;
+          errtxt << "DoVolumeToVolumeRegistration: Unable to find volume with no outliers in shell " << shell << " with b-value=" << bvals[shell];
+          throw EddyException(errtxt.str());
+        }
+        if (clo.Verbose()) cout << "Setting scan " << mindx << " as shell shape-reference for shell "<< shell << " with b-value= " << bvals[shell] << endl;
+        sm.SetShellShapeReference(shell,mindx);
       }
       // Apply reference for location
     }
@@ -634,12 +634,12 @@ ReplacementManager *DoVolumeToVolumeRegistration(// Input
 ********************************************************************/
 
 ReplacementManager *DoSliceToVolumeRegistration(// Input
-						const EddyCommandLineOptions&  clo,
-						unsigned int                   oi,        // Order index
-						bool                           dol,       // Detect outliers?
-						// Input/Output
-						ECScanManager&                 sm,
-						ReplacementManager             *dwi_rm) EddyTry
+                                                const EddyCommandLineOptions&  clo,
+                                                unsigned int                   oi,        // Order index
+                                                bool                           dol,       // Detect outliers?
+                                                // Input/Output
+                                                ECScanManager&                 sm,
+                                                ReplacementManager             *dwi_rm) EddyTry
 {
   static Utilities::FSLProfiler prof("_"+string(__FILE__)+"_"+string(__func__));
   double total_key = prof.StartEntry("Total");
@@ -701,11 +701,11 @@ ReplacementManager *DoSliceToVolumeRegistration(// Input
 ********************************************************************/
 /*
 void EstimateBiasField(// Input
-		       const EddyCommandLineOptions&  clo,
-		       double                         ksp,
-		       double                         lambda,
-		       // Input/output
-		       ECScanManager&                 sm) EddyTry
+                       const EddyCommandLineOptions&  clo,
+                       double                         ksp,
+                       double                         lambda,
+                       // Input/output
+                       ECScanManager&                 sm) EddyTry
 {
   BiasFieldEstimator bfe;
   ScanType st[2] = {B0, DWI};
@@ -719,21 +719,21 @@ void EstimateBiasField(// Input
       // First calculate the average location for this scan type to use as reference
       EDDY::ImageCoordinates mic = sm.Scan(0,st[sti]).SamplingPoints();
       for (unsigned int s=1; s<sm.NScans(st[sti]); s++) {
-	mic += sm.Scan(s,st[sti]).SamplingPoints();
+        mic += sm.Scan(s,st[sti]).SamplingPoints();
       }
       mic /= static_cast<float>(sm.NScans(st[sti]));
       bfe.SetRefScan(mask,mic);
       // Next loop over chunks of predictions and add scans
       for (GpuPredictorChunk c(sm.NScans(st[sti]),mask); c<sm.NScans(st[sti]); c++) {
-	std::vector<unsigned int> si = c.Indicies();
-	std::vector<NEWIMAGE::volume<float> > pred = pmp->Predict(si);
-	// Loop over scans within chunk
-	for (unsigned int i=0; i<si.size(); i++) {
-	  // EDDY::ImageCoordinates ic = EddyGpuUtils::GetCoordinatesInScannerSpace(sm.Scan(si[i],st[sti]));
-	  // cout << "i = " << i << ", calling SamplingPoints()" << endl;
-	  EDDY::ImageCoordinates ic = sm.Scan(si[i],st[sti]).SamplingPoints();
-	  bfe.AddScan(pred[i],EddyGpuUtils::GetUnwarpedScan(sm.Scan(si[i],st[sti]),sm.GetSuscHzOffResField(si[i],st[sti]),true,sm.GetPolation()),mask,ic);
-	}
+        std::vector<unsigned int> si = c.Indicies();
+        std::vector<NEWIMAGE::volume<float> > pred = pmp->Predict(si);
+        // Loop over scans within chunk
+        for (unsigned int i=0; i<si.size(); i++) {
+          // EDDY::ImageCoordinates ic = EddyGpuUtils::GetCoordinatesInScannerSpace(sm.Scan(si[i],st[sti]));
+          // cout << "i = " << i << ", calling SamplingPoints()" << endl;
+          EDDY::ImageCoordinates ic = sm.Scan(si[i],st[sti]).SamplingPoints();
+          bfe.AddScan(pred[i],EddyGpuUtils::GetUnwarpedScan(sm.Scan(si[i],st[sti]),sm.GetSuscHzOffResField(si[i],st[sti]),true,sm.GetPolation()),mask,ic);
+        }
       }
     }
   }
@@ -796,9 +796,9 @@ void EstimateBiasField(// Input
 *
 ********************************************************************/
 float EstimatedBiasFieldOffset(// Input
-			       const EddyCommandLineOptions&  clo,
-			       // Input/output
-			       ECScanManager&                 sm) EddyTry
+                               const EddyCommandLineOptions&  clo,
+                               // Input/output
+                               ECScanManager&                 sm) EddyTry
 {
   return(1.0);
 } EddyCatch
@@ -826,18 +826,18 @@ float EstimatedBiasFieldOffset(// Input
 *
 ********************************************************************/
 ReplacementManager *Register(// Input
-			     const EddyCommandLineOptions&  clo,
-			     ScanType                       st,
-			     unsigned int                   niter,
-			     const std::vector<float>&      fwhm,
-			     SecondLevelECModel             slm,
-			     bool                           dol,
-			     // Input/Output
-			     ECScanManager&                 sm,
-			     ReplacementManager             *rm,
-			     // Output
-			     NEWMAT::Matrix&                msshist,
-			     NEWMAT::Matrix&                phist) EddyTry
+                             const EddyCommandLineOptions&  clo,
+                             ScanType                       st,
+                             unsigned int                   niter,
+                             const std::vector<float>&      fwhm,
+                             SecondLevelECModel             slm,
+                             bool                           dol,
+                             // Input/Output
+                             ECScanManager&                 sm,
+                             ReplacementManager             *rm,
+                             // Output
+                             NEWMAT::Matrix&                msshist,
+                             NEWMAT::Matrix&                phist) EddyTry
 {
   static Utilities::FSLProfiler prof("_"+string(__FILE__)+"_"+string(__func__));
   double total_key = prof.StartEntry("Total");
@@ -867,17 +867,17 @@ ReplacementManager *Register(// Input
       od_pmp = pmp;
       stats = EddyGpuUtils::DetectOutliers(clo,st,od_pmp,mask,sm,*rm);
       if (iter) {
-	EddyGpuUtils::ReplaceOutliers(clo,st,od_pmp,mask,*rm,false,sm);
-	// EddyGpuUtils::UpdatePredictionMaker(clo,st,sm,rm,mask,pmp);
+        EddyGpuUtils::ReplaceOutliers(clo,st,od_pmp,mask,*rm,false,sm);
+        // EddyGpuUtils::UpdatePredictionMaker(clo,st,sm,rm,mask,pmp);
         pmp = EddyGpuUtils::LoadPredictionMaker(clo,st,sm,iter,fwhm[iter],mask);
       }
       #else
       od_pmp = pmp;
       stats = EDDY::DetectOutliers(clo,st,od_pmp,mask,sm,*rm);
       if (iter) {
-	EDDY::ReplaceOutliers(clo,st,od_pmp,mask,*rm,false,sm);
-	// EDDY::UpdatePredictionMaker(clo,st,sm,rm,mask,pmp);
-	pmp = EDDY::LoadPredictionMaker(clo,st,sm,iter,fwhm[iter],mask);
+        EDDY::ReplaceOutliers(clo,st,od_pmp,mask,*rm,false,sm);
+        // EDDY::UpdatePredictionMaker(clo,st,sm,rm,mask,pmp);
+        pmp = EDDY::LoadPredictionMaker(clo,st,sm,iter,fwhm[iter],mask);
       }
       #endif
       prof.EndEntry(dol_key);
@@ -901,11 +901,11 @@ ReplacementManager *Register(// Input
       double update_chunk_key = prof.StartEntry("Updating parameters for chunk");
       for (unsigned int i=0; i<si.size(); i++) {
         unsigned int global_indx = (st==EDDY::DWI) ? sm.GetDwi2GlobalIndexMapping(si[i]) : sm.Getb02GlobalIndexMapping(si[i]);
-	if (clo.DebugLevel() && clo.DebugIndicies().IsAmongIndicies(global_indx)) {
-	  mss_tmp[si[i]] = EddyGpuUtils::MovAndECParamUpdate(pred[i],sm.GetSuscHzOffResField(si[i],st),sm.GetBiasField(),mask,true,fwhm[iter],global_indx,iter,clo.DebugLevel(),sm.Scan(si[i],st));
-	}
-	else mss_tmp[si[i]] = EddyGpuUtils::MovAndECParamUpdate(pred[i],sm.GetSuscHzOffResField(si[i],st),sm.GetBiasField(),mask,true,fwhm[iter],sm.Scan(si[i],st));
-	if (clo.VeryVerbose()) printf("Iter: %d, scan: %d, gpu_mss = %f\n",iter,si[i],mss_tmp[si[i]]);
+        if (clo.DebugLevel() && clo.DebugIndicies().IsAmongIndicies(global_indx)) {
+          mss_tmp[si[i]] = EddyGpuUtils::MovAndECParamUpdate(pred[i],sm.GetSuscHzOffResField(si[i],st),sm.GetBiasField(),mask,true,fwhm[iter],global_indx,iter,clo.DebugLevel(),sm.Scan(si[i],st));
+        }
+        else mss_tmp[si[i]] = EddyGpuUtils::MovAndECParamUpdate(pred[i],sm.GetSuscHzOffResField(si[i],st),sm.GetBiasField(),mask,true,fwhm[iter],sm.Scan(si[i],st));
+        if (clo.VeryVerbose()) printf("Iter: %d, scan: %d, gpu_mss = %f\n",iter,si[i],mss_tmp[si[i]]);
       }
       prof.EndEntry(update_chunk_key);
     }
@@ -917,7 +917,7 @@ ReplacementManager *Register(// Input
       // Update parameters
       unsigned int global_indx = (st==EDDY::DWI) ? sm.GetDwi2GlobalIndexMapping(s) : sm.Getb02GlobalIndexMapping(s);
       if (clo.DebugLevel() && clo.DebugIndicies().IsAmongIndicies(global_indx)) {
-	mss_tmp[s] = EddyUtils::MovAndECParamUpdate(pred,sm.GetSuscHzOffResField(s,st),sm.GetBiasField(),mask,true,fwhm[iter],global_indx,iter,clo.DebugLevel(),sm.Scan(s,st));
+        mss_tmp[s] = EddyUtils::MovAndECParamUpdate(pred,sm.GetSuscHzOffResField(s,st),sm.GetBiasField(),mask,true,fwhm[iter],global_indx,iter,clo.DebugLevel(),sm.Scan(s,st));
       }
       else mss_tmp[s] = EddyUtils::MovAndECParamUpdate(pred,sm.GetSuscHzOffResField(s,st),sm.GetBiasField(),mask,true,fwhm[iter],sm.Scan(s,st));
       if (clo.VeryVerbose()) printf("Iter: %d, scan: %d, mss = %f\n",iter,s,mss_tmp[s]);
@@ -947,10 +947,10 @@ ReplacementManager *Register(// Input
 } EddyCatch
 
 ReplacementManager *FinalOLCheck(// Input
-				 const EddyCommandLineOptions&  clo,
-				 // Input/output
-				 ReplacementManager             *rm,
-				 ECScanManager&                 sm) EddyTry
+                                 const EddyCommandLineOptions&  clo,
+                                 // Input/output
+                                 ReplacementManager             *rm,
+                                 ECScanManager&                 sm) EddyTry
 {
   static Utilities::FSLProfiler prof("_"+string(__FILE__)+"_"+string(__func__));
   double total_key = prof.StartEntry("Total");
@@ -1010,15 +1010,15 @@ ReplacementManager *FinalOLCheck(// Input
 *
 ********************************************************************/
 std::shared_ptr<DWIPredictionMaker> LoadPredictionMaker(// Input
-							const EddyCommandLineOptions& clo,
-							ScanType                      st,
-							const ECScanManager&          sm,
-							unsigned int                  iter,
-							float                         fwhm,
-							// Output
-							NEWIMAGE::volume<float>&      mask,
-							// Optional input
-							bool                          use_orig) EddyTry
+                                                        const EddyCommandLineOptions& clo,
+                                                        ScanType                      st,
+                                                        const ECScanManager&          sm,
+                                                        unsigned int                  iter,
+                                                        float                         fwhm,
+                                                        // Output
+                                                        NEWIMAGE::volume<float>&      mask,
+                                                        // Optional input
+                                                        bool                          use_orig) EddyTry
 {
   static Utilities::FSLProfiler prof("_"+string(__FILE__)+"_"+string(__func__));
   double total_key = prof.StartEntry("Total");
@@ -1035,11 +1035,11 @@ std::shared_ptr<DWIPredictionMaker> LoadPredictionMaker(// Input
     else {
       if (clo.HyParCostFunction() == CC) hpe = std::shared_ptr<CheapAndCheerfulHyParEstimator>(new CheapAndCheerfulHyParEstimator(clo.NVoxHp(),clo.InitRand()));
       else {
-	if (clo.HyParCostFunction() == MML) hpcf = std::shared_ptr<MMLHyParCF>(new MMLHyParCF);
-	else if (clo.HyParCostFunction() == CV) hpcf = std::shared_ptr<CVHyParCF>(new CVHyParCF);
-	else if (clo.HyParCostFunction() == GPP) hpcf = std::shared_ptr<GPPHyParCF>(new GPPHyParCF);
-	else throw EddyException("LoadPredictionMaker: Unknown hyperparameter cost-function");
-	hpe = std::shared_ptr<FullMontyHyParEstimator>(new FullMontyHyParEstimator(hpcf,clo.HyParFudgeFactor(),clo.NVoxHp(),clo.InitRand(),clo.VeryVerbose()));
+        if (clo.HyParCostFunction() == MML) hpcf = std::shared_ptr<MMLHyParCF>(new MMLHyParCF);
+        else if (clo.HyParCostFunction() == CV) hpcf = std::shared_ptr<CVHyParCF>(new CVHyParCF);
+        else if (clo.HyParCostFunction() == GPP) hpcf = std::shared_ptr<GPPHyParCF>(new GPPHyParCF);
+        else throw EddyException("LoadPredictionMaker: Unknown hyperparameter cost-function");
+        hpe = std::shared_ptr<FullMontyHyParEstimator>(new FullMontyHyParEstimator(hpcf,clo.HyParFudgeFactor(),clo.NVoxHp(),clo.InitRand(),clo.VeryVerbose()));
       }
     }
     pmp = std::shared_ptr<DWIPredictionMaker>(new DiffusionGP(K,hpe));  // GP
@@ -1079,13 +1079,13 @@ std::shared_ptr<DWIPredictionMaker> LoadPredictionMaker(// Input
 } EddyCatch
 
 DiffStatsVector DetectOutliers(// Input
-			       const EddyCommandLineOptions&             clo,
-			       ScanType                                  st,
-			       const std::shared_ptr<DWIPredictionMaker> pmp,
-			       const NEWIMAGE::volume<float>&            mask,
-			       const ECScanManager&                      sm,
-			       // Input/Output
-			       ReplacementManager&                       rm) EddyTry
+                               const EddyCommandLineOptions&             clo,
+                               ScanType                                  st,
+                               const std::shared_ptr<DWIPredictionMaker> pmp,
+                               const NEWIMAGE::volume<float>&            mask,
+                               const ECScanManager&                      sm,
+                               // Input/Output
+                               ReplacementManager&                       rm) EddyTry
 {
   static Utilities::FSLProfiler prof("_"+string(__FILE__)+"_"+string(__func__));
   double total_key = prof.StartEntry("Total");
@@ -1104,14 +1104,14 @@ DiffStatsVector DetectOutliers(// Input
 } EddyCatch
 
 void ReplaceOutliers(// Input
-		     const EddyCommandLineOptions&             clo,
-		     ScanType                                  st,
-		     const std::shared_ptr<DWIPredictionMaker> pmp,
-		     const NEWIMAGE::volume<float>&            mask,
-		     const ReplacementManager&                 rm,
-		     bool                                      add_noise,
-		     // Input/Output
-		     ECScanManager&                            sm) EddyTry
+                     const EddyCommandLineOptions&             clo,
+                     ScanType                                  st,
+                     const std::shared_ptr<DWIPredictionMaker> pmp,
+                     const NEWIMAGE::volume<float>&            mask,
+                     const ReplacementManager&                 rm,
+                     bool                                      add_noise,
+                     // Input/Output
+                     ECScanManager&                            sm) EddyTry
 {
   static Utilities::FSLProfiler prof("_"+string(__FILE__)+"_"+string(__func__));
   double total_key = prof.StartEntry("Total");
@@ -1124,10 +1124,10 @@ void ReplaceOutliers(// Input
       if (clo.VeryVerbose()) cout << "Scan " << s << " has " << ol.size() << " outlier slices" << endl;
       NEWIMAGE::volume<float> pred = pmp->Predict(s,true);
       if (add_noise) {
-	double vp = pmp->PredictionVariance(s,true);
-	double ve = pmp->ErrorVariance(s);
-	double stdev = std::sqrt(vp+ve) - std::sqrt(vp);
-	pred += EddyUtils::MakeNoiseIma(pred,0.0,stdev);
+        double vp = pmp->PredictionVariance(s,true);
+        double ve = pmp->ErrorVariance(s);
+        double stdev = std::sqrt(vp+ve) - std::sqrt(vp);
+        pred += EddyUtils::MakeNoiseIma(pred,0.0,stdev);
       }
       sm.Scan(s,st).SetAsOutliers(pred,sm.GetSuscHzOffResField(s,st),mask,ol);
     }
@@ -1151,11 +1151,11 @@ void ReplaceOutliers(// Input
 *
 ********************************************************************/
 std::vector<double> GetPredictionsForResampling(// Input
-						const EddyCommandLineOptions&    clo,
-						ScanType                         st,
-						const ECScanManager&             sm,
-						// Output
-						NEWIMAGE::volume4D<float>&       pred) EddyTry
+                                                const EddyCommandLineOptions&    clo,
+                                                ScanType                         st,
+                                                const ECScanManager&             sm,
+                                                // Output
+                                                NEWIMAGE::volume4D<float>&       pred) EddyTry
 {
   static Utilities::FSLProfiler prof("_"+string(__FILE__)+"_"+string(__func__));
   double total_key = prof.StartEntry("Total");
@@ -1213,13 +1213,13 @@ std::vector<double> GetPredictionsForResampling(// Input
 ********************************************************************/
 void GetScatterBrainPredictions(// Input
                                 const EddyCommandLineOptions&    clo,
-				ScanType                         st,
-				ECScanManager&                   sm,
-				const std::vector<double>&       hypar,
-				// Output
-				NEWIMAGE::volume4D<float>&       pred,
-				// Optional input
-				bool                             vwbvrot) EddyTry
+                                ScanType                         st,
+                                ECScanManager&                   sm,
+                                const std::vector<double>&       hypar,
+                                // Output
+                                NEWIMAGE::volume4D<float>&       pred,
+                                // Optional input
+                                bool                             vwbvrot) EddyTry
 {
   static Utilities::FSLProfiler prof("_"+string(__FILE__)+"_"+string(__func__));
   double total_key = prof.StartEntry("Total");
@@ -1282,13 +1282,13 @@ void GetScatterBrainPredictions(// Input
 *
 ********************************************************************/
 void CalculateCNRMaps(// Input
-		      const EddyCommandLineOptions&               clo,
-		      const ECScanManager&                        sm,
-		      // Output
-		      std::shared_ptr<NEWIMAGE::volume4D<float> > std_cnr,
-		      std::shared_ptr<NEWIMAGE::volume4D<float> > range_cnr,
+                      const EddyCommandLineOptions&               clo,
+                      const ECScanManager&                        sm,
+                      // Output
+                      std::shared_ptr<NEWIMAGE::volume4D<float> > std_cnr,
+                      std::shared_ptr<NEWIMAGE::volume4D<float> > range_cnr,
                       std::shared_ptr<NEWIMAGE::volume<float> >   b0_snr,
-		      std::shared_ptr<NEWIMAGE::volume4D<float> > residuals) EddyTry
+                      std::shared_ptr<NEWIMAGE::volume4D<float> > residuals) EddyTry
 {
   static Utilities::FSLProfiler prof("_"+string(__FILE__)+"_"+string(__func__));
   double total_key = prof.StartEntry("Total");
@@ -1330,34 +1330,34 @@ void CalculateCNRMaps(// Input
     for (unsigned int i=0; i<grpb.size(); i++) {
       mvols[i] = dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][0]));
       for (unsigned int j=1; j<dwi_indx[i].size(); j++) {
-	mvols[i] += dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][j]));
+        mvols[i] += dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][j]));
       }
       mvols[i] /= float(dwi_indx[i].size());
     }
     std::vector<NEWIMAGE::volume<float> >    stdvols(grpb.size());
     if (std_cnr) { // Calculate standard deviation volumes of predictions
       for (unsigned int i=0; i<grpb.size(); i++) {
-	NEWIMAGE::volume<float> tmp = dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][0])) - mvols[i];
-	stdvols[i] = tmp*tmp;
-	for (unsigned int j=1; j<dwi_indx[i].size(); j++) {
-	  tmp = dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][j])) - mvols[i];
-	  stdvols[i] += tmp*tmp;
-	}
-	stdvols[i] /= float(dwi_indx[i].size()-1);
-	stdvols[i] = NEWIMAGE::sqrt(stdvols[i]);
+        NEWIMAGE::volume<float> tmp = dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][0])) - mvols[i];
+        stdvols[i] = tmp*tmp;
+        for (unsigned int j=1; j<dwi_indx[i].size(); j++) {
+          tmp = dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][j])) - mvols[i];
+          stdvols[i] += tmp*tmp;
+        }
+        stdvols[i] /= float(dwi_indx[i].size()-1);
+        stdvols[i] = NEWIMAGE::sqrt(stdvols[i]);
       }
     }
     std::vector<NEWIMAGE::volume<float> >    minvols(grpb.size());
     std::vector<NEWIMAGE::volume<float> >    maxvols(grpb.size());
     if (range_cnr) { // Caclculate range (max-min) volumes of predictions
       for (unsigned int i=0; i<grpb.size(); i++) {
-	minvols[i] = dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][0]));
-	maxvols[i] = minvols[i];
-	for (unsigned int j=1; j<dwi_indx[i].size(); j++) {
-	  minvols[i] = NEWIMAGE::min(minvols[i],dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][j])));
-	  maxvols[i] = NEWIMAGE::max(maxvols[i],dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][j])));
-	}
-	maxvols[i] -= minvols[i]; // Maxvols now contain the range rather than the max
+        minvols[i] = dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][0]));
+        maxvols[i] = minvols[i];
+        for (unsigned int j=1; j<dwi_indx[i].size(); j++) {
+          minvols[i] = NEWIMAGE::min(minvols[i],dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][j])));
+          maxvols[i] = NEWIMAGE::max(maxvols[i],dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][j])));
+        }
+        maxvols[i] -= minvols[i]; // Maxvols now contain the range rather than the max
       }
     }
     // Calculate standard deviation of residuals
@@ -1366,8 +1366,8 @@ void CalculateCNRMaps(// Input
       NEWIMAGE::volume<float> tmp = dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][0])) - dwi_pmp->InputData(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][0]));
       stdres[i] = tmp*tmp;
       for (unsigned int j=1; j<dwi_indx[i].size(); j++) {
-	tmp = dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][j])) - dwi_pmp->InputData(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][j]));
-	stdres[i] += tmp*tmp;
+        tmp = dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][j])) - dwi_pmp->InputData(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][j]));
+        stdres[i] += tmp*tmp;
       }
       stdres[i] /= float(dwi_indx[i].size()-1);
       stdres[i] = NEWIMAGE::sqrt(stdres[i]);
@@ -1385,8 +1385,8 @@ void CalculateCNRMaps(// Input
       *b0_snr = b0_pmp->Predict(0) - b0_pmp->InputData(0); // N.B. Predict(i) is mean of all b0 scans
       *b0_snr *= *b0_snr;
       for (unsigned int i=1; i<b0_indx.size(); i++) {
-	NEWIMAGE::volume<float> tmp = b0_pmp->Predict(i) - b0_pmp->InputData(i);
-	*b0_snr += tmp*tmp;
+        NEWIMAGE::volume<float> tmp = b0_pmp->Predict(i) - b0_pmp->InputData(i);
+        *b0_snr += tmp*tmp;
       }
       *b0_snr /= static_cast<float>(b0_indx.size()-1);
       *b0_snr = NEWIMAGE::sqrt(*b0_snr);
@@ -1409,11 +1409,11 @@ void CalculateCNRMaps(// Input
 } EddyCatch
 
 void WriteCNRMaps(// Input
-		  const EddyCommandLineOptions&   clo,
-		  const ECScanManager&            sm,
-		  const std::string&              spatial_fname,
-		  const std::string&              range_fname,
-		  const std::string&              residual_fname) EddyTry
+                  const EddyCommandLineOptions&   clo,
+                  const ECScanManager&            sm,
+                  const std::string&              spatial_fname,
+                  const std::string&              range_fname,
+                  const std::string&              residual_fname) EddyTry
 {
   static Utilities::FSLProfiler prof("_"+string(__FILE__)+"_"+string(__func__));
   double total_key = prof.StartEntry("Total");
@@ -1472,11 +1472,11 @@ void WriteCNRMaps(// Input
 
 /*
 void WriteCNRMaps(// Input
-		  const EddyCommandLineOptions&   clo,
-		  const ECScanManager&            sm,
-		  const std::string&              spatial_fname,
-		  const std::string&              range_fname,
-		  const std::string&              residual_fname) EddyTry
+                  const EddyCommandLineOptions&   clo,
+                  const ECScanManager&            sm,
+                  const std::string&              spatial_fname,
+                  const std::string&              range_fname,
+                  const std::string&              residual_fname) EddyTry
 {
   if (spatial_fname == std::string("") && residual_fname == std::string("")) throw EddyException("EDDY::WriteCNRMaps: At least one of spatial and residual fname must be set");
 
@@ -1497,65 +1497,65 @@ void WriteCNRMaps(// Input
       std::vector<NEWIMAGE::volume<float> >    mvols(grpb.size());
       // Calculate mean volumes of predictions
       for (unsigned int i=0; i<grpb.size(); i++) {
-	mvols[i] = dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][0]));
-	for (unsigned int j=1; j<dwi_indx[i].size(); j++) {
-	  mvols[i] += dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][j]));
-	}
-	mvols[i] /= float(dwi_indx[i].size());
+        mvols[i] = dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][0]));
+        for (unsigned int j=1; j<dwi_indx[i].size(); j++) {
+          mvols[i] += dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][j]));
+        }
+        mvols[i] /= float(dwi_indx[i].size());
       }
       // Calculate standard deviation volumes of predictions
       std::vector<NEWIMAGE::volume<float> >    stdvols(grpb.size());
       for (unsigned int i=0; i<grpb.size(); i++) {
-	NEWIMAGE::volume<float> tmp = dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][0])) - mvols[i];
-	stdvols[i] = tmp*tmp;
-	for (unsigned int j=1; j<dwi_indx[i].size(); j++) {
-	  tmp = dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][j])) - mvols[i];
-	  stdvols[i] += tmp*tmp;
-	}
-	stdvols[i] /= float(dwi_indx[i].size()-1);
-	stdvols[i] = NEWIMAGE::sqrt(stdvols[i]);
+        NEWIMAGE::volume<float> tmp = dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][0])) - mvols[i];
+        stdvols[i] = tmp*tmp;
+        for (unsigned int j=1; j<dwi_indx[i].size(); j++) {
+          tmp = dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][j])) - mvols[i];
+          stdvols[i] += tmp*tmp;
+        }
+        stdvols[i] /= float(dwi_indx[i].size()-1);
+        stdvols[i] = NEWIMAGE::sqrt(stdvols[i]);
       }
       // Calculate range (min--max) volumes of predictions to make dHCP data seem like it has decent CNR
       std::vector<NEWIMAGE::volume<float> >    minvols(grpb.size());
       std::vector<NEWIMAGE::volume<float> >    maxvols(grpb.size());
       for (unsigned int i=0; i<grpb.size(); i++) {
-	minvols[i] = dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][0]));
-	maxvols[i] = minvols[i];
-	for (unsigned int j=1; j<dwi_indx[i].size(); j++) {
-	  minvols[i] = NEWIMAGE::min(minvols[i],dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][j])));
-	  maxvols[i] = NEWIMAGE::max(maxvols[i],dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][j])));
-	}
-	maxvols[i] -= minvols[i]; // Maxvols now contain the range rather than the max
+        minvols[i] = dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][0]));
+        maxvols[i] = minvols[i];
+        for (unsigned int j=1; j<dwi_indx[i].size(); j++) {
+          minvols[i] = NEWIMAGE::min(minvols[i],dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][j])));
+          maxvols[i] = NEWIMAGE::max(maxvols[i],dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][j])));
+        }
+        maxvols[i] -= minvols[i]; // Maxvols now contain the range rather than the max
       }
       // Calculate standard deviation of residuals
       std::vector<NEWIMAGE::volume<float> >  stdres(grpb.size());
       for (unsigned int i=0; i<grpb.size(); i++) {
-	NEWIMAGE::volume<float> tmp = dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][0])) - dwi_pmp->InputData(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][0]));
-	stdres[i] = tmp*tmp;
-	for (unsigned int j=1; j<dwi_indx[i].size(); j++) {
-	  tmp = dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][j])) - dwi_pmp->InputData(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][j]));
-	  stdres[i] += tmp*tmp;
-	}
-	stdres[i] /= float(dwi_indx[i].size()-1);
-	stdres[i] = NEWIMAGE::sqrt(stdres[i]);
+        NEWIMAGE::volume<float> tmp = dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][0])) - dwi_pmp->InputData(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][0]));
+        stdres[i] = tmp*tmp;
+        for (unsigned int j=1; j<dwi_indx[i].size(); j++) {
+          tmp = dwi_pmp->Predict(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][j])) - dwi_pmp->InputData(sm.GetGlobal2DWIIndexMapping(dwi_indx[i][j]));
+          stdres[i] += tmp*tmp;
+        }
+        stdres[i] /= float(dwi_indx[i].size()-1);
+        stdres[i] = NEWIMAGE::sqrt(stdres[i]);
       }
       // Divide std and range of predictions with std of residuals to get CNR
       for (unsigned int i=0; i<grpb.size(); i++) {
-	maxvols[i] /= stdres[i];
-	stdvols[i] /= stdres[i];
+        maxvols[i] /= stdres[i];
+        stdvols[i] /= stdres[i];
       }
       // Get the SNR (since CNR is zero) of the b0s
       std::vector<unsigned int>   b0_indx = sm.GetB0Indicies();
       NEWIMAGE::volume<float>     b0_SNR = b0_pmp->Predict(0) - b0_pmp->InputData(0);
       if (b0_indx.size() > 1) {
-	b0_SNR *= b0_SNR;
-	for (unsigned int i=1; i<b0_indx.size(); i++) {
-	  NEWIMAGE::volume<float> tmp = b0_pmp->Predict(i) - b0_pmp->InputData(i);
-	  b0_SNR += tmp*tmp;
-	}
-	b0_SNR /= float(b0_indx.size()-1);
-	b0_SNR = NEWIMAGE::sqrt(b0_SNR);
-	b0_SNR = b0_pmp->Predict(0) /= b0_SNR;
+        b0_SNR *= b0_SNR;
+        for (unsigned int i=1; i<b0_indx.size(); i++) {
+          NEWIMAGE::volume<float> tmp = b0_pmp->Predict(i) - b0_pmp->InputData(i);
+          b0_SNR += tmp*tmp;
+        }
+        b0_SNR /= float(b0_indx.size()-1);
+        b0_SNR = NEWIMAGE::sqrt(b0_SNR);
+        b0_SNR = b0_pmp->Predict(0) /= b0_SNR;
       }
       else b0_SNR = 0.0; // Set it to zero if we can't assess it.
       // Put SNR and CNR maps together into 4D file with spatial CNR
@@ -1563,23 +1563,23 @@ void WriteCNRMaps(// Input
       NEWIMAGE::copybasicproperties(stdvols[0],spat_cnr);
       spat_cnr[0] = b0_SNR;
       if (spatial_fname != std::string("")) {
-	for (unsigned int i=0; i<stdvols.size(); i++) spat_cnr[i+1] = stdvols[i];
-	NEWIMAGE::write_volume(spat_cnr,spatial_fname);
+        for (unsigned int i=0; i<stdvols.size(); i++) spat_cnr[i+1] = stdvols[i];
+        NEWIMAGE::write_volume(spat_cnr,spatial_fname);
       }
       // Put SNR and range maps together into 4D file with spatial "range-CNR"
       if (range_fname != std::string("")) {
-	for (unsigned int i=0; i<maxvols.size(); i++) spat_cnr[i+1] = maxvols[i];
-	NEWIMAGE::write_volume(spat_cnr,range_fname);
+        for (unsigned int i=0; i<maxvols.size(); i++) spat_cnr[i+1] = maxvols[i];
+        NEWIMAGE::write_volume(spat_cnr,range_fname);
       }
     }
     if (residual_fname != std::string("")) {   // Calculate and write maps of residuals for all (b0 and DWI) scans
       NEWIMAGE::volume4D<float> residuals(dwi_pmp->InputData(0).xsize(),dwi_pmp->InputData(0).ysize(),dwi_pmp->InputData(0).zsize(),sm.NScans(ANY));
       NEWIMAGE::copybasicproperties(dwi_pmp->InputData(0),residuals);
       for (unsigned int i=0; i<sm.NScans(DWI); i++) {
-	residuals[sm.GetDwi2GlobalIndexMapping(i)] = dwi_pmp->InputData(i) - dwi_pmp->Predict(i);
+        residuals[sm.GetDwi2GlobalIndexMapping(i)] = dwi_pmp->InputData(i) - dwi_pmp->Predict(i);
       }
       for (unsigned int i=0; i<sm.NScans(B0); i++) {
-	residuals[sm.Getb02GlobalIndexMapping(i)] = b0_pmp->InputData(i) - b0_pmp->Predict(i);
+        residuals[sm.Getb02GlobalIndexMapping(i)] = b0_pmp->InputData(i) - b0_pmp->Predict(i);
       }
       NEWIMAGE::write_volume(residuals,residual_fname);
     }
@@ -1591,16 +1591,16 @@ void WriteCNRMaps(// Input
 */
 
 void Diagnostics(// Input
-		 const EddyCommandLineOptions&  clo,
-		 unsigned int                   iter,
-		 ScanType                       st,
-		 const ECScanManager&           sm,
+                 const EddyCommandLineOptions&  clo,
+                 unsigned int                   iter,
+                 ScanType                       st,
+                 const ECScanManager&           sm,
                  const double                   *mss_tmp,
                  const DiffStatsVector&         stats,
-		 const ReplacementManager&      rm,
-		 // Output
-		 NEWMAT::Matrix&                mss,
-		 NEWMAT::Matrix&                phist) EddyTry
+                 const ReplacementManager&      rm,
+                 // Output
+                 NEWMAT::Matrix&                mss,
+                 NEWMAT::Matrix&                phist) EddyTry
 {
   if (clo.Verbose()) {
     double tss=0.0;
@@ -1623,7 +1623,7 @@ void Diagnostics(// Input
 } EddyCatch
 
 void AddRotation(ECScanManager&               sm,
-		 const NEWMAT::ColumnVector&  rp) EddyTry
+                 const NEWMAT::ColumnVector&  rp) EddyTry
 {
   for (unsigned int i=0; i<sm.NScans(); i++) {
     NEWMAT::ColumnVector mp = sm.Scan(i).GetParams(EDDY::MOVEMENT);
