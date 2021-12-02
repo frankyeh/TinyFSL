@@ -1,1 +1,1 @@
-move /y patches\eddy\eddy.cpp include\eddy
+move /y patches\eddy\* include\eddy
