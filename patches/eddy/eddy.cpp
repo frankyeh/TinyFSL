@@ -17,7 +17,6 @@ using std::tr1::array;
 #include "armawrap/newmat.h"
 #include "newimage/newimageall.h"
 #include "miscmaths/miscmaths.h"
-#include "utils/stack_dump.h"
 #include "utils/FSLProfiler.h"
 #include "EddyHelperClasses.h"
 #include "ECScanClasses.h"
@@ -35,14 +34,13 @@ using std::tr1::array;
 #include "cuda/EddyGpuUtils.h"
 #endif
 
+#include "tipl/tipl.hpp"
 using namespace std;
 using namespace EDDY;
 
 /// The entry point of eddy.
 int main(int argc, char *argv[]) try
 {
-  StackDump::Install(); // Gives us informative stack dump if/when program crashes
-
   // Parse comand line input
   EddyCommandLineOptions clo(argc,argv); // Command Line Options
 
@@ -911,7 +909,7 @@ ReplacementManager *Register(// Input
     }
     #else
     # pragma omp parallel for shared(mss_tmp, pmp)
-    for (int s=0; s<int(sm.NScans(st)); s++) {
+    tipl::par_for(int(sm.NScans(st)),[&](int s){
       // Get prediction in model space
       NEWIMAGE::volume<float> pred = pmp->Predict(s);
       // Update parameters
@@ -922,6 +920,7 @@ ReplacementManager *Register(// Input
       else mss_tmp[s] = EddyUtils::MovAndECParamUpdate(pred,sm.GetSuscHzOffResField(s,st),sm.GetBiasField(),mask,true,fwhm[iter],sm.Scan(s,st));
       if (clo.VeryVerbose()) printf("Iter: %d, scan: %d, mss = %f\n",iter,s,mss_tmp[s]);
     }
+    );
     #endif
     prof.EndEntry(update_key);
 
@@ -1052,7 +1051,8 @@ std::shared_ptr<DWIPredictionMaker> LoadPredictionMaker(// Input
   if (clo.Verbose()) cout << "Loading prediction maker";
   if (clo.VeryVerbose()) cout << endl << "Scan: " << endl;
 #pragma omp parallel for shared(pmp,st)
-  for (int s=0; s<int(sm.NScans(st)); s++) {
+  std::mutex mu;
+  tipl::par_for(int(sm.NScans(st)),[&](int s){
     if (clo.VeryVerbose()) printf(" %d\n",s);
     NEWIMAGE::volume<float> tmpmask = sm.Scan(s,st).GetIma();
     EddyUtils::SetTrilinearInterp(tmpmask); tmpmask = 1.0;
@@ -1060,9 +1060,11 @@ std::shared_ptr<DWIPredictionMaker> LoadPredictionMaker(// Input
     else pmp->SetScan(sm.GetUnwarpedScan(s,tmpmask,st),sm.Scan(s,st).GetDiffPara(clo.RotateBVecsDuringEstimation()),s);
 #pragma omp critical
     {
+      std::lock_guard<std::mutex> lock(mu);
       mask *= tmpmask;
     }
   }
+  );
   prof.EndEntry(load_key);
   double eval_key = prof.StartEntry("Evaluating");
   if (clo.Verbose()) cout << endl << "Evaluating prediction maker model" << endl;
@@ -1093,10 +1095,12 @@ DiffStatsVector DetectOutliers(// Input
   // Generate slice-wise stats on difference between observation and prediction
   DiffStatsVector stats(sm.NScans(st));
 #pragma omp parallel for shared(stats,st)
-  for (int s=0; s<int(sm.NScans(st)); s++) {
+  tipl::par_for(int(sm.NScans(st)),[&](int s){
+    if (clo.VeryVerbose()) cout << s << std::endl;
     NEWIMAGE::volume<float> pred = pmp->Predict(s);
     stats[s] = EddyUtils::GetSliceWiseStats(pred,sm.GetSuscHzOffResField(s,st),mask,sm.Mask(),sm.Scan(s,st));
   }
+  );
   // Detect outliers and update replacement manager
   rm.Update(stats);
   prof.EndEntry(total_key);
@@ -1118,7 +1122,7 @@ void ReplaceOutliers(// Input
   // Replace outlier slices with their predictions
   if (clo.VeryVerbose()) cout << "Replacing outliers with predictions" << endl;
 #pragma omp parallel for shared(st)
-  for (int s=0; s<int(sm.NScans(st)); s++) {
+  tipl::par_for(int(sm.NScans(st)),[&](int s){
     std::vector<unsigned int> ol = rm.OutliersInScan(s);
     if (ol.size()) { // If this scan has outlier slices
       if (clo.VeryVerbose()) cout << "Scan " << s << " has " << ol.size() << " outlier slices" << endl;
@@ -1132,6 +1136,7 @@ void ReplaceOutliers(// Input
       sm.Scan(s,st).SetAsOutliers(pred,sm.GetSuscHzOffResField(s,st),mask,ol);
     }
   }
+  );
   prof.EndEntry(total_key);
   return;
 } EddyCatch
