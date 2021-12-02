@@ -3,7 +3,7 @@
     align shells to each other and to b0 after the "main eddy"
     has completed.
 */
-
+#include "tipl/tipl.hpp"
 #include <iostream>
 
 #include "topup/topup_file_io.h"
@@ -170,18 +170,19 @@ NEWIMAGE::volume<float> PEASUtils::get_mean_scan(// Input
     mask *= tmpmask;
   }
 #else
-#pragma omp parallel for shared(sm,mean,mask)
-  for (int i=0; i<int(indx.size()); i++) {
+  std::mutex m;
+  tipl::par_for(int(indx.size()),[&](int i){
     if (clo.VeryVerbose()) { cout << indx[i] << " "; cout.flush(); }
     NEWIMAGE::volume<float> tmpmask = sm.Scan(0,ANY).GetIma();
     EddyUtils::SetTrilinearInterp(tmpmask); tmpmask = 1.0;
     NEWIMAGE::volume<float> tmpima = sm.GetUnwarpedScan(indx[i],tmpmask,ANY);
-#pragma omp critical
     {
+      std::lock_guard<std::mutex> lock(m);
       mean += tmpima;
       mask *= tmpmask;
     }
   }
+  );
 #endif
   if (clo.VeryVerbose()) printf("\n");
   mean /= indx.size();
@@ -430,10 +431,8 @@ void PEASUtils::align_shells_using_MI(// Input
   if (clo.VeryVerbose()) cout << "Registering shell means" << endl;
   mov_par.resize(dwi_means.size());
   NEWIMAGE::volume<float> rima;
-  #ifndef COMPILE_GPU
-  # pragma omp parallel for shared(mov_par)
-  #endif
-  for (unsigned int i=0; i<dwi_means.size(); i++) {
+
+  tipl::par_for (dwi_means.size(),[&](unsigned int i){
     if (pe_only) {
       if (clo.VeryVerbose()) cout << "Registering shell " << grpb[i] << " along PE to b0" << endl;
       unsigned int pe_dir = sm.HasPEinX() ? 0 : 1;
@@ -446,16 +445,17 @@ void PEASUtils::align_shells_using_MI(// Input
       if (clo.VeryVerbose()) cout << "mov_par = " << mov_par[i] << endl;
     }
   }
+  );
   // NEWIMAGE::write_volume(rima,"registered_mean_dwi_volume");
 
 
   cmov_par.resize(dwi_means.size());
   for (unsigned int i=0; i<dwi_means.size(); i++) {
     cmov_par[i].resize(dwi_means.size());
-    #ifndef COMPILE_GPU
-    # pragma omp parallel for shared(cmov_par)
-    #endif
-    for (unsigned int j=i+1; j<dwi_means.size(); j++) {
+
+    tipl::par_for (dwi_means.size(),[&](unsigned int j){
+      if(j < i + 1)
+            return;
       if (pe_only) {
 	if (clo.VeryVerbose()) cout << "Registering shell " << j << " along PE to shell " << i << endl; cout.flush();
 	if (clo.VeryVerbose()) cout << "Registering shell " << grpb[j] << " along PE to shell " << grpb[i] << endl; cout.flush();
@@ -470,6 +470,7 @@ void PEASUtils::align_shells_using_MI(// Input
 	if (clo.VeryVerbose()) cout << "cmov_par = " << cmov_par[i][j] << endl;
       }
     }
+    );
   }
 
   // Collate estimates to use
