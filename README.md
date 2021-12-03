@@ -16,7 +16,7 @@ TinyFSL follows the original FSL license https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/
 
 - [x] [eddy](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/eddy)
 
-The eddy in TinyFSL have more multi-core support than the original eddy_openmp version. There are four places in eddy_openmp that cannot be parallelized due to free() error. The one in TinyFSL does not have this problem.
+The eddy in TinyFSL have more multi-core support than the original eddy_openmp version. There are four places in the original eddy_openmp version unabled to be parallelized due to free() error. The eddy in TinyFSL solved this limitation and potentially faster than eddy_openmp.
   
 - [x] [topup](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/topup/TopupUsersGuide)
 
