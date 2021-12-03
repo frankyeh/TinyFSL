@@ -14,7 +14,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include <unistd.h>
+
 
 #include "armawrap/newmatap.h"
 #include "armawrap/newmatio.h"
