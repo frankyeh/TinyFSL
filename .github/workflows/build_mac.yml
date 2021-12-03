@@ -36,7 +36,7 @@ jobs:
       - name: Patch FSL
         run: |
           cd src
-          for i in "fsl-"*;do mv -v -f "$i"/* ../include/"${i#"fsl-"}";done
+          for i in "fsl-"*;do mv -v -f "$i" ../include/"${i#"fsl-"}";done
           cd ..
           cd patches
           for i in *;do mv -v -f "$i"/* ../include/"$i";done
