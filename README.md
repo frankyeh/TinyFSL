@@ -1,7 +1,7 @@
 # Tiny FSL
 A simplified re-comiled version of the FSL package 
 
-* Download-and-run executives. No installation required
+* Download-and-run. No installation required
 * Tiny (< 100 mb)
 * Windows version available
 * Improved multi-core supports
