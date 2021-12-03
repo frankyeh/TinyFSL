@@ -1,0 +1,107 @@
+name: BUILD_WIN64
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag'
+        required: true
+        default: '2021.12.00'
+        
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download FSL
+        run: |
+          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-armawrap-0.6.0-h2bc3f7f_0.tar.bz2 --output fsl-armawrap-0.6.0-h2bc3f7f_0.tar.bz2 
+          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-avwutils-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-avwutils-2111.0-h2bc3f7f_0.tar.bz2
+          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-bet2-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-bet2-2111.0-h2bc3f7f_0.tar.bz2
+          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-basisfield-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-basisfield-2111.0-h2bc3f7f_0.tar.bz2
+          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-cprob-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-cprob-2111.0-h2bc3f7f_0.tar.bz2
+          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-eddy-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-eddy-2111.0-h2bc3f7f_0.tar.bz2 
+          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-meshclass-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-meshclass-2111.0-h2bc3f7f_0.tar.bz2
+          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-miscmaths-2111.1-h2bc3f7f_0.tar.bz2 --output fsl-miscmaths-2111.1-h2bc3f7f_0.tar.bz2
+          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-newimage-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-newimage-2111.0-h2bc3f7f_0.tar.bz2
+          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-newimage-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-newimage-2111.0-h2bc3f7f_0.tar.bz2
+          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-newnifti-4.0.0-h2bc3f7f_0.tar.bz2 --output fsl-newnifti-4.0.0-h2bc3f7f_0.tar.bz2 
+          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-topup-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-topup-2111.0-h2bc3f7f_0.tar.bz2
+          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-utils-2111.1-h2bc3f7f_0.tar.bz2 --output fsl-utils-2111.1-h2bc3f7f_0.tar.bz2
+          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-warpfns-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-warpfns-2111.0-h2bc3f7f_0.tar.bz2
+          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-znzlib-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-znzlib-2111.0-h2bc3f7f_0.tar.bz2
+          7z e *.bz2
+          del *.bz2
+          7z x *.tar -y
+          del *.tar
+          cd include
+          for /f "delims=" %%x in ('dir * /b ') do (move /y ..\src\fsl-%%x\* %%x) 
+          cd ..
+          rmdir /S /Q bin
+          rmdir /S /Q info
+          rmdir /S /Q src
+          rmdir /S /Q tcl
+          rmdir /S /Q lib
+      - name: Patch FSL
+        run: |
+          for /f "delims=" %%x in ('dir patches\*.bat /b ') do (call patches\%%x)
+        shell: cmd
+        
+      - name: Download TIPL
+        run: |
+          git clone https://github.com/frankyeh/TIPL.git
+          move TIPL include
+          
+      - name: Download Boost
+        run: |
+          curl -L https://boostorg.jfrog.io/artifactory/main/release/1.77.0/source/boost_1_77_0.tar.bz2 --output boost.tar.bz2
+          7z x boost.tar.bz2
+          7z x boost.tar
+          del *.tar
+          del *.tar.bz2
+          move ./boost_1_77_0/boost ./include
+          rmdir /S /Q boost_1_77_0        
+      - name: Download OpenBLAS
+        run: |
+          curl -L https://github.com/xianyi/OpenBLAS/releases/download/v0.3.18/OpenBLAS-0.3.18-x64.zip --output openblas.zip
+          7z x openblas.zip
+          del openblas.zip
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v2
+        with:
+          version: 5.12.0
+      - name: Compile Programs 
+        run: |
+          for /f "usebackq delims=#" %%a in (`"%programfiles(x86)%\Microsoft Visual Studio\Installer\vswhere" -latest -property installationPath`) do call "%%a\Common7\Tools\VsDevCmd.bat" -arch=x64
+          mkdir -p build
+          cd build
+          qmake ../eddy.pro QMAKE_LIBDIR=${{ github.workspace }}/lib
+          nmake
+          qmake ../topup.pro QMAKE_LIBDIR=${{ github.workspace }}/lib
+          nmake
+          qmake ../applytopup.pro QMAKE_LIBDIR=${{ github.workspace }}/lib
+          nmake
+          qmake ../bet2.pro QMAKE_LIBDIR=${{ github.workspace }}/lib
+          nmake
+        shell: cmd
+        
+      - name: Packaging
+        run: |
+          mkdir tiny_fsl
+          move build\release\*.exe tiny_fsl
+          move bin\*.dll tiny_fsl
+          windeployqt tiny_fsl\eddy.exe
+          
+      - name: Zip Package
+        uses: TheDoctor0/zip-release@0.6.0
+        with:
+          filename: tiny_fsl_win64.zip
+          exclusions: .git
+          path: tiny_fsl          
+          
+      - name: Create Release
+        uses: ncipollo/release-action@v1.8.9
+        with:
+          allowUpdates: true
+          artifacts: "*.zip"
+          tag: ${{ github.event.inputs.tag }}
+          prerelease: false  
