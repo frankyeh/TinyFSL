@@ -5,7 +5,7 @@ on:
       tag:
         description: 'Tag'
         required: true
-        default: '2021.12.00'
+        default: '2021.12.03'
         
 jobs:
   mac_build:
@@ -78,7 +78,7 @@ jobs:
           make
           qmake ../bet2.pro QMAKE_LIBDIR=${{ github.workspace }}/lib
           make
-               
+          rm *.o
       - name: Packaging
         run: |
           mkdir tiny_fsl
