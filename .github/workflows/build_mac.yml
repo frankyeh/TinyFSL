@@ -35,9 +35,12 @@ jobs:
           rm -fr *.tar
       - name: Patch FSL
         run: |
-          for i in src/"fsl-"*;do mv -v -f src/"$i" "${i#"fsl-"}";done
-          for i in src/*;do mv -v -f "$i"/* include/"${i#"src/"}";done
-          for i in patches/*;do mv -v -f "$i"/* include/"${i#"patches/"}";done
+          cd src
+          for i in "fsl-"*;do mv -v -f "$i"/* ../include/"${i#"fsl-"}";done
+          cd ..
+          cd patches
+          for i in *;do mv -v -f "$i"/* ../include/"$i";done
+          cd ..
           rm -fr bin
           rm -fr info
           rm -fr src
