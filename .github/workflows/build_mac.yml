@@ -46,11 +46,12 @@ jobs:
           rm -fr src
           rm -fr tcl
           rm -fr lib
+          ls include
       - name: Download TIPL
         run: |
           git clone https://github.com/frankyeh/TIPL.git
           mv TIPL include
-          
+          ls include          
       - name: Download Boost
         run: |
           curl -L https://boostorg.jfrog.io/artifactory/main/release/1.77.0/source/boost_1_77_0.tar.bz2 --output boost.tar.bz2
@@ -59,27 +60,33 @@ jobs:
           rm -f *.tar
           rm -f *.tar.bz2
           mv -f ./boost_1_77_0/boost ./include    
+          ls include
       - name: Download OpenBLAS
         run: |
           curl -L https://github.com/xianyi/OpenBLAS/releases/download/v0.3.18/OpenBLAS-0.3.18-x64.zip --output openblas.zip
           7z x openblas.zip
           rm -f openblas.zip
+          ls
       - name: Install Qt
         run: |
           brew update
           brew install qt5
       - name: Compile Programs 
         run: |
+          ls
+          ls include
           export PATH="/usr/local/opt/qt@5/bin:$PATH" && export LDFLAGS="-L/usr/local/opt/qt@5/lib" && export CPPFLAGS="-I/usr/local/opt/qt@5/include" && export PKG_CONFIG_PATH="/usr/local/opt/qt@5/lib/pkgconfig"
-          qmake eddy.pro QMAKE_LIBDIR=${{ github.workspace }}/lib
+          mkdir -p build
+          cd build
+          qmake ../eddy.pro QMAKE_LIBDIR=${{ github.workspace }}/lib
           make
-          qmake topup.pro QMAKE_LIBDIR=${{ github.workspace }}/lib
+          qmake ../topup.pro QMAKE_LIBDIR=${{ github.workspace }}/lib
           make
-          qmake applytopup.pro QMAKE_LIBDIR=${{ github.workspace }}/lib
+          qmake ../applytopup.pro QMAKE_LIBDIR=${{ github.workspace }}/lib
           make
-          qmake bet2.pro QMAKE_LIBDIR=${{ github.workspace }}/lib
+          qmake ../bet2.pro QMAKE_LIBDIR=${{ github.workspace }}/lib
           make
-          ls        
+               
       - name: Packaging
         run: |
           mkdir tiny_fsl
