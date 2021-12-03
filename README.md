@@ -1,5 +1,10 @@
 # Tiny FSL
-A simplified redistribution of FSL package
+A simplified re-comiled version of the FSL package 
+
+* Download-and-run executives. No installation required
+* Tiny (< 100 mb)
+* Windows version available
+* Improved multi-core supports
 
 Parent package: FMRIB Software Library v6.0 (version 2111)
 
