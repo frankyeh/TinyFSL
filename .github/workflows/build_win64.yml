@@ -35,9 +35,7 @@ jobs:
           del *.tar
       - name: Patch FSL
         run: |
-          cd include
           for /f "delims=" %%x in ('dir include\* /b ') do (move /y src\fsl-%%x\* include\%%x) 
-          cd ..
           rmdir /S /Q bin
           rmdir /S /Q info
           rmdir /S /Q src
