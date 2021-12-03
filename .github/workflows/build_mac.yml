@@ -37,10 +37,10 @@ jobs:
         run: |
           cd src
           for i in "fsl-"*;do mv -v -f "$i" "${i#"fsl-"}";done
-          for i in *;do mv -v -f "$i" ../include;done
+          for i in *;do cp -v -r -f "$i" ../include/;done
           cd ..
           cd patches
-          for i in *;do mv -v -f "$i"/* ../include/"$i";done
+          for i in *;do cp -v -r -f "$i" ../include/;done
           cd ..
           rm -fr bin
           rm -fr info
