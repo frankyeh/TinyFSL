@@ -191,7 +191,7 @@ typedef struct
 #if 1
 /* #ifdef __STDC__ */
 #define ANSIPROT 1
-int mtherr ( char *, int );
+int mtherr (const char *, int );
 #else
 int mtherr();
 #endif
