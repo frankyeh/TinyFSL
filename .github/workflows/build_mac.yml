@@ -71,13 +71,13 @@ jobs:
       - name: Compile Programs 
         run: |
           export PATH="/usr/local/opt/qt@5/bin:$PATH" && export LDFLAGS="-L/usr/local/opt/qt@5/lib" && export CPPFLAGS="-I/usr/local/opt/qt@5/include" && export PKG_CONFIG_PATH="/usr/local/opt/qt@5/lib/pkgconfig"
-          qmake ../eddy.pro QMAKE_LIBDIR=${{ github.workspace }}/lib
+          qmake eddy.pro QMAKE_LIBDIR=${{ github.workspace }}/lib
           make
-          qmake ../topup.pro QMAKE_LIBDIR=${{ github.workspace }}/lib
+          qmake topup.pro QMAKE_LIBDIR=${{ github.workspace }}/lib
           make
-          qmake ../applytopup.pro QMAKE_LIBDIR=${{ github.workspace }}/lib
+          qmake applytopup.pro QMAKE_LIBDIR=${{ github.workspace }}/lib
           make
-          qmake ../bet2.pro QMAKE_LIBDIR=${{ github.workspace }}/lib
+          qmake bet2.pro QMAKE_LIBDIR=${{ github.workspace }}/lib
           make
           ls        
       - name: Packaging
