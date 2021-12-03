@@ -80,6 +80,7 @@ jobs:
           make
           rm *.o
           rm Makefile
+          /usr/local/opt/qt@5/bin/macdeployqt eddy
       - name: Packaging
         run: |
           mkdir tiny_fsl
