@@ -60,15 +60,11 @@ jobs:
           rm -f *.tar
           rm -f *.tar.bz2
           mv -f ./boost_1_77_0/boost ./include    
-      - name: Download OpenBLAS
-        run: |
-          curl -L https://github.com/xianyi/OpenBLAS/releases/download/v0.3.18/OpenBLAS-0.3.18-x64.zip --output openblas.zip
-          7z x openblas.zip
-          rm -f openblas.zip
-      - name: Install Qt
+      - name: Install Qt and OpenBLAS
         run: |
           brew update
           brew install qt5
+          brew install openblas
       - name: Compile Programs 
         run: |
           export PATH="/usr/local/opt/qt@5/bin:$PATH" && export LDFLAGS="-L/usr/local/opt/qt@5/lib" && export CPPFLAGS="-I/usr/local/opt/qt@5/include" && export PKG_CONFIG_PATH="/usr/local/opt/qt@5/lib/pkgconfig"
