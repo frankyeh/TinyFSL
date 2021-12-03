@@ -86,6 +86,7 @@ jobs:
           move build\release\*.exe tiny_fsl
           move bin\*.dll tiny_fsl
           windeployqt tiny_fsl\eddy.exe
+          move FSL_LICENSE tiny_fsl
           
       - name: Zip Package
         uses: TheDoctor0/zip-release@0.6.0
