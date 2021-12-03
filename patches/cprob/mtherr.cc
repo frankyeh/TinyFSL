@@ -47,7 +47,7 @@
  * mconf.h
  *
  */
-
+
 /*
 Cephes Math Library Release 2.0:  April, 1987
 Copyright 1984, 1987 by Stephen L. Moshier
@@ -67,7 +67,7 @@ int merror = 0;
  * messages is bound to the error codes defined
  * in mconf.h.
  */
-static char *ermsg[7] = {
+static const char *ermsg[7] = {
 "unknown",      /* error code 0 */
 "domain",       /* error code 1 */
 "singularity",  /* et seq.      */
@@ -78,15 +78,15 @@ static char *ermsg[7] = {
 };
 
 /* Current error function */
-static int (*err_fn)(char *name, int code) = mtherr_default;
+static int (*err_fn)(const char *name, int code) = mtherr_default;
 
 
-int mtherr(char *name, int code)
+int mtherr(const char *name, int code)
 {
   return err_fn(name, code);
 }
 
-int set_mtherr (int (*fn)(char *, int))
+int set_mtherr (int (*fn)(const char *, int))
 {
   err_fn = fn;
   return 0;
@@ -94,11 +94,11 @@ int set_mtherr (int (*fn)(char *, int))
 
 
 /* Set err_fn to this to suppress all errors. */
-int mtherr_quiet(char *name, int code) {
+int mtherr_quiet(const char *name, int code) {
   return 0;
 }
 
-int mtherr_default( char *name, int code )
+int mtherr_default(const char *name, int code )
 {
 
 /* Display string passed by calling program,
@@ -114,7 +114,7 @@ merror = code;
  * by the code argument.
  */
 if( (code <= 0) || (code >= 7) )
-	code = 0;
+    code = 0;
 printf( "%s error\n", ermsg[code] );
 
 /* Return to calling
