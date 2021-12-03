@@ -13,7 +13,7 @@ LIBS += -lz -lopenblas
 }
 
 mac{
-LIBS += -L/usr/local/opt/openblas/lib -lz -lopenblas
+LIBS += -L/usr/local/opt/openblas/lib -lz -l:libopenblas.a
 }
 
 
