@@ -30,7 +30,7 @@ jobs:
           curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-warpfns-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-warpfns-2111.0-h2bc3f7f_0.tar.bz2
           curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-znzlib-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-znzlib-2111.0-h2bc3f7f_0.tar.bz2
           bunzip2 *.bz2
-          for i in *.tar;do tar -xfv "$i";done
+          for i in *.tar;do tar -xf "$i";done
           rm -fr *.bz2
           rm -fr *.tar
       - name: Patch FSL
