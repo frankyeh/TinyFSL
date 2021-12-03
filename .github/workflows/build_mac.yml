@@ -79,6 +79,7 @@ jobs:
           qmake ../bet2.pro QMAKE_LIBDIR=${{ github.workspace }}/lib
           make
           rm *.o
+          rm Makefile
       - name: Packaging
         run: |
           mkdir tiny_fsl
