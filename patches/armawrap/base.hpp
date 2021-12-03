@@ -198,19 +198,19 @@ namespace armawrap {
      */
 
     inline elem_type operator()(const int i) const {
-      return AWCallManager<elem_type, wT, is_simple_armawrap_type<wT>::value>(get_wt_ref(), i);
+      return *&AWCallManager<elem_type, wT, is_simple_armawrap_type<wT>::value>(get_wt_ref(), i);
     }
 
     inline elem_type operator()(const int row, const int col) const {
-      return AWCallManager<elem_type, wT, is_simple_armawrap_type<wT>::value>(get_wt_ref(), row, col);
+      return *&AWCallManager<elem_type, wT, is_simple_armawrap_type<wT>::value>(get_wt_ref(), row, col);
     }
 
-    inline AWCallManager<elem_type, wT, is_simple_armawrap_type<wT>::value> operator()(const int i) {
-      return AWCallManager<elem_type, wT, is_simple_armawrap_type<wT>::value>(get_wt_ref(), i);
+    inline elem_type& operator()(const int i) {
+      return *&AWCallManager<elem_type, wT, is_simple_armawrap_type<wT>::value>(get_wt_ref(), i);
     }
 
-    inline AWCallManager<elem_type, wT, is_simple_armawrap_type<wT>::value> operator()(const int row, const int col) {
-      return AWCallManager<elem_type, wT, is_simple_armawrap_type<wT>::value>(get_wt_ref(), row, col);
+    inline elem_type& operator()(const int row, const int col) {
+      return *&AWCallManager<elem_type, wT, is_simple_armawrap_type<wT>::value>(get_wt_ref(), row, col);
     }
 
     /*
@@ -225,11 +225,11 @@ namespace armawrap {
       return operator()(row + 1, col + 1);
     }
 
-    inline AWCallManager<elem_type, wT, is_simple_armawrap_type<wT>::value> element(const int i) {
+    inline elem_type& element(const int i) {
       return operator()(i + 1);
     }
 
-    inline AWCallManager<elem_type, wT, is_simple_armawrap_type<wT>::value> element(const int row, const int col) {
+    inline elem_type& element(const int row, const int col) {
       return operator()(row + 1, col + 1);
     }
 
