@@ -24,7 +24,7 @@
 #include <vector>
 #include <cmath>
 #include <iomanip>
-#include <sys/time.h>
+
 #include <boost/current_function.hpp>
 #include "armawrap/newmat.h"
 #include "newimage/newimageall.h"
