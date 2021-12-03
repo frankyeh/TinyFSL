@@ -33,19 +33,18 @@ jobs:
           del *.bz2
           7z x *.tar -y
           del *.tar
+      - name: Patch FSL
+        run: |
           cd include
-          for /f "delims=" %%x in ('dir * /b ') do (move /y ..\src\fsl-%%x\* %%x) 
+          for /f "delims=" %%x in ('dir include\* /b ') do (move /y src\fsl-%%x\* include\%%x) 
           cd ..
           rmdir /S /Q bin
           rmdir /S /Q info
           rmdir /S /Q src
           rmdir /S /Q tcl
           rmdir /S /Q lib
-      - name: Patch FSL
-        run: |
           for /f "delims=" %%x in ('dir patches\*.bat /b ') do (call patches\%%x)
         shell: cmd
-        
       - name: Download TIPL
         run: |
           git clone https://github.com/frankyeh/TIPL.git
