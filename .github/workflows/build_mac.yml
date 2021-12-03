@@ -35,17 +35,14 @@ jobs:
           rm -fr *.tar
       - name: Patch FSL
         run: |
-          cd src
-          for i in "fsl-"*;do mv "$i" "${i#"fsl-"}";done
-          cd ..
-          mv -f src/* include
-          mv -f patches/* include
+          for i in src/"fsl-"*;do mv -f src/"$i" src/"${i#"fsl-"}";done
+          for i in src/*;do mv -f "$i"/* include/"${i#"src/"}";done
+          for i in patches/*;do mv -f "$i"/* include/"${i#"patches/"}";done
           rm -fr bin
           rm -fr info
           rm -fr src
           rm -fr tcl
           rm -fr lib
-          
       - name: Download TIPL
         run: |
           git clone https://github.com/frankyeh/TIPL.git
