@@ -30,14 +30,14 @@ jobs:
           curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-warpfns-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-warpfns-2111.0-h2bc3f7f_0.tar.bz2
           curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-znzlib-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-znzlib-2111.0-h2bc3f7f_0.tar.bz2
           bunzip2 *.bz2
-          for i in *.tar;do tar -xf "$i";done
+          for i in *.tar;do tar -xfv "$i";done
           rm -fr *.bz2
           rm -fr *.tar
       - name: Patch FSL
         run: |
-          for i in src/"fsl-"*;do mv -f src/"$i" src/"${i#"fsl-"}";done
-          for i in src/*;do mv -f "$i"/* include/"${i#"src/"}";done
-          for i in patches/*;do mv -f "$i"/* include/"${i#"patches/"}";done
+          for i in src/"fsl-"*;do mv -v -f src/"$i" "${i#"fsl-"}";done
+          for i in src/*;do mv -v -f "$i"/* include/"${i#"src/"}";done
+          for i in patches/*;do mv -v -f "$i"/* include/"${i#"patches/"}";done
           rm -fr bin
           rm -fr info
           rm -fr src
