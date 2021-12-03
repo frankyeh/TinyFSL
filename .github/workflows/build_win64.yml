@@ -55,8 +55,7 @@ jobs:
           7z x boost.tar
           del *.tar
           del *.tar.bz2
-          move ./boost_1_77_0/boost ./include
-          rmdir /S /Q boost_1_77_0        
+          move ./boost_1_77_0/boost ./include    
       - name: Download OpenBLAS
         run: |
           curl -L https://github.com/xianyi/OpenBLAS/releases/download/v0.3.18/OpenBLAS-0.3.18-x64.zip --output openblas.zip
