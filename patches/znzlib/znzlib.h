@@ -35,7 +35,7 @@ NB: seeks for writable files with compression are quite restricted
 
 */
 
-
+#include "zlib.h"
 /*=================*/
 #ifdef  __cplusplus
 extern "C" {
@@ -47,7 +47,7 @@ extern "C" {
 #include <string.h>
 #include <stdarg.h>
 
-#include "zlib.h"
+
 
 
 struct znzptr {
