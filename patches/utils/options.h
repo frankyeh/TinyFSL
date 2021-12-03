@@ -380,20 +380,20 @@ namespace Utilities {
     unsigned int valuevec_size_;
   };
 
-  template<> std::string Option<bool>::config_key() const
+  template<> inline std::string Option<bool>::config_key() const
   {
       return set()? (long_form().empty()?short_form():long_form()):std::string();
   }
-  template<> bool Option<bool>::set_value(const std::string& s)
+  template<> inline bool Option<bool>::set_value(const std::string& s)
   {
       value_=s.empty()?(!default_):(s=="true"?true:(s=="false"?false:value_));
       return !(unset_=!s.empty()&&s!="true"&&s!="false");
   }
-  template<> bool Option<bool>::set_value(const std::string& vs,char*[],int,int)
+  template<> inline bool Option<bool>::set_value(const std::string& vs,char*[],int,int)
   {
       return set_value(vs);
   }
-  template<> std::ostream& Option<bool>::print(std::ostream& os) const
+  template<> inline std::ostream& Option<bool>::print(std::ostream& os) const
   {
       os << "# " << help_text() << std::endl;
       if (set())
