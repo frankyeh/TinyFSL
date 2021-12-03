@@ -83,28 +83,7 @@ bool FslImageExists(const string& filename) {
 
 int FslGetEnvOutputType(void)
 {
-  /* return type is one of FSL_TYPE_* or -1 to indicate error */
-  char *otype;
-  otype = getenv("FSLOUTPUTTYPE");
-  if (otype == NULL) {
-    fprintf(stderr,"ERROR:: Environment variable FSLOUTPUTTYPE is not set!\n");
-    fprintf(stderr,"Please make sure that the appropriate configuration file is sourced by your shell (e.g. by putting it in .profile).\n");
-    fprintf(stderr,"e.g. bash or sh users add the line \". ${FSLDIR}/etc/fslconf/fsl.sh\"\n");
-    fprintf(stderr,"e.g. tcsh or csh users add the line \"source ${FSLDIR}/etc/fslconf/fsl.csh\"\n");
-    exit(EXIT_FAILURE);
-  }
-  if (strcmp(otype,"NIFTI")==0) { return FSL_TYPE_NIFTI; }
-  if (strcmp(otype,"NIFTI2")==0) { return FSL_TYPE_NIFTI2; }
-  if (strcmp(otype,"NIFTI_GZ")==0) { return FSL_TYPE_NIFTI_GZ; }
-  if (strcmp(otype,"NIFTI2_GZ")==0) { return FSL_TYPE_NIFTI2_GZ; }
-  if (strcmp(otype,"NIFTI_PAIR")==0) { return FSL_TYPE_NIFTI_PAIR; }
-  if (strcmp(otype,"NIFTI2_PAIR")==0) { return FSL_TYPE_NIFTI2_PAIR; }
-  if (strcmp(otype,"NIFTI_PAIR_GZ")==0) { return FSL_TYPE_NIFTI_PAIR_GZ; }
-  if (strcmp(otype,"NIFTI2_PAIR_GZ")==0) { return FSL_TYPE_NIFTI2_PAIR_GZ; }
-  fprintf(stderr,"ERROR:: Unrecognised value (%s) of environment variable FSLOUTPUTTYPE\n",otype);
-  fprintf(stderr,"Legal values are: NIFTI, NIFTI_PAIR, NIFTI_GZ, NIFTI_PAIR_GZ\n");
-  exit(EXIT_FAILURE);
-  return -1;
+  return FSL_TYPE_NIFTI_GZ;
 }
 
 string outputExtension(const int filetype)
@@ -313,7 +292,6 @@ int save_unswapped_vol(const V& source, const string& filename, int filetype,int
   set_fsl_hdr(source,header);
   if ( filetype<0 )
     filetype=FslGetEnvOutputType();
-  header.description=BUILDSTRING;
   header.setNiftiVersion(FslNiftiVersionFileType(filetype),FslIsSingleFileType(filetype));
   header.bitsPerVoxel=bitsPerVoxel;
   if ( header.isAnalyze() ) {
