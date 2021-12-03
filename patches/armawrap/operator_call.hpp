@@ -541,6 +541,11 @@ namespace armawrap {
       return val;
     }
 
+    elem_type* operator&() {
+        if (i != -1)
+            return const_cast<elem_type *>(&lookup1D(target, i));
+        else return const_cast<elem_type *>(&lookup2D(target, row, col));
+    }
 
     inline void operator*=(elem_type val) {
 
