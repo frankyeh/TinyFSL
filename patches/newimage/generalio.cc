@@ -590,7 +590,6 @@ int save_complexvolume(const volume<float>& realvols, const volume<float>& imagv
     buffer[2*voxel]=*rit++;
     buffer[2*voxel+1]=*iit++;
   }
-  niihdr.description=BUILDSTRING;
   NiftiIO::saveImage(make_basename(filename)+outputExtension(filetype), (const char *)buffer, realvols.extensions, niihdr, FslIsCompressedFileType(filetype));
   // restore to original ?
   if (!realvols.RadiologicalFile) { const_cast< volume <float>& > (realvols).makeradiological(); }
