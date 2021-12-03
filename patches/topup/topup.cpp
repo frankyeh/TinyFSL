@@ -22,7 +22,6 @@
 #include "newimage/newimageall.h"
 #include "miscmaths/miscmaths.h"
 #include "miscmaths/nonlin.h"
-#include "utils/stack_dump.h"
 #include "warpfns/warpfns.h"
 #include "basisfield/basisfield.h"
 #include "basisfield/splinefield.h"
@@ -40,7 +39,6 @@ using namespace TOPUP;
 int main(int   argc,
          char  *argv[])
 {
-  StackDump::Install(); // Gives us informative stack dump if/when program crashes
 
   // Read command line input
   std::shared_ptr<topup_clp> clp;
