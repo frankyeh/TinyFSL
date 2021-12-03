@@ -41,7 +41,7 @@ jobs:
           rmdir /S /Q src
           rmdir /S /Q tcl
           rmdir /S /Q lib
-          for /f "delims=" %%x in ('dir patches\*.bat /b ') do (call patches\%%x)
+          move /y patches\* include
         shell: cmd
       - name: Download TIPL
         run: |
