@@ -36,7 +36,8 @@ jobs:
       - name: Patch FSL
         run: |
           cd src
-          for i in "fsl-"*;do mv -v -f "$i" ../include/"${i#"fsl-"}";done
+          for i in "fsl-"*;do mv -v -f "$i" "${i#"fsl-"}";done
+          for i in *;do mv -v -f "$i" ../include;done
           cd ..
           cd patches
           for i in *;do mv -v -f "$i"/* ../include/"$i";done
@@ -46,12 +47,11 @@ jobs:
           rm -fr src
           rm -fr tcl
           rm -fr lib
-          ls include
       - name: Download TIPL
         run: |
           git clone https://github.com/frankyeh/TIPL.git
-          mv TIPL include
-          ls include          
+          mv TIPL tipl
+          mv tipl include     
       - name: Download Boost
         run: |
           curl -L https://boostorg.jfrog.io/artifactory/main/release/1.77.0/source/boost_1_77_0.tar.bz2 --output boost.tar.bz2
@@ -60,21 +60,17 @@ jobs:
           rm -f *.tar
           rm -f *.tar.bz2
           mv -f ./boost_1_77_0/boost ./include    
-          ls include
       - name: Download OpenBLAS
         run: |
           curl -L https://github.com/xianyi/OpenBLAS/releases/download/v0.3.18/OpenBLAS-0.3.18-x64.zip --output openblas.zip
           7z x openblas.zip
           rm -f openblas.zip
-          ls
       - name: Install Qt
         run: |
           brew update
           brew install qt5
       - name: Compile Programs 
         run: |
-          ls
-          ls include
           export PATH="/usr/local/opt/qt@5/bin:$PATH" && export LDFLAGS="-L/usr/local/opt/qt@5/lib" && export CPPFLAGS="-I/usr/local/opt/qt@5/include" && export PKG_CONFIG_PATH="/usr/local/opt/qt@5/lib/pkgconfig"
           mkdir -p build
           cd build
