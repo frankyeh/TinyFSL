@@ -25,12 +25,12 @@ namespace Utilities {
 
   using namespace std;
 
-  template<> string Option<bool>::config_key() const
+  /*template<>  string Option<bool>::config_key() const
   {
     if(set()) {
       string key(long_form());
       if( key == "" )
-	key = short_form();
+    key = short_form();
 
       return key;
     } else
@@ -43,18 +43,18 @@ namespace Utilities {
   {
     if(s.length() == 0)
       {
-	value_ = !default_;
-	unset_=false;
+    value_ = !default_;
+    unset_=false;
       }
     else if (s == "true")
       {
-	value_ = true;
-	unset_=false;
+    value_ = true;
+    unset_=false;
       }
     else if (s == "false")
       {
-	value_ = false;
-	unset_=false;
+    value_ = false;
+    unset_=false;
       }
     return !unset_;
   }
@@ -67,7 +67,7 @@ namespace Utilities {
   {
     os << "# " << help_text() << endl;
     if (Utilities::UserStreamFlag.find("OutputType") != Utilities::UserStreamFlag.end() &&
-	os.iword(Utilities::UserStreamFlag["OutputType"]) == Utilities::DetailedOutput) {
+    os.iword(Utilities::UserStreamFlag["OutputType"]) == Utilities::DetailedOutput) {
       os << key() << "=" << ( set() ? "True" : "False");
     }
     else {
@@ -77,7 +77,7 @@ namespace Utilities {
     return os;
   }
 
-  ostream& operator<<(ostream& os, const BaseOption& o)
+  */ostream&  operator<<(ostream& os, const BaseOption& o)
   {
     return o.print(os);
   }
@@ -152,7 +152,7 @@ namespace Utilities {
     return true;
   }
 
-//   ostream& operator<<(ostream &os, const BaseOption& o) {
+//   */ostream&  operator<<(ostream &os, const BaseOption& o) {
 //     string test=o.help_text();
 //     if ((test.length()>=1) && (test[0]=='~')) {
 //       test[0]=' ';
@@ -188,9 +188,9 @@ namespace Utilities {
     while( (np = key_.find(",", pos)) != string::npos ) {
       string candidate(key_.substr(pos, np - pos));
       if( is_short_form(candidate) )
-	return candidate;
+    return candidate;
       else
-	pos = np + 1;
+    pos = np + 1;
     }
     string candidate(key_.substr(pos, np - pos));
     if( is_short_form(candidate) )
@@ -210,9 +210,9 @@ namespace Utilities {
       string candidate(key_.substr(pos, np - pos));
 
       if( !is_short_form(candidate) )
-	return candidate;
+    return candidate;
       else
-	pos = np + 1;
+    pos = np + 1;
     }
     string candidate(key_.substr(pos, np - pos));
     if( !is_short_form(candidate) )
