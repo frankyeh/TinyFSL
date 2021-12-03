@@ -9,7 +9,8 @@ A simplified re-comiled version of the FSL package
 Parent package: FMRIB Software Library v6.0 (version 2111)
 
 ## License
-TinyFSL follows the original FSL license https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence given non-commercial usage.
+
+TinyFSL follows the original FSL license https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence 
 
 ## Currently Available Programs
 
