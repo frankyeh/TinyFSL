@@ -90,7 +90,7 @@ jobs:
           macdeployqt eddy.app
           macdeployqt topup.app
           macdeployqt applytopup.app
-          macdeployqt bets.app
+          macdeployqt bet2.app
       - name: Packaging
         run: |
           mkdir tiny_fsl
