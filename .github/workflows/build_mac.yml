@@ -66,11 +66,12 @@ jobs:
           rm -f *.tar.bz2
           rm -f *.tar.gz
           
-      - name: Install Qt and OpenBLAS
+      - name: Install Qt and gfortran
         run: |
           brew update
           brew install qt5
-          
+          brew install gfortran
+          brew info gfortran
       - name: Compile Programs 
         run: |
           export PATH="/usr/local/opt/qt@5/bin:$PATH" && export LDFLAGS="-L/usr/local/opt/qt@5/lib" && export CPPFLAGS="-I/usr/local/opt/qt@5/include" && export PKG_CONFIG_PATH="/usr/local/opt/qt@5/lib/pkgconfig"
