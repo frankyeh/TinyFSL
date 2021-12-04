@@ -13,7 +13,8 @@ LIBS += -lz -lopenblas
 }
 
 mac{
-LIBS += /usr/local/opt/openblas/lib/libopenblas64_.0.3.0.dev.a /usr/local/opt/gcc/lib/gcc/11/libgfortran.a -lz
+QMAKE_LFLAGS += -static
+LIBS += -lz -L/usr/local/opt/openblas/lib/ libopenblas64_.0.3.0.dev.a libgfortran.a libquadmath.a libgomp.a libgcc_s.1.dylib
 }
 
 
