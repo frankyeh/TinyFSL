@@ -12,6 +12,7 @@ LIBS += -lz -lopenblas
 }
 
 mac{
+CONFIG -= app_bundle
 LIBS += -lz /usr/local/opt/openblas/lib/libopenblas64_.0.3.0.dev.a \
             /usr/local/opt/gcc/lib/gcc/11/libgfortran.a \
             /usr/local/opt/gcc/lib/gcc/11/libquadmath.a \
