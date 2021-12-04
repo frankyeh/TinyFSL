@@ -1,4 +1,4 @@
-QT -= gui
+QT -= gui core
 
 DEFINES += ARMA_NO_DEBUG
 CONFIG += c++11 console
@@ -6,7 +6,7 @@ CONFIG -= app_bundle
 
 
 win32* {
-LIBS += -llibopenblas
+LIBS += -llibopenblas -lzlibstatic
 }
 
 linux* {
@@ -14,7 +14,6 @@ LIBS += -lz -lopenblas
 }
 
 mac{
-QT -= core
 LIBS += -L/usr/local/opt/openblas/lib -lz -lopenblas
 }
 
