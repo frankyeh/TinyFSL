@@ -1,5 +1,5 @@
 # Tiny FSL
-A simplified re-comiled version of the FSL package 
+A simplified patched recompiled version of the FSL package 
 
 * Download-and-run. No installation required
 * Tiny (< 100 mb)
