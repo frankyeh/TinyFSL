@@ -70,8 +70,10 @@ jobs:
         run: |
           brew update
           brew install qt5
-          brew install gfortran
-          brew info gfortran
+          echo /usr/local/opt/gcc/lib/gcc/11
+          ls /usr/local/opt/gcc/lib/gcc/11
+          echo /usr/local/opt/gcc/lib
+          ls /usr/local/opt/gcc/lib
       - name: Compile Programs 
         run: |
           export PATH="/usr/local/opt/qt@5/bin:$PATH" && export LDFLAGS="-L/usr/local/opt/qt@5/lib" && export CPPFLAGS="-I/usr/local/opt/qt@5/include" && export PKG_CONFIG_PATH="/usr/local/opt/qt@5/lib/pkgconfig"
