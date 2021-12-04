@@ -2,7 +2,6 @@ QT -= gui core
 
 DEFINES += ARMA_NO_DEBUG
 CONFIG += c++11 console
-CONFIG -= app_bundle
 
 win32* {
 LIBS += -llibopenblas -lzlibstatic
@@ -13,7 +12,6 @@ LIBS += -lz -lopenblas
 }
 
 mac{
-QMAKE_LFLAGS += -static
 LIBS += -lz /usr/local/opt/openblas/lib/libopenblas64_.0.3.0.dev.a \
             /usr/local/opt/gcc/lib/gcc/11/libgfortran.a \
             /usr/local/opt/gcc/lib/gcc/11/libquadmath.a \
