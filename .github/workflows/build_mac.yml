@@ -70,24 +70,20 @@ jobs:
         run: |
           brew update
           brew install qt5
-          echo /usr/local/opt/gcc/lib/gcc/11/gcc
-          ls /usr/local/opt/gcc/lib/gcc/11/gcc
           echo /usr/local/opt/gcc/lib/gcc/11
           ls /usr/local/opt/gcc/lib/gcc/11
-          echo /usr/local/opt/gcc/lib
-          ls /usr/local/opt/gcc/lib
       - name: Compile Programs 
         run: |
           export PATH="/usr/local/opt/qt@5/bin:$PATH" && export LDFLAGS="-L/usr/local/opt/qt@5/lib" && export CPPFLAGS="-I/usr/local/opt/qt@5/include" && export PKG_CONFIG_PATH="/usr/local/opt/qt@5/lib/pkgconfig"
           mkdir -p build
           cd build
-          qmake ../eddy.pro -spec macx-g++
+          qmake ../eddy.pro
           make
-          qmake ../topup.pro -spec macx-g++
+          qmake ../topup.pro
           make
-          qmake ../applytopup.pro -spec macx-g++
+          qmake ../applytopup.pro
           make
-          qmake ../bet2.pro -spec macx-g++
+          qmake ../bet2.pro
           make
           rm *.o
           rm Makefile
