@@ -70,6 +70,8 @@ jobs:
         run: |
           brew update
           brew install qt5
+          echo /usr/local/opt/gcc/lib/gcc/11/gcc
+          ls /usr/local/opt/gcc/lib/gcc/11/gcc
           echo /usr/local/opt/gcc/lib/gcc/11
           ls /usr/local/opt/gcc/lib/gcc/11
           echo /usr/local/opt/gcc/lib
