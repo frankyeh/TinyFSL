@@ -65,6 +65,8 @@ jobs:
           brew update
           brew install qt5
           brew install openblas
+          rm -f /usr/local/opt/openblas/lib/libopenblas.0.dylib
+          rm -f /usr/local/opt/openblas/lib/libopenblas.dylib
           ls /usr/local/opt/openblas/lib
       - name: Compile Programs 
         run: |
@@ -81,7 +83,6 @@ jobs:
           make
           rm *.o
           rm Makefile
-          /usr/local/opt/qt@5/bin/macdeployqt eddy
       - name: Packaging
         run: |
           mkdir tiny_fsl
