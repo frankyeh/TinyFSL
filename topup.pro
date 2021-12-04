@@ -13,7 +13,7 @@ LIBS += -lz -lopenblas
 }
 
 mac{
-LIBS += /usr/local/opt/openblas/lib/libopenblas64_.0.3.0.dev.a -lz -lgfortran
+LIBS += /usr/local/opt/openblas/lib/libopenblas64_.0.3.0.dev.a /usr/local/opt/gcc/lib/gcc/11/libgfortran.a -lz
 }
 
 
