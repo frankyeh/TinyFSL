@@ -1,9 +1,9 @@
 # Tiny FSL
 A simplified patched recompiled version of the FSL package 
 
-[![Release](https://github.com/frankyeh/TinyFSL/actions/workflows/build_win64.yml/badge.svg)](https://github.com/frankyeh/TinyFSL/actions/workflows/build_mac.yml)[![Release](https://github.com/frankyeh/TinyFSL/actions/workflows/build_mac.yml/badge.svg)](https://github.com/frankyeh/TinyFSL/actions/workflows/build_win64.yml)<a href="https://github.com/frankyeh/TinyFSL/commits/master"><img src="https://img.shields.io/github/last-commit/frankyeh/TinyFSL"><a href="https://github.com/frankyeh/TinyFSL/releases"><img src="https://img.shields.io/github/v/release/frankyeh/TinyFSL"></a><a href="https://github.com/frankyeh/TinyFSL/releases"><img src="https://img.shields.io/github/downloads/frankyeh/TinyFSL/total?style=social"></a>
+[![Release](https://github.com/frankyeh/TinyFSL/actions/workflows/build_win64.yml/badge.svg)](https://github.com/frankyeh/TinyFSL/actions/workflows/build_mac.yml)<a href="https://github.com/frankyeh/TinyFSL/commits/master"><img src="https://img.shields.io/github/last-commit/frankyeh/TinyFSL"><a href="https://github.com/frankyeh/TinyFSL/releases"><img src="https://img.shields.io/github/v/release/frankyeh/TinyFSL"></a><a href="https://github.com/frankyeh/TinyFSL/releases"><img src="https://img.shields.io/github/downloads/frankyeh/TinyFSL/total?style=social"></a>
   
-* Available in Windows and Mac version
+* Available in Windows version
 * Download-and-run. No installation required
 * ~20 MB 
 * Improved multi-core supports
