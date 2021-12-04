@@ -81,13 +81,13 @@ jobs:
           export PATH="/usr/local/opt/qt@5/bin:$PATH" && export LDFLAGS="-L/usr/local/opt/qt@5/lib" && export CPPFLAGS="-I/usr/local/opt/qt@5/include" && export PKG_CONFIG_PATH="/usr/local/opt/qt@5/lib/pkgconfig"
           mkdir -p build
           cd build
-          qmake ../eddy.pro
+          qmake ../eddy.pro -spec macx-g++
           make
-          qmake ../topup.pro
+          qmake ../topup.pro -spec macx-g++
           make
-          qmake ../applytopup.pro
+          qmake ../applytopup.pro -spec macx-g++
           make
-          qmake ../bet2.pro
+          qmake ../bet2.pro -spec macx-g++
           make
           rm *.o
           rm Makefile
