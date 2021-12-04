@@ -14,7 +14,7 @@ LIBS += -lz -lopenblas
 }
 
 mac{
-Qt -= core
+QT -= core
 LIBS += -L/usr/local/opt/openblas/lib -lz -lopenblas
 }
 
