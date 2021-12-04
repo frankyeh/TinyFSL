@@ -1,9 +1,9 @@
 # Tiny FSL
 A simplified patched recompiled version of the FSL package 
 
+* Available in Windows and Mac version
 * Download-and-run. No installation required
 * Tiny (< 100 mb)
-* Windows version available
 * Improved multi-core supports
 
 Parent package: FMRIB Software Library v6.0 (version 2111)
