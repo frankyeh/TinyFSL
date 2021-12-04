@@ -87,16 +87,11 @@ jobs:
           make
           rm *.o
           rm Makefile
-          macdeployqt eddy.app
-          macdeployqt topup.app
-          macdeployqt applytopup.app
-          macdeployqt bet2.app
       - name: Packaging
         run: |
           mkdir tiny_fsl
           mv build/* tiny_fsl
           cp FSL_LICENSE tiny_fsl
-          
       - name: Zip Package
         uses: TheDoctor0/zip-release@0.6.0
         with:
