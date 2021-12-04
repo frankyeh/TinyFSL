@@ -57,15 +57,20 @@ jobs:
           curl -L https://boostorg.jfrog.io/artifactory/main/release/1.77.0/source/boost_1_77_0.tar.bz2 --output boost.tar.bz2
           7z x boost.tar.bz2
           7z x boost.tar
+          mv -f ./boost_1_77_0/boost ./include    
+          curl -L https://github.com/JuliaLinearAlgebra/OpenBLASBuilder/releases/download/v0.3.0-3/OpenBLAS.v0.3.0.x86_64-apple-darwin14-gcc8.tar.gz
+          7z e OpenBLAS.v0.3.0.x86_64-apple-darwin14-gcc8.tar.gz
+          7z e OpenBLAS.v0.3.0.x86_64-apple-darwin14-gcc8.tar -o/usr/local/opt/openblas/lib/
+          ls -l /usr/local/opt/openblas/lib/
           rm -f *.tar
           rm -f *.tar.bz2
-          mv -f ./boost_1_77_0/boost ./include    
+          rm -f *.tar.gz
+          
       - name: Install Qt and OpenBLAS
         run: |
           brew update
           brew install qt5
-          brew install openblas
-          ls /usr/local/opt/openblas/lib
+          
       - name: Compile Programs 
         run: |
           export PATH="/usr/local/opt/qt@5/bin:$PATH" && export LDFLAGS="-L/usr/local/opt/qt@5/lib" && export CPPFLAGS="-I/usr/local/opt/qt@5/include" && export PKG_CONFIG_PATH="/usr/local/opt/qt@5/lib/pkgconfig"
