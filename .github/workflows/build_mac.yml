@@ -65,8 +65,6 @@ jobs:
           brew update
           brew install qt5
           brew install openblas
-          rm -f /usr/local/opt/openblas/lib/libopenblas.0.dylib
-          rm -f /usr/local/opt/openblas/lib/libopenblas.dylib
           ls /usr/local/opt/openblas/lib
       - name: Compile Programs 
         run: |
@@ -88,6 +86,8 @@ jobs:
           mkdir tiny_fsl
           mv build/* tiny_fsl
           cp FSL_LICENSE tiny_fsl
+          cp /usr/local/opt/openblas/lib/libopenblas.0.dylib tiny_fsl
+          cp /usr/local/opt/openblas/lib/libopenblas.dylib tiny_fsl
       - name: Zip Package
         uses: TheDoctor0/zip-release@0.6.0
         with:
