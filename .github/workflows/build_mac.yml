@@ -81,13 +81,16 @@ jobs:
           make
           rm *.o
           rm Makefile
+          install_name_tool -change /usr/local/opt/openblas/lib/libopenblas.0.dylib @executable_path/libopenblas.0.dylib eddy
+          install_name_tool -change /usr/local/opt/openblas/lib/libopenblas.0.dylib @executable_path/libopenblas.0.dylib topup
+          install_name_tool -change /usr/local/opt/openblas/lib/libopenblas.0.dylib @executable_path/libopenblas.0.dylib applytopup
+          install_name_tool -change /usr/local/opt/openblas/lib/libopenblas.0.dylib @executable_path/libopenblas.0.dylib bet2
       - name: Packaging
         run: |
           mkdir tiny_fsl
           mv build/* tiny_fsl
           cp FSL_LICENSE tiny_fsl
           cp /usr/local/opt/openblas/lib/libopenblas.0.dylib tiny_fsl
-          cp /usr/local/opt/openblas/lib/libopenblas.dylib tiny_fsl
       - name: Zip Package
         uses: TheDoctor0/zip-release@0.6.0
         with:
