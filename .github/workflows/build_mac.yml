@@ -1,4 +1,4 @@
-name: BUILD_MAC
+name: BUILD MAC
 on:
   workflow_dispatch:
     inputs:
