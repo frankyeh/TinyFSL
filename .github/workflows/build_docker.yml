@@ -28,4 +28,4 @@ jobs:
         file: Dockerfile
         push: true
         tags: |
-            dsistudio/tiny_fsl:latest
+            dsistudio/tinyfsl:latest
