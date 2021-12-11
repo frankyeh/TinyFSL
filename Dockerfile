@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND noninteractive
 # Prepare environment
 RUN apt update && apt full-upgrade -y && \
   apt install -y --no-install-recommends \
-  openblas \
+  libopenblas-dev \
   unzip \
   curl \
   make \
