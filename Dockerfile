@@ -30,7 +30,7 @@ RUN git clone https://github.com/frankyeh/TIPL.git \
   && git clone https://github.com/frankyeh/TinyFSL.git \
   && mv TinyFSL tiny_fsl \
   && mv tiny_fsl /opt \
-  && mv Tiny tipl \
+  && mv TIPL tipl \
   && mv tipl /opt/tiny_fsl/include
 
 RUN cd /opt/tiny_fsl \
