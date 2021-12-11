@@ -31,7 +31,8 @@ RUN git clone https://github.com/frankyeh/TIPL.git \
   && mv TinyFSL tiny_fsl \
   && mv tiny_fsl /opt \
   && mv TIPL tipl \
-  && mv tipl /opt/tiny_fsl/include
+  && mkdir -p /opt/tiny_fsl/include/ \
+  && mv tipl /opt/tiny_fsl/include/
 
 RUN cd /opt/tiny_fsl \
   && curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-armawrap-0.6.0-h2bc3f7f_0.tar.bz2 --output fsl-armawrap-0.6.0-h2bc3f7f_0.tar.bz2 \
