@@ -26,6 +26,14 @@ RUN ldconfig
 ADD "https://api.github.com/repos/frankyeh/TinyFSL/commits?per_page=1" latest_commit
 ADD "https://api.github.com/repos/frankyeh/TIPL/commits?per_page=1" latest_commit
 
+ENV OS="Linux"
+ENV FSLDIR=/opt/tiny_fsl
+ENV FSL_DIR=$FSLDIR
+ENV FSLOUTPUTTYPE="NIFTI_GZ"
+ENV FSLMULTIFILEQUIT="TRUE"
+ENV LD_LIBRARY_PATH=$FSLDIR/lib:$LD_LIBRARY_PATH
+ENV PATH=$FSLDIR/bin:$PATH
+
 
 RUN git clone https://github.com/frankyeh/TIPL.git \
   && git clone https://github.com/frankyeh/TinyFSL.git \
@@ -90,13 +98,6 @@ RUN cd /opt \
   && cd /opt/tiny_fsl \
   && mv tiny_fsl_bin bin
 
-ENV OS="Linux" \
-    FSLDIR="/opt/tiny_fsl" \
-    FSL_DIR="$FSLDIR" \
-    FSLOUTPUTTYPE="NIFTI_GZ" \
-    FSLMULTIFILEQUIT="TRUE" \
-    LD_LIBRARY_PATH="$FSLDIR/lib:$LD_LIBRARY_PATH" \
-    PATH="$FSLDIR/bin:$PATH"
   
 
 
