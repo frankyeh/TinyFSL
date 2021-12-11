@@ -81,7 +81,7 @@ RUN mkdir -p /opt/tiny_fsl/build \
   && mv bet2 /opt/tiny_fsl_bin
 
 
-RUN cd /opt
+RUN cd /opt \
   && rm -fr tiny_fsl \
   && mkdir tiny_fsl \
   && mv tiny_fsl_bin tiny_fsl \
