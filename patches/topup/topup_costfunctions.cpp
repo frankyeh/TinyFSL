@@ -250,9 +250,9 @@ NEWIMAGE::volume<float> TopupScan::GetMovementDerivative(unsigned int i,
   NEWMAT::Matrix T2 = rval.sampling_mat().i() * mp_to_matrix(p).i() * rval.sampling_mat();
 
   auto* ptr = rval.nsfbegin();
-  auto* dv0_ptr = _derivs[0].nsfbegin();
-  auto* dv1_ptr = _derivs[1].nsfbegin();
-  auto* dv2_ptr = _derivs[2].nsfbegin();
+  const auto* dv0_ptr = _derivs[0].fbegin();
+  const auto* dv1_ptr = _derivs[1].fbegin();
+  const auto* dv2_ptr = _derivs[2].fbegin();
   tipl::par_for(rval.zsize(),[&](int k) {
     size_t pos = k*rval.ysize()*rval.xsize();
     NEWMAT::ColumnVector x(4);
@@ -885,9 +885,10 @@ void TopupScanManager::SetInterpolationModel(TopupInterpolationType it) const
 void TopupScanManager::update(const BASISFIELD::splinefield& field) const
 {
   if (TracePrint()) cout << "Entering TopupScanManager::update" << endl;
-
   if (!_up_to_date) {
     if (TracePrint()) cout << "TopupScanManager::update: Things not up to date, proceeds with updating." << endl;
+
+
 
     _mean = _scans[0]->GetResampled(field);
     _mask = _scans[0]->GetMask(field);
@@ -1279,19 +1280,27 @@ double TopupCF::cf(const NEWMAT::ColumnVector& p) const
 
   double ssd = 0.0;
   unsigned int n = static_cast<unsigned int>(mask.sum());
-  for (unsigned int s=0; s<_sm.NoOfScans(); s++) {
-    const NEWIMAGE::volume<float>&  scan = _sm.GetScan(s,_field);
-    for (int k=0; k<mean.zsize(); k++) {
-      for (int j=0; j<mean.ysize(); j++) {
-	for (int i=0; i<mean.xsize(); i++) {
-	  if (mask(i,j,k)) {
-        ssd += SQR(mean(i,j,k)-scan(i,j,k));
-	  }
-	}
-      }
-    }
-  }
-  ssd /= double(n*(_sm.NoOfScans()-1));
+  std::vector<double> ssd_(std::thread::hardware_concurrency());
+  std::vector<NEWIMAGE::volume<float> > sms(_sm.NoOfScans());
+  for (unsigned int s=0; s<_sm.NoOfScans(); s++)
+      sms[s] = _sm.GetScan(s,_field);
+
+  const auto* mean_ptr = mean.fbegin();
+  const auto* mask_ptr = mask.fbegin();
+
+  size_t plane_size = mean.xsize()*mean.ysize();
+  tipl::par_for2(mean.zsize(),[&](size_t k,int thread){
+        for (unsigned int s=0; s< sms.size(); s++)
+        {
+            size_t pos = plane_size*k;
+            size_t pos_end = pos + plane_size;
+            const auto* scan_ptr = sms[s].fbegin();
+            for (;pos != pos_end; ++pos)
+               if (mask_ptr[pos])
+                  ssd_[thread] += SQR(mean_ptr[pos]-scan_ptr[pos]);
+        }
+    });
+  ssd = std::accumulate(ssd_.begin(),ssd_.end(),0.0)/double(n*(_sm.NoOfScans()-1));
   set_latest_ssd(ssd);
 
   if (debug_level()) {
@@ -1701,14 +1710,13 @@ double TopupCF::sum_of_prod(const NEWIMAGE::volume<float>& i1,
   if (TracePrint()) cout << "Entering TopupCF::sum_of_prod" << endl;
 
   double sum = 0.0;
-
-  for (int k=0; k<i1.zsize(); k++) {
-    for (int j=0; j<i1.ysize(); j++) {
-      for (int i=0; i<i1.xsize(); i++) {
-        if (mask(i,j,k)) sum += i1(i,j,k)*i2(i,j,k);
-      }
-    }
-  }
+  const auto* ptr1 = i1.fbegin();
+  const auto* ptr2 = i2.fbegin();
+  const auto* ptrm = mask.fbegin();
+  auto size = i1.totalElements();
+  for(long long i = 0;i < size;++i)
+      if(ptrm[i])
+          sum += ptr1[i]*ptr2[i];
 
   if (TracePrint()) cout << "Leaving TopupCF::sum_of_prod" << endl;
 
