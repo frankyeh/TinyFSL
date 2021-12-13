@@ -249,17 +249,22 @@ NEWIMAGE::volume<float> TopupScan::GetMovementDerivative(unsigned int i,
   NEWMAT::Matrix T1 = rval.sampling_mat().i() * mp_to_matrix(_mp).i() * rval.sampling_mat();
   NEWMAT::Matrix T2 = rval.sampling_mat().i() * mp_to_matrix(p).i() * rval.sampling_mat();
 
-  NEWMAT::ColumnVector x(4);
-  x(4) = 1.0;
+  auto* ptr = rval.nsfbegin();
+  auto* dv0_ptr = _derivs[0].nsfbegin();
+  auto* dv1_ptr = _derivs[1].nsfbegin();
+  auto* dv2_ptr = _derivs[2].nsfbegin();
   tipl::par_for(rval.zsize(),[&](int k) {
+    size_t pos = k*rval.ysize()*rval.xsize();
+    NEWMAT::ColumnVector x(4);
+    x(4) = 1.0;
     x(3) = k;
     for (int j=0; j<rval.ysize(); j++) {
       x(2) = j;
-      for (int i=0; i<rval.xsize(); i++) {
+      for (int i=0; i<rval.xsize(); i++,++pos) {
         x(1) = i;
 	NEWMAT::ColumnVector y1 = T1*x;
-	NEWMAT::ColumnVector y2 = T2*x;
-        rval(i,j,k) = float(sf[0]*(y2(1)-y1(1))*_derivs[0](i,j,k) + sf[1]*(y2(2)-y1(2))*_derivs[1](i,j,k) + sf[2]*(y2(3)-y1(3))*_derivs[2](i,j,k));
+    NEWMAT::ColumnVector y2 = T2*x;
+        ptr[pos] = float(sf[0]*(y2(1)-y1(1))*dv0_ptr[pos] + sf[1]*(y2(2)-y1(2))*dv1_ptr[pos] + sf[2]*(y2(3)-y1(3))*dv2_ptr[pos]);
       }
     }
   });
@@ -983,7 +988,7 @@ void TopupCF::SubSample(unsigned int ss)
       double jj=start;
       for (unsigned int j=0; j<size[1]; j++, jj+=step) {
         double ii=start;
-	for (unsigned int i=0; i<size[0]; i++, ii+=step) {
+    for (unsigned int i=0; i<size[0]; i++, ii+=step) {
           vol(i,j,k) = _field(ii,jj,kk);
 	}
       }
