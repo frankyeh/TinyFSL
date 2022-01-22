@@ -1289,7 +1289,7 @@ double TopupCF::cf(const NEWMAT::ColumnVector& p) const
   const auto* mask_ptr = mask.fbegin();
 
   size_t plane_size = mean.xsize()*mean.ysize();
-  tipl::par_for2(mean.zsize(),[&](size_t k,int thread){
+  tipl::par_for(mean.zsize(),[&](size_t k,int thread){
         for (unsigned int s=0; s< sms.size(); s++)
         {
             size_t pos = plane_size*k;
