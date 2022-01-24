@@ -1,7 +1,7 @@
 QT -= gui core
 
 DEFINES += ARMA_NO_DEBUG
-CONFIG += c++11 console
+CONFIG += c++17 console
 
 win32* {
 LIBS += -llibopenblas -lzlibstatic
