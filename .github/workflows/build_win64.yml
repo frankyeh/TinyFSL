@@ -38,6 +38,7 @@ jobs:
       - name: Patch FSL
         run: |
           cd fsl
+          move /y src\fsl-eddy\cuda include\eddy
           for /f "delims=" %%x in ('dir include\* /b ') do (move /y src\fsl-%%x\* include\%%x) 
           rmdir /S /Q bin
           rmdir /S /Q info
