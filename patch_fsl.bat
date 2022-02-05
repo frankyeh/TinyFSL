@@ -5,4 +5,4 @@ rmdir /S /Q info
 rmdir /S /Q src
 rmdir /S /Q tcl
 cd ..
-for /f "delims=" %%x in ('dir patches\* /b ') do (move /y patches\%%x\* fsl\include\%%x) 
+for /f "delims=" %%x in ('dir patches\* /b ') do (copy /y patches\%%x\* fsl\include\%%x) 
