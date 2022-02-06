@@ -104,12 +104,31 @@ jobs:
           cd eddy
           cmake -S . -B ..\build_eddy -GNinja -DBoost_INCLUDE_DIR=..\fsl\include -DBLAS_LIB_DIR=..\fsl\openblas\lib -DBLAS_LIBRARIES=libopenblas "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_C_COMPILER:STRING=cl" "-DCMAKE_CXX_COMPILER:STRING=cl" -DCUDA_ARCH=${{ matrix.arch }} "-DCUDA_PATH=C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.5" -DTIPL_DIR=..\fsl\include
           cmake --build ..\build_eddy --parallel --config Release
+          
+          mkdir -p build_topup
+          cd topup
+          cmake -S . -B ..\build_topup -GNinja -DBoost_INCLUDE_DIR=..\fsl\include -DBLAS_LIB_DIR=..\fsl\openblas\lib -DBLAS_LIBRARIES=libopenblas "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_C_COMPILER:STRING=cl" "-DCMAKE_CXX_COMPILER:STRING=cl" -DTIPL_DIR=..\fsl\include
+          cmake --build ..\build_topup --parallel --config Release
+          
+          mkdir -p build_applytopup
+          cd applytopup
+          cmake -S . -B ..\build_applytopup -GNinja -DBoost_INCLUDE_DIR=..\fsl\include -DBLAS_LIB_DIR=..\fsl\openblas\lib -DBLAS_LIBRARIES=libopenblas "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_C_COMPILER:STRING=cl" "-DCMAKE_CXX_COMPILER:STRING=cl" -DTIPL_DIR=..\fsl\include
+          cmake --build ..\build_applytopup --parallel --config Release
+          
+          mkdir -p build_bet2
+          cd bet2
+          cmake -S . -B ..\build_bet2 -GNinja -DBoost_INCLUDE_DIR=..\fsl\include -DBLAS_LIB_DIR=..\fsl\openblas\lib -DBLAS_LIBRARIES=libopenblas "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_C_COMPILER:STRING=cl" "-DCMAKE_CXX_COMPILER:STRING=cl" -DTIPL_DIR=..\fsl\include
+          cmake --build ..\build_bet2 --parallel --config Release
+          
         shell: cmd
         
       - name: Packaging
         run: |
           mkdir tiny_fsl
           move build_eddy\eddy.exe tiny_fsl
+          move build_topup\topup.exe tiny_fsl
+          move build_applytopup\applytopup.exe tiny_fsl
+          move build_bet2\bet2.exe tiny_fsl
           move fsl\openblas\bin\*.dll tiny_fsl
           move FSL_LICENSE tiny_fsl
           
