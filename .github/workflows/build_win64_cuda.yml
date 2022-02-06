@@ -18,6 +18,9 @@ jobs:
       - uses: actions/checkout@v2
       - name: Download FSL
         run: |
+          mkdir fsl
+          cd fsl
+          
           curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-armawrap-0.6.0-h2bc3f7f_0.tar.bz2 --output fsl-armawrap-0.6.0-h2bc3f7f_0.tar.bz2 
           curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-avwutils-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-avwutils-2111.0-h2bc3f7f_0.tar.bz2
           curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-bet2-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-bet2-2111.0-h2bc3f7f_0.tar.bz2
@@ -37,8 +40,6 @@ jobs:
           curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-cudabasisfield-cuda-11.3-1.1.0-h2bc3f7f_0.tar.bz2 --output fsl-cudabasisfield-cuda-11.3-1.1.0-h2bc3f7f_0.tar.bz2
           curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-eddy-cuda-11.3-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-eddy-cuda-11.3-2111.0-h2bc3f7f_0.tar.bz2
           
-          move *.bz2 fsl
-          cd fsl
           7z e *.bz2
           del *.bz2
           7z x *.tar -y
@@ -46,27 +47,34 @@ jobs:
       - name: Patch FSL
         run: |
           cd fsl
-          move /y src\fsl-eddy\cuda include\eddy
           for /f "delims=" %%x in ('dir include\* /b ') do (move /y src\fsl-%%x\* include\%%x) 
+          
+          copy /y src\fsl-eddy\cuda include\eddy
+          copy /y src\fsl-eddy-cuda-11.3 include\eddy
+          copy /y src\fsl-cudabasisfield-cuda-11.3 include\cudabasisfield
+          
           rmdir /S /Q bin
           rmdir /S /Q info
           rmdir /S /Q src
           rmdir /S /Q tcl
+          
           cd ..
           for /f "delims=" %%x in ('dir patches\* /b ') do (copy /y patches\%%x\* fsl\include\%%x) 
         shell: cmd
       - name: Download TIPL
         run: |
+          cd fsl
           git clone https://github.com/frankyeh/TIPL.git
           move TIPL include
       - name: Download Boost
         run: |
+          cd fsl
           curl -L https://boostorg.jfrog.io/artifactory/main/release/1.77.0/source/boost_1_77_0.tar.bz2 --output boost.tar.bz2
           7z x boost.tar.bz2
           7z x boost.tar
           del *.tar
           del *.tar.bz2
-          move ./boost_1_77_0/boost ./fsl/include    
+          move ./boost_1_77_0/boost include    
       - name: Download OpenBLAS
         run: |
           cd fsl
