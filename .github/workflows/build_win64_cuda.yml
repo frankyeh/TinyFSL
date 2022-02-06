@@ -49,8 +49,10 @@ jobs:
           cd fsl
           for /f "delims=" %%x in ('dir include\* /b ') do (move /y src\fsl-%%x\* include\%%x) 
           
-          copy /y src\fsl-eddy\cuda include\eddy
+          move src\fsl-eddy\cuda include\eddy
           copy /y src\fsl-eddy-cuda-11.3 include\eddy
+          copy /y src\fsl-eddy-cuda-11.3\cuda include\eddy\cuda
+          
           copy /y src\fsl-cudabasisfield-cuda-11.3 include\cudabasisfield
           
           rmdir /S /Q bin
@@ -60,6 +62,8 @@ jobs:
           
           cd ..
           for /f "delims=" %%x in ('dir patches\* /b ') do (copy /y patches\%%x\* fsl\include\%%x) 
+          copy /y patches\eddy\cuda fsl\include\eddy\cuda
+          
         shell: cmd
       - name: Download TIPL
         run: |
