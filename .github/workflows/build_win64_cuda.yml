@@ -103,7 +103,7 @@ jobs:
           mkdir -p build_eddy
           cd eddy
           cmake -S . -B ..\build_eddy -GNinja -DBoost_INCLUDE_DIR=..\fsl\include -DBLAS_LIB_DIR=..\fsl\openblas\lib -DBLAS_LIBRARIES=libopenblas "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_C_COMPILER:STRING=cl" "-DCMAKE_CXX_COMPILER:STRING=cl" -DCUDA_ARCH=${{ matrix.arch }} -DTIPL_DIR=..\fsl\include
-          cmake --build ./build_eddy --parallel --config Release
+          cmake --build ..\build_eddy --parallel --config Release
         shell: cmd
         
       - name: Packaging
