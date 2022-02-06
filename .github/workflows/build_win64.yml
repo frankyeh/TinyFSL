@@ -29,6 +29,10 @@ jobs:
           curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-utils-2111.1-h2bc3f7f_0.tar.bz2 --output fsl-utils-2111.1-h2bc3f7f_0.tar.bz2
           curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-warpfns-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-warpfns-2111.0-h2bc3f7f_0.tar.bz2
           curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-znzlib-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-znzlib-2111.0-h2bc3f7f_0.tar.bz2
+          
+          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-cudabasisfield-cuda-11.3-1.1.0-h2bc3f7f_0.tar.bz2 --output fsl-cudabasisfield-cuda-11.3-1.1.0-h2bc3f7f_0.tar.bz2
+          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-eddy-cuda-11.3-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-eddy-cuda-11.3-2111.0-h2bc3f7f_0.tar.bz2
+          
           move *.bz2 fsl
           cd fsl
           7z e *.bz2
