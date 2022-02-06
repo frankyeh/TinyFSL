@@ -29,18 +29,27 @@ jobs:
           curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-utils-2111.1-h2bc3f7f_0.tar.bz2 --output fsl-utils-2111.1-h2bc3f7f_0.tar.bz2
           curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-warpfns-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-warpfns-2111.0-h2bc3f7f_0.tar.bz2
           curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-znzlib-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-znzlib-2111.0-h2bc3f7f_0.tar.bz2
+          
+          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-cudabasisfield-cuda-11.3-1.1.0-h2bc3f7f_0.tar.bz2 --output fsl-cudabasisfield-cuda-11.3-1.1.0-h2bc3f7f_0.tar.bz2
+          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-eddy-cuda-11.3-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-eddy-cuda-11.3-2111.0-h2bc3f7f_0.tar.bz2
+          
+          move *.bz2 fsl
+          cd fsl
           7z e *.bz2
           del *.bz2
           7z x *.tar -y
           del *.tar
       - name: Patch FSL
         run: |
+          cd fsl
+          move /y src\fsl-eddy\cuda include\eddy
           for /f "delims=" %%x in ('dir include\* /b ') do (move /y src\fsl-%%x\* include\%%x) 
           rmdir /S /Q bin
           rmdir /S /Q info
           rmdir /S /Q src
           rmdir /S /Q tcl
-          for /f "delims=" %%x in ('dir patches\* /b ') do (move /y patches\%%x\* include\%%x) 
+          cd ..
+          for /f "delims=" %%x in ('dir patches\* /b ') do (copy /y patches\%%x\* fsl\include\%%x) 
         shell: cmd
       - name: Download TIPL
         run: |
@@ -54,9 +63,12 @@ jobs:
           7z x boost.tar
           del *.tar
           del *.tar.bz2
-          move ./boost_1_77_0/boost ./include    
+          move ./boost_1_77_0/boost ./fsl/include    
       - name: Download OpenBLAS
         run: |
+          cd fsl
+          mkdir openblas
+          cd openblas
           curl -L https://github.com/xianyi/OpenBLAS/releases/download/v0.3.18/OpenBLAS-0.3.18-x64.zip --output openblas.zip
           7z x openblas.zip
           del openblas.zip
