@@ -169,10 +169,11 @@ target_link_directories(eddy PUBLIC ${BLAS_LIB_DIR})
 
 if(CUDA_ARCH)
   target_compile_definitions(eddy PUBLIC COMPILE_GPU)
+  target_link_libraries(eddy ${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES} )
+  include_directories(eddy ${CUDA_PATH}/include)
   set_property(TARGET eddy PROPERTY CUDA_ARCHITECTURES ${CUDA_ARCH})
   set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -allow-unsupported-compiler -Xcompiler /Zc:__cplusplus")
   set(CMAKE_CUDA_RUNTIME_LIBRARY "Static")
-  target_link_libraries(eddy ${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES} )
 endif()
 target_link_libraries(eddy ${BLAS_LIBRARIES} ZLIB::ZLIB)
 
