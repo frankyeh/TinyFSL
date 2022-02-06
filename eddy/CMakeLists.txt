@@ -8,117 +8,155 @@ endif()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-find_package(OpenBLAS)
+
+set(BLA_VENDOR OpenBLAS)
+find_package(BLAS REQUIRED)
+find_package(Boost REQUIRED)
 find_package(ZLIB REQUIRED)
 if(CUDA_ARCH)
     find_package(CUDA REQUIRED)
+    set(OTHER_SOURCES
+        ../fsl/include/eddy/cuda/CudaVolume.cu
+        ../fsl/include/eddy/cuda/GpuPredictorChunk.cu
+        ../fsl/include/eddy/cuda/DiffusionGP.cu
+        ../fsl/include/eddy/cuda/EddyCudaHelperFunctions.cu
+        ../fsl/include/eddy/cuda/PostEddyCF.cu
+        ../fsl/include/eddy/cuda/EddyGpuUtils.cu
+        ../fsl/include/eddy/cuda/LSResampler.cu
+        ../fsl/include/eddy/cuda/EddyMatrixKernels.cu
+        ../fsl/include/eddy/cuda/StackResampler.cu
+        ../fsl/include/eddy/cuda/DerivativeCalculator.cu
+        ../fsl/include/eddy/cuda/EddyKernels.cu
+        ../fsl/include/eddy/cuda/EddyInternalGpuUtils.cu
+
+        ../fsl/include/cudabasisfield/CBFKernelDefinitions.cu
+        ../fsl/include/cudabasisfield/CBFSparseDiagonalMatrix.cu
+        ../fsl/include/cudabasisfield/CBFSplineField.cu)
+else()
+    set(OTHER_SOURCES
+        ../fsl/include/eddy/LSResampler.cpp
+        ../fsl/include/eddy/PostEddyCF.cpp
+        )
 endif()
 
 set(SOURCES
-    include/eddy/b0Predictor.cpp
-    include/eddy/BiasFieldEstimatorImpl.cpp
-    include/eddy/CPUStackResampler.cpp
-    include/eddy/DiffusionGP.cpp
-    include/eddy/ECModels.cpp
-    include/eddy/ECScanClasses.cpp
-    include/eddy/eddy.cpp
-    include/eddy/EddyCommandLineOptions.cpp
-    include/eddy/EddyHelperClasses.cpp
-    include/eddy/EddyUtils.cpp
-    include/eddy/HyParEstimator.cpp
-    include/eddy/KMatrix.cpp
-    include/eddy/LSResampler.cpp
-    include/eddy/MoveBySuscCF.cpp
-    include/eddy/PostEddyAlignShellsFunctions.cpp
-    include/eddy/PostEddyCF.cpp
-    include/basisfield/basisfield.cpp
-    include/basisfield/dctfield.cpp
-    include/basisfield/splinefield.cpp
-    include/cprob/bdtr.cc
-    include/cprob/btdtr.cc
-    include/cprob/chdtr.cc
-    include/cprob/const.cc
-    include/cprob/drand.cc
-    include/cprob/expx2.cc
-    include/cprob/fdtr.cc
-    include/cprob/gamma.cc
-    include/cprob/gdtr.cc
-    include/cprob/igam.cc
-    include/cprob/igami.cc
-    include/cprob/incbet.cc
-    include/cprob/incbi.cc
-    include/cprob/kolmogorov.cc
-    include/cprob/mtherr.cc
-    include/cprob/nbdtr.cc
-    include/cprob/ndtr.cc
-    include/cprob/ndtri.cc
-    include/cprob/pdtr.cc
-    include/cprob/polevl.cc
-    include/cprob/stdtr.cc
-    include/cprob/unity.cc
-    include/cprob/xmath.cc
-    include/meshclass/mesh.cpp
-    include/meshclass/mpoint.cpp
-    include/meshclass/point.cpp
-    include/meshclass/profile.cpp
-    include/meshclass/pt_special.cpp
-    include/meshclass/triangle.cpp
-    include/miscmaths/base2z.cc
-    include/miscmaths/bfmatrix.cpp
-    include/miscmaths/cspline.cc
-    include/miscmaths/f2z.cc
-    include/miscmaths/histogram.cc
-    include/miscmaths/kernel.cc
-    include/miscmaths/minimize.cc
-    include/miscmaths/miscmaths.cc
-    include/miscmaths/miscprob.cc
-    include/miscmaths/nonlin.cpp
-    include/miscmaths/optimise.cc
-    include/miscmaths/rungekutta.cc
-    include/miscmaths/Simplex.cpp
-    include/miscmaths/sparse_matrix.cc
-    include/miscmaths/sparsefn.cc
-    include/miscmaths/SpMatMatrices.cpp
-    include/miscmaths/t2z.cc
-    include/newimage/complexvolume.cc
-    include/newimage/imfft.cc
-    include/newimage/lazy.cc
-    include/newimage/newimage.cc
-    include/newimage/newimagefns.cc
-    include/newnifti/legacyFunctions.cc
-    include/newnifti/NewNifti.cc
-    include/topup/displacement_vector.cpp
-    include/topup/topup_costfunctions.cpp
-    include/topup/topup_file_io.cpp
-    include/topup/topup_matrices.cpp
-    include/topup/topupfns.cpp
-    include/utils/check.cc
-    include/utils/functions.cc
-    include/utils/log.cc
-    include/utils/matches.cc
-    include/utils/parse.cc
-    include/utils/time_tracer.cc
-    include/utils/usage.cc
-    include/warpfns/fnirt_file_reader.cpp
-    include/warpfns/fnirt_file_writer.cpp
-    include/warpfns/point_list.cpp
-    include/warpfns/warpfns.cc
-    include/znzlib/znzlib.c
-    include/utils/FSLProfiler.cpp
-    include/newimage/costfns.cc
-    include/newimage/generalio.cc)
+    ../fsl/include/eddy/b0Predictor.cpp
+    ../fsl/include/eddy/BiasFieldEstimatorImpl.cpp
+    ../fsl/include/eddy/CPUStackResampler.cpp
+    ../fsl/include/eddy/DiffusionGP.cpp
+    ../fsl/include/eddy/ECModels.cpp
+    ../fsl/include/eddy/ECScanClasses.cpp
+    ../fsl/include/eddy/eddy.cpp
+    ../fsl/include/eddy/EddyCommandLineOptions.cpp
+    ../fsl/include/eddy/EddyHelperClasses.cpp
+    ../fsl/include/eddy/EddyUtils.cpp
+    ../fsl/include/eddy/HyParEstimator.cpp
+    ../fsl/include/eddy/KMatrix.cpp
+    ../fsl/include/eddy/MoveBySuscCF.cpp
+    ../fsl/include/eddy/PostEddyAlignShellsFunctions.cpp
+    ../fsl/include/basisfield/basisfield.cpp
+    ../fsl/include/basisfield/dctfield.cpp
+    ../fsl/include/basisfield/splinefield.cpp
+    ../fsl/include/cprob/bdtr.cc
+    ../fsl/include/cprob/btdtr.cc
+    ../fsl/include/cprob/chdtr.cc
+    ../fsl/include/cprob/const.cc
+    ../fsl/include/cprob/drand.cc
+    ../fsl/include/cprob/expx2.cc
+    ../fsl/include/cprob/fdtr.cc
+    ../fsl/include/cprob/gamma.cc
+    ../fsl/include/cprob/gdtr.cc
+    ../fsl/include/cprob/igam.cc
+    ../fsl/include/cprob/igami.cc
+    ../fsl/include/cprob/incbet.cc
+    ../fsl/include/cprob/incbi.cc
+    ../fsl/include/cprob/kolmogorov.cc
+    ../fsl/include/cprob/mtherr.cc
+    ../fsl/include/cprob/nbdtr.cc
+    ../fsl/include/cprob/ndtr.cc
+    ../fsl/include/cprob/ndtri.cc
+    ../fsl/include/cprob/pdtr.cc
+    ../fsl/include/cprob/polevl.cc
+    ../fsl/include/cprob/stdtr.cc
+    ../fsl/include/cprob/unity.cc
+    ../fsl/include/cprob/xmath.cc
+    ../fsl/include/meshclass/mesh.cpp
+    ../fsl/include/meshclass/mpoint.cpp
+    ../fsl/include/meshclass/point.cpp
+    ../fsl/include/meshclass/profile.cpp
+    ../fsl/include/meshclass/pt_special.cpp
+    ../fsl/include/meshclass/triangle.cpp
+    ../fsl/include/miscmaths/base2z.cc
+    ../fsl/include/miscmaths/bfmatrix.cpp
+    ../fsl/include/miscmaths/cspline.cc
+    ../fsl/include/miscmaths/f2z.cc
+    ../fsl/include/miscmaths/histogram.cc
+    ../fsl/include/miscmaths/kernel.cc
+    ../fsl/include/miscmaths/minimize.cc
+    ../fsl/include/miscmaths/miscmaths.cc
+    ../fsl/include/miscmaths/miscprob.cc
+    ../fsl/include/miscmaths/nonlin.cpp
+    ../fsl/include/miscmaths/optimise.cc
+    ../fsl/include/miscmaths/rungekutta.cc
+    ../fsl/include/miscmaths/Simplex.cpp
+    ../fsl/include/miscmaths/sparse_matrix.cc
+    ../fsl/include/miscmaths/sparsefn.cc
+    ../fsl/include/miscmaths/SpMatMatrices.cpp
+    ../fsl/include/miscmaths/t2z.cc
+    ../fsl/include/newimage/complexvolume.cc
+    ../fsl/include/newimage/imfft.cc
+    ../fsl/include/newimage/lazy.cc
+    ../fsl/include/newimage/newimage.cc
+    ../fsl/include/newimage/newimagefns.cc
+    ../fsl/include/newnifti/legacyFunctions.cc
+    ../fsl/include/newnifti/NewNifti.cc
+    ../fsl/include/topup/displacement_vector.cpp
+    ../fsl/include/topup/topup_costfunctions.cpp
+    ../fsl/include/topup/topup_file_io.cpp
+    ../fsl/include/topup/topup_matrices.cpp
+    ../fsl/include/topup/topupfns.cpp
+    ../fsl/include/utils/check.cc
+    ../fsl/include/utils/functions.cc
+    ../fsl/include/utils/log.cc
+    ../fsl/include/utils/matches.cc
+    ../fsl/include/utils/parse.cc
+    ../fsl/include/utils/time_tracer.cc
+    ../fsl/include/utils/usage.cc
+    ../fsl/include/warpfns/fnirt_file_reader.cpp
+    ../fsl/include/warpfns/fnirt_file_writer.cpp
+    ../fsl/include/warpfns/point_list.cpp
+    ../fsl/include/warpfns/warpfns.cc
+    ../fsl/include/znzlib/znzlib.c
+    ../fsl/include/utils/FSLProfiler.cpp
+    ../fsl/include/newimage/costfns.cc
+    ../fsl/include/newimage/generalio.cc)
 
-add_executable(eddy ${SOURCES})
+if(APPLE)
+    set(OTHER_EXEC
+        MACOSX_BUNDLE)
+endif()
+
+
+add_executable(eddy ${SOURCES} ${OTHER_SOURCES} ${OTHER_EXEC})
 
 set_target_properties(eddy PROPERTIES CXX_STANDARD 17 CXX_EXTENSIONS NONE)
 
-target_compile_definitions(dsi_studio PUBLIC ARMA_NO_DEBUG)
+target_compile_definitions(eddy PUBLIC ARMA_NO_DEBUG)
+if(CUDA_ARCH)
+    target_compile_definitions(eddy PUBLIC BUILDSTRING=TinyFSL_CUDA_SM${CUDA_ARCH})
+else()
+    target_compile_definitions(eddy PUBLIC BUILDSTRING=TinyFSL)
+endif()
+if(MSVC)
+    target_compile_options(eddy PUBLIC "$<$<COMPILE_LANGUAGE:CXX>:/Zc:__cplusplus>")
+endif()
 
-
-set_property(TARGET eddy PROPERTY CUDA_ARCHITECTURES 52 60 70 75)
-
-set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS}")
-set(CMAKE_CUDA_RUNTIME_LIBRARY "Static")
+target_include_directories(eddy PUBLIC
+  ${CMAKE_SOURCE_DIR}/../fsl/include/cudabasisfield
+  ${CMAKE_SOURCE_DIR}/../fsl/include/eddy
+  ${CMAKE_SOURCE_DIR}/../fsl/include
+  ${CMAKE_SOURCE_DIR}/../fsl
+  ${CMAKE_BINARY_DIR})
 
 if(EXISTS "${TIPL_DIR}")
   include_directories(eddy ${TIPL_DIR})
@@ -126,6 +164,15 @@ else()
   find_package(TIPL REQUIRED)
   target_link_libraries(eddy TIPL::tipl)
 endif()
+target_link_directories(eddy PUBLIC ${BLAS_LIB_DIR})
 
-target_link_libraries(eddy ${CUDA_LIBRARIES} OpenBLAS::OpenBLAS)
+
+if(CUDA_ARCH)
+  target_compile_definitions(eddy PUBLIC COMPILE_GPU)
+  set_property(TARGET eddy PROPERTY CUDA_ARCHITECTURES ${CUDA_ARCH})
+  set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -allow-unsupported-compiler -Xcompiler /Zc:__cplusplus")
+  set(CMAKE_CUDA_RUNTIME_LIBRARY "Static")
+  target_link_libraries(eddy ${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES} )
+endif()
+target_link_libraries(eddy ${BLAS_LIBRARIES} ZLIB::ZLIB)
 
