@@ -3,7 +3,7 @@
     align shells to each other and to b0 after the "main eddy"
     has completed.
 */
-#include "tipl/tipl.hpp"
+#include "TIPL/tipl.hpp"
 #include <iostream>
 
 #include "topup/topup_file_io.h"

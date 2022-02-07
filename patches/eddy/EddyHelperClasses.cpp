@@ -19,7 +19,7 @@
 #include "miscmaths/miscmaths.h"
 #include "EddyHelperClasses.h"
 #include "EddyUtils.h"
-#include "tipl/tipl.hpp"
+#include "TIPL/tipl.hpp"
 using namespace std;
 using namespace EDDY;
 

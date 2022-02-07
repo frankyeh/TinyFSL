@@ -28,7 +28,7 @@
 #include "LSResampler.h"
 #include "ECScanClasses.h"
 #include "CPUStackResampler.h"
-#include "tipl/tipl.hpp"
+#include "TIPL/tipl.hpp"
 #ifdef COMPILE_GPU
 #include "cuda/EddyGpuUtils.h"
 #include "cuda/EddyCudaHelperFunctions.h"

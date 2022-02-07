@@ -7,7 +7,7 @@
 // Copyright (C) 2009 University of Oxford
 //
 /*  CCOPYRIGHT  */
-#include "tipl/tipl.hpp"
+#include "TIPL/tipl.hpp"
 #include <cstdlib>
 #include <iostream>
 #include <string>

@@ -34,7 +34,7 @@ using std::tr1::array;
 #include "cuda/EddyGpuUtils.h"
 #endif
 
-#include "tipl/tipl.hpp"
+#include "TIPL/tipl.hpp"
 using namespace std;
 using namespace EDDY;
 
