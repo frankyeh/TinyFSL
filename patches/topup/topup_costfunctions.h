@@ -160,6 +160,27 @@ public:
   NEWIMAGE::volume<float> GetAlpha(const BASISFIELD::splinefield& field) const;
   NEWIMAGE::volume<float> GetBeta(const BASISFIELD::splinefield& field) const;
   NEWIMAGE::volume<float> GetGamma(const BASISFIELD::splinefield& field) const;
+
+
+  inline float GetResampled(size_t index) const
+  {return _jac.at(index) * _resampled.at(index);}
+
+  inline float GetMask(size_t index) const
+  {return _mask.at(index);}
+
+  inline float GetAlpha(size_t index,float s0,float s1) const
+  {
+      if(s0 == 0.0f) return s1 * _derivs[1].at(index) * _jac.at(index);
+      if(s1 == 0.0f) return s0 * _derivs[0].at(index) * _jac.at(index);
+      return (s1 * _derivs[1].at(index) + s0 * _derivs[0].at(index)) * _jac.at(index);
+  }
+  inline float GetBeta(size_t index,float s) const
+  {return (s != 0.0f) ? s * _resampled.at(index) : 0.0f;}
+
+  inline float GetGamma(size_t index,float s) const
+  {return (s != 0.0f) ? s * _resampled.at(index) : 0.0f;}
+
+
   NEWIMAGE::volume<float> GetMovementDerivative(unsigned int i,
                                                 const BASISFIELD::splinefield& field) const;
   NEWIMAGE::volume<float> GetNumericalMovementDerivative(unsigned int i,
@@ -175,7 +196,7 @@ public:
   void ReGrid(const std::vector<unsigned int>& sz) { ReGrid(int(sz[0]),int(sz[1]),int(sz[2])); }
   void Smooth(double fwhm);
   void SubSample(unsigned int ss);
-private:
+//private:
   std::shared_ptr<NEWIMAGE::volume<float> >   _orig;
   std::shared_ptr<NEWIMAGE::volume<float> >   _regrid;      // May be identical to _orig
   std::shared_ptr<NEWIMAGE::volume<float> >   _subsamp;     // May be identical to _regrid
