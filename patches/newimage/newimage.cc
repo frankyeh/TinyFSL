@@ -835,7 +835,7 @@ namespace NEWIMAGE {
       else if (ep == constpad) { *dfdx=0.0; *dfdy=0.0; *dfdz=0.0; extrapval = padvalue; return(extrapval); }
     }
 
-    static std::vector<T>   partials(3,0);
+    std::vector<T>   partials(3,0);
     float                   rval = 0.0;
     if (!splint.Valid() || getsplineorder() != (int)splint.Order() || translate_extrapolation_type(getextrapolationmethod()) != splint.Extrapolation(0)) {
       forcesplinecoefcalculation();
