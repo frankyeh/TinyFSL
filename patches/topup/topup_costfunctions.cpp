@@ -889,23 +889,101 @@ void TopupScanManager::update(const BASISFIELD::splinefield& field) const
     if (TracePrint()) cout << "TopupScanManager::update: Things not up to date, proceeds with updating." << endl;
 
 
+  // TinyFSL
+  {
 
-    _mean = _scans[0]->GetResampled(field);
-    _mask = _scans[0]->GetMask(field);
-    _mean_alpha = _scans[0]->GetAlpha(field);
-    if (HasBeta()) _mean_beta = _scans[0]->GetBeta(field);
-    if (HasGamma()) _mean_gamma = _scans[0]->GetGamma(field);
-    for (unsigned int i=1; i<_scans.size(); i++) {
-      _mean += _scans[i]->GetResampled(field);
-      _mask *= _scans[i]->GetMask(field);
-      _mean_alpha += _scans[i]->GetAlpha(field);
-      if (HasBeta(i)) _mean_beta += _scans[i]->GetBeta(field);
-      if (HasGamma(i)) _mean_gamma += _scans[i]->GetGamma(field);
+    BASISFIELD::splinefield& tmpfield = const_cast<BASISFIELD::splinefield& >(field);
+    tmpfield.Update(BASISFIELD::FIELD);
+
+    for(auto scan : _scans)
+        scan->update(field);
+
+    {
+        auto isz = ImageSize(Target);
+        auto idim = ImageVxs(Target);
+        _mean.reinitialize(int(isz[0]),int(isz[1]),int(isz[2]));
+        _mean.setdims(float(idim[0]),float(idim[1]),float(idim[2]));
+        _mask = _scans[0]->_mask;
+        _mean_alpha.reinitialize(int(isz[0]),int(isz[1]),int(isz[2]));
+        _mean_alpha.setdims(float(idim[0]),float(idim[1]),float(idim[2]));
+        if (HasBeta())
+        {
+            _mean_beta.reinitialize(int(isz[0]),int(isz[1]),int(isz[2]));
+            _mean_beta.setdims(float(idim[0]),float(idim[1]),float(idim[2]));
+        }
+        if (HasGamma())
+        {
+            _mean_gamma.reinitialize(int(isz[0]),int(isz[1]),int(isz[2]));
+            _mean_gamma.setdims(float(idim[0]),float(idim[1]),float(idim[2]));
+        }
     }
-    _mean /= _scans.size();
-    _mean_alpha /= _scans.size();
-    _mean_beta /= _scans.size();
-    _mean_gamma /= _scans.size();
+
+
+    std::vector<float> beta_scale(_scans.size()),gamma_scale(_scans.size());
+    std::vector<float> alphsa_scale0(_scans.size()),alphsa_scale1(_scans.size());
+    for(unsigned int i = 0;i < _scans.size();++i)
+    {
+        std::vector<double> ovxs = _scans[i]->ImageVxs(Original);
+        std::vector<double> svxs = _scans[i]->ImageVxs(Subsampled);
+        std::vector<double> tvxs = _scans[i]->ImageVxs(Target);
+        double sf0 = svxs[0] / ovxs[0];
+        double sf1 = svxs[1] / ovxs[1];
+        double ss0 = tvxs[0] / ovxs[0];
+        double ss1 = tvxs[1] / ovxs[1];
+        alphsa_scale0[i] = float(_scans[i]->_rotime / sf0 * _scans[i]->_pevec(1) / double(_scans.size()));
+        alphsa_scale1[i] = float(_scans[i]->_rotime / sf1 * _scans[i]->_pevec(2) / double(_scans.size()));
+        beta_scale[i]    = float(_scans[i]->_rotime / ss0 * _scans[i]->_pevec(1) / double(_scans.size()));
+        gamma_scale[i]   = float(_scans[i]->_rotime / ss1 * _scans[i]->_pevec(2) / double(_scans.size()));
+    }
+
+    tipl::par_for(_mean.fend()-_mean.fbegin(),[&](unsigned int index){
+        auto& mean = _mean.at(index);
+        auto& mask = _mask.at(index);
+        auto& alpha = _mean_alpha.at(index);
+
+        mean = _scans[0]->GetResampled(index);
+        alpha = _scans[0]->GetAlpha(index,alphsa_scale0[0],alphsa_scale1[0]);
+        mask = _scans[0]->_mask.at(index);
+        for(unsigned int i =1;i < _scans.size();++i)
+        {
+            mean += _scans[i]->GetResampled(index);
+            alpha += _scans[i]->GetAlpha(index,alphsa_scale0[i],alphsa_scale1[i]);
+            mask &= _scans[i]->_mask.at(index);
+        }
+        mean /= float(_scans.size());
+        if (HasBeta())
+        {
+            auto& beta = _mean_beta.at(index);
+            beta = _scans[0]->GetBeta(index,beta_scale[0]);
+            for(unsigned int i = 1;i < _scans.size();++i)
+                beta += _scans[i]->GetBeta(index,beta_scale[i]);
+        }
+        if (HasGamma())
+        {
+            auto& gamma = _mean_gamma.at(index);
+            gamma = _scans[0]->GetGamma(index,gamma_scale[0]);
+            for(unsigned int i = 1;i < _scans.size();++i)
+                gamma += _scans[i]->GetGamma(index,gamma_scale[i]);
+        }
+    });
+
+  }
+    //_mean = _scans[0]->GetResampled(field);
+    //_mask = _scans[0]->GetMask(field);
+    //_mean_alpha = _scans[0]->GetAlpha(field);
+    //if (HasBeta()) _mean_beta = _scans[0]->GetBeta(field);
+    //if (HasGamma()) _mean_gamma = _scans[0]->GetGamma(field);
+    for (unsigned int i=1; i<_scans.size(); i++) {
+      //_mean += _scans[i]->GetResampled(field);
+      //_mask *= _scans[i]->GetMask(field);
+      //_mean_alpha += _scans[i]->GetAlpha(field);
+      //if (HasBeta(i)) _mean_beta += _scans[i]->GetBeta(field);
+      //if (HasGamma(i)) _mean_gamma += _scans[i]->GetGamma(field);
+    }
+    //_mean /= _scans.size();
+    //_mean_alpha /= _scans.size();
+    //_mean_beta /= _scans.size();
+    //_mean_gamma /= _scans.size();
 
     _up_to_date = true;
   }
@@ -1365,13 +1443,26 @@ NEWMAT::ReturnMatrix TopupCF::grad(const NEWMAT::ColumnVector& p) const
   }
 
   // Then calculate them
-
+  /*
+  tipl::par_for(mean.fend()-mean.fbegin(),[&](unsigned int index)
+  {
+      for (unsigned int i=0; i<_sm.NoOfScans(); i++)
+      {
+          float diff = *(mean.fbegin()+index);
+          if(*(_sm._scans[i]->_mask.fbegin()+index))
+            diff -= *(_sm._scans[i]->_jac.fbegin()+index)* (*(_sm._scans[i]->_resampled.fbegin()+index));
+          *const_cast<float*>(abf[0]->fbegin()+index) += *(mean_alpha.fbegin()+index
+      }
+  });
+  */
   for (unsigned int i=0; i<_sm.NoOfScans(); i++) {
     NEWIMAGE::volume<float>  diff = mean - _sm.GetScan(i,_field);
     *(abf[0]) += (mean_alpha - _sm.GetAlpha(i,_field)) * diff;
     if (_sm.HasBeta(i)) *(abf[1]) += (mean_beta - _sm.GetBeta(i,_field)) * diff;
     if (_sm.HasGamma(i)) *(abf[2]) += (mean_gamma - _sm.GetGamma(i,_field)) * diff;
   }
+
+
   gradient.Rows(1,NDefPar()) += 2.0 * _field.Jte(*(abf[0]),&mask) / (n*(m - 1));
   std::vector<unsigned int> deriv(3,0);
   if (_sm.HasBeta()) { deriv[0] = 1; gradient.Rows(1,NDefPar()) += 2.0 * _field.Jte(deriv,*(abf[1]),&mask) / (n*(m - 1)); deriv[0] = 0; }
@@ -1388,11 +1479,12 @@ NEWMAT::ReturnMatrix TopupCF::grad(const NEWMAT::ColumnVector& p) const
     for (unsigned int s=0; s<_sm.NoOfScans(); s++) {
       NEWIMAGE::volume<float>  diff = mean - _sm.GetScan(s,_field);
       // cout << "Scan s = " << s << ", No d = " << _sm.NoOfMovementParametersForScan(s) << endl;
-      for (unsigned int d=0; d<_sm.NoOfMovementParametersForScan(s); d++) {
-	NEWIMAGE::volume<float> deriv = _sm.GetMovementDerivative(s,d,_field);
-        gradient(gi) = - (2.0 / (n*(m - 1))) * sum_of_prod(diff,deriv,mask);
-        gi++;
-      }
+      tipl::par_for(_sm.NoOfMovementParametersForScan(s),[&](unsigned int d)
+      {
+        NEWIMAGE::volume<float> deriv = _sm.GetMovementDerivative(s,d,_field);
+        gradient(gi+d) = - (2.0 / (n*(m - 1))) * sum_of_prod(diff,deriv,mask);
+      });
+      gi+=_sm.NoOfMovementParametersForScan(s);
     }
     // gradient.Rows(NDefPar()+1,NPar()) = numerical_gradient(p,NDefPar()+1,NPar(),1e-4,false); // Uncomment for numerical derivatives
   }
