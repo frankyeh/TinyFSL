@@ -304,7 +304,7 @@ public:
   void SetMovementParameters(const NEWMAT::ColumnVector& mp) const; // Sets the parameters that are being estimated
   void SetInterpolationModel(TopupInterpolationType it) const;
 
-private:
+//private:
   std::vector<TopupScan* >                      _scans;  // Vector of pointers
   mutable NEWIMAGE::volume<char>                _mask;
   mutable NEWIMAGE::volume<float>               _mean;
