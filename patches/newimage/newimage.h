@@ -17,7 +17,7 @@
 #include <vector>
 #include <string>
 #include <stdexcept>
-#include <boost/type_traits/is_integral.hpp>
+#include "TIPL/tipl.hpp"
 #include "armawrap/newmatap.h"
 #include "positerators.h"
 #include "NewNifti/NewNifti.h"
@@ -369,7 +369,8 @@ int readGeneralVolume(volume<T>& target, const std::string& filename,
     // DATA ACCESS FUNCTIONS (iterators)
 
     typedef const T* fast_const_iterator;
-
+    inline T& at(size_t index) {return Data[index];}
+    inline const T& at(size_t index) const {return Data[index];}
     inline fast_const_iterator fbegin() const { return Data; }
     inline fast_const_iterator fend() const { return DataEnd; }
     inline fast_const_iterator fbegin(const int64_t offset) const { return Data + offset*nvoxels(); }
@@ -378,7 +379,7 @@ int readGeneralVolume(volume<T>& target, const std::string& filename,
     // BASIC DATA ACCESS FUNCTIONS
     template<class A, class B, class C>
     inline bool in_bounds( A x, B y, C z) const {
-      if ( boost::is_integral<A>::value && boost::is_integral<B>::value && boost::is_integral<C>::value )
+      if ( std::is_integral<A>::value && std::is_integral<B>::value && std::is_integral<C>::value )
         return ( (x>=0) && (y>=0) && (z>=0) && (x<ColumnsX) && (y<RowsY) && (z<SlicesZ) );
       return ( (floor(x)>=0) && (floor(y)>=0) && (floor(z)>=0) && (ceil(x)<ColumnsX) && (ceil(y)<RowsY) && (ceil(z)<SlicesZ) );
     }
