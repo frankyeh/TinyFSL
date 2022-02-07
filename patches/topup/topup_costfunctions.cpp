@@ -483,7 +483,6 @@ void TopupScan::update(const BASISFIELD::splinefield&  field) const
 
     // cout << "_mp = " << _mp(1) << ", " << _mp(2) << ", " << _mp(3) << ", " << _mp(4) << ", " << _mp(5) << ", " << _mp(6) << endl;
     NEWMAT::Matrix rb = mp_to_matrix(_mp);
-
     // Map field(Hz)->displacement_fields _for_ _the_ _non-subsampled_ _data_
     // Note that general_transform expects displacement fields in mm, hence the multiplication with voxel-size.
     std::vector<unsigned int> isz = this->ImageSize(Target);
@@ -891,7 +890,6 @@ void TopupScanManager::update(const BASISFIELD::splinefield& field) const
 
   // TinyFSL
   {
-
     BASISFIELD::splinefield& tmpfield = const_cast<BASISFIELD::splinefield& >(field);
     tmpfield.Update(BASISFIELD::FIELD);
 
