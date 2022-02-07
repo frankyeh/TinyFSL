@@ -6,7 +6,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(BLA_VENDOR OpenBLAS)
 find_package(BLAS REQUIRED)
-find_package(Boost REQUIRED)
 find_package(ZLIB REQUIRED)
 
 set(SOURCES
