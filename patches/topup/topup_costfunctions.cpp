@@ -920,7 +920,7 @@ void TopupScanManager::update(const BASISFIELD::splinefield& field) const
 
 
     std::vector<float> beta_scale(_scans.size()),gamma_scale(_scans.size());
-    std::vector<float> alphsa_scale0(_scans.size()),alphsa_scale1(_scans.size());
+    std::vector<float> alpha_scale0(_scans.size()),alpha_scale1(_scans.size());
     for(unsigned int i = 0;i < _scans.size();++i)
     {
         std::vector<double> ovxs = _scans[i]->ImageVxs(Original);
@@ -930,8 +930,8 @@ void TopupScanManager::update(const BASISFIELD::splinefield& field) const
         double sf1 = svxs[1] / ovxs[1];
         double ss0 = tvxs[0] / ovxs[0];
         double ss1 = tvxs[1] / ovxs[1];
-        alphsa_scale0[i] = float(_scans[i]->_rotime / sf0 * _scans[i]->_pevec(1) / double(_scans.size()));
-        alphsa_scale1[i] = float(_scans[i]->_rotime / sf1 * _scans[i]->_pevec(2) / double(_scans.size()));
+        alpha_scale0[i] = float(_scans[i]->_rotime / sf0 * _scans[i]->_pevec(1) / double(_scans.size()));
+        alpha_scale1[i] = float(_scans[i]->_rotime / sf1 * _scans[i]->_pevec(2) / double(_scans.size()));
         beta_scale[i]    = float(_scans[i]->_rotime / ss0 * _scans[i]->_pevec(1) / double(_scans.size()));
         gamma_scale[i]   = float(_scans[i]->_rotime / ss1 * _scans[i]->_pevec(2) / double(_scans.size()));
     }
@@ -942,12 +942,12 @@ void TopupScanManager::update(const BASISFIELD::splinefield& field) const
         auto& alpha = _mean_alpha.at(index);
 
         mean = _scans[0]->GetResampled(index);
-        alpha = _scans[0]->GetAlpha(index,alphsa_scale0[0],alphsa_scale1[0]);
+        alpha = _scans[0]->GetAlpha(index,alpha_scale0[0],alpha_scale1[0]);
         mask = _scans[0]->_mask.at(index);
         for(unsigned int i =1;i < _scans.size();++i)
         {
             mean += _scans[i]->GetResampled(index);
-            alpha += _scans[i]->GetAlpha(index,alphsa_scale0[i],alphsa_scale1[i]);
+            alpha += _scans[i]->GetAlpha(index,alpha_scale0[i],alpha_scale1[i]);
             mask &= _scans[i]->_mask.at(index);
         }
         mean /= float(_scans.size());
@@ -984,7 +984,6 @@ void TopupScanManager::update(const BASISFIELD::splinefield& field) const
     //_mean_alpha /= _scans.size();
     //_mean_beta /= _scans.size();
     //_mean_gamma /= _scans.size();
-
     _up_to_date = true;
   }
 
@@ -1443,24 +1442,48 @@ NEWMAT::ReturnMatrix TopupCF::grad(const NEWMAT::ColumnVector& p) const
   }
 
   // Then calculate them
-  /*
+
+  auto& _scans = _sm._scans;
+  std::vector<float> beta_scale(_scans.size()),gamma_scale(_scans.size());
+  std::vector<float> alpha_scale0(_scans.size()),alpha_scale1(_scans.size());
+  for(unsigned int i = 0;i < _scans.size();++i)
+  {
+      std::vector<double> ovxs = _scans[i]->ImageVxs(Original);
+      std::vector<double> svxs = _scans[i]->ImageVxs(Subsampled);
+      std::vector<double> tvxs = _scans[i]->ImageVxs(Target);
+      double sf0 = svxs[0] / ovxs[0];
+      double sf1 = svxs[1] / ovxs[1];
+      double ss0 = tvxs[0] / ovxs[0];
+      double ss1 = tvxs[1] / ovxs[1];
+      alpha_scale0[i] = float(_scans[i]->_rotime / sf0 * _scans[i]->_pevec(1));
+      alpha_scale1[i] = float(_scans[i]->_rotime / sf1 * _scans[i]->_pevec(2));
+      beta_scale[i]    = float(_scans[i]->_rotime / ss0 * _scans[i]->_pevec(1));
+      gamma_scale[i]   = float(_scans[i]->_rotime / ss1 * _scans[i]->_pevec(2));
+  }
+
+
   tipl::par_for(mean.fend()-mean.fbegin(),[&](unsigned int index)
   {
       for (unsigned int i=0; i<_sm.NoOfScans(); i++)
       {
-          float diff = *(mean.fbegin()+index);
-          if(*(_sm._scans[i]->_mask.fbegin()+index))
-            diff -= *(_sm._scans[i]->_jac.fbegin()+index)* (*(_sm._scans[i]->_resampled.fbegin()+index));
-          *const_cast<float*>(abf[0]->fbegin()+index) += *(mean_alpha.fbegin()+index
+          float diff = mean.at(index) - _scans[i]->GetResampled(index);
+          abf[0]->at(index) += (mean_alpha.at(index) - _scans[i]->GetAlpha(index,alpha_scale0[i],alpha_scale1[i])) * diff;
+          if (_sm.HasBeta(i)) abf[1]->at(index) += (mean_beta.at(index) - _scans[i]->GetBeta(index,beta_scale[i])) * diff;
+          if (_sm.HasGamma(i)) abf[2]->at(index) += (mean_gamma.at(index) - _scans[i]->GetGamma(index,gamma_scale[i])) * diff;
       }
   });
-  */
+
+
+  /*
   for (unsigned int i=0; i<_sm.NoOfScans(); i++) {
     NEWIMAGE::volume<float>  diff = mean - _sm.GetScan(i,_field);
     *(abf[0]) += (mean_alpha - _sm.GetAlpha(i,_field)) * diff;
     if (_sm.HasBeta(i)) *(abf[1]) += (mean_beta - _sm.GetBeta(i,_field)) * diff;
     if (_sm.HasGamma(i)) *(abf[2]) += (mean_gamma - _sm.GetGamma(i,_field)) * diff;
   }
+  */
+
+
 
 
   gradient.Rows(1,NDefPar()) += 2.0 * _field.Jte(*(abf[0]),&mask) / (n*(m - 1));
