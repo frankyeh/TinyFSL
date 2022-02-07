@@ -25,7 +25,6 @@
 #include <cmath>
 #include <iomanip>
 
-#include <boost/current_function.hpp>
 #include "armawrap/newmat.h"
 #include "newimage/newimageall.h"
 #include "miscmaths/miscmaths.h"
