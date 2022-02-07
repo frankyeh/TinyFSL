@@ -46,7 +46,7 @@
 #ifdef UseEddyTry
   #ifndef EddyTry
     #define EddyTry try
-    #define EddyCatch catch (const std::exception& e) { std::cout << e.what() << std::endl; throw EDDY::EddyException(std::string(__FILE__) + ":::  " + std::string(BOOST_CURRENT_FUNCTION) + ":  Exception thrown"); }
+    #define EddyCatch catch (const std::exception& e) { std::cout << e.what() << std::endl; throw EDDY::EddyException(std::string(__FILE__) + ":::  " + std::string(__func__) + ":  Exception thrown"); }
   #endif
 #else // If not UseEddyTry
   #ifndef EddyTry
