@@ -385,6 +385,26 @@ void TopupScan::SubSample(unsigned int ss)
     _subsamp->setextrapolationmethod(_regrid->getextrapolationmethod());
     std::vector<bool> epval = _regrid->getextrapolationvalidity();
     _subsamp->setextrapolationvalidity(epval[0],epval[1],epval[2]);
+
+    double inv_ss3 = 1.0/double(ss*ss*ss);
+    tipl::shape<3> sp(_subsamp->xsize(),_subsamp->ysize(),_subsamp->zsize());
+    tipl::par_for(tipl::begin_index(sp),tipl::end_index(sp),[&](const tipl::pixel_index<3>& index)
+    {
+        float v = 0.0f;
+        unsigned int i_ss = index[0]*ss;
+        unsigned int j_ss = index[1]*ss;
+        unsigned int k_ss = index[2]*ss;
+        for (unsigned int kk=0; kk<ss; kk++) {
+            for (unsigned int jj=0; jj<ss; jj++) {
+              for (unsigned int ii=0; ii<ss; ii++) {
+                v += (*_regrid)(i_ss+ii,j_ss+jj,k_ss+kk);
+              }
+            }
+          }
+        _subsamp->at(index.index()) = v*inv_ss3;
+
+    });
+    /*
     *(_subsamp) = 0.0;
     for (int k=0; k<_subsamp->zsize(); k++) {
       for (int j=0; j<_subsamp->ysize(); j++) {
@@ -399,7 +419,7 @@ void TopupScan::SubSample(unsigned int ss)
           (*_subsamp)(i,j,k) /= double(ss*ss*ss);
         }
       }
-    }
+    }*/
   }
   _uptodate = false;
   _smooth = _subsamp;
@@ -489,59 +509,94 @@ void TopupScan::update(const BASISFIELD::splinefield&  field) const
     std::vector<double> idim = this->ImageVxs(Target);
     NEWIMAGE::volume4D<float> df(isz[0],isz[1],isz[2],3);
     df.setdims(float(idim[0]),float(idim[1]),float(idim[2]),1.0);
-    // I am forced to cast away constness on field here. When I have more
-    // time I should address this in the splinefield class instead.
+
+    _resampled.reinitialize(int(isz[0]),int(isz[1]),int(isz[2])); _resampled.setdims(float(idim[0]),float(idim[1]),float(idim[2]));
+    _mask.reinitialize(int(isz[0]),int(isz[1]),int(isz[2])); _mask.setdims(float(idim[0]),float(idim[1]),float(idim[2]));
+    _derivs.reinitialize(int(isz[0]),int(isz[1]),int(isz[2]),3); _derivs.setdims(float(idim[0]),float(idim[1]),float(idim[2]),1.0);
+
+
+
+    if (!field.UpToDate(BASISFIELD::FIELD))
+        throw BASISFIELD::BasisfieldException("TopupScan::update splinefield needs to be updated");
+
+
+    auto ptr = field.Get(BASISFIELD::FIELD);
+    float s0 = float(_rotime * _pevec(1) * _orig->xdim());
+    float s1 = float(_rotime * _pevec(2) * _orig->ydim());
+
+
+    tipl::par_for(df[0].fend()-df[0].fbegin(),[&](int index){
+        float v = ptr->element(index);
+        df[1].at(index) = float(v*s1);
+        df[0].at(index) = float(v*s0);
+        df[2].at(index) = 0.0f;
+        _resampled.at(index) = 0.0f;
+        _derivs.at(index) = 0.0;
+        _mask.at(index) = 0;
+    });
+
+
+    /*
     BASISFIELD::splinefield& tmpfield = const_cast<BASISFIELD::splinefield& >(field);
     NEWIMAGE::ShadowVolume<float> tmpVol(df[0]);
     tmpfield.AsVolume(tmpVol);
     df[1] = float(_rotime * _pevec(2) * _orig->ydim()) * df[0];
     df[0] *= _rotime * _pevec(1) * _orig->xdim();
     df[2] = 0; // Don't allow any component in the z-direction
-
-    // Get resampled data, resampled derivatives and mask
     _resampled.reinitialize(int(isz[0]),int(isz[1]),int(isz[2])); _resampled.setdims(float(idim[0]),float(idim[1]),float(idim[2]));
     _mask.reinitialize(int(isz[0]),int(isz[1]),int(isz[2])); _mask.setdims(float(idim[0]),float(idim[1]),float(idim[2]));
     _derivs.reinitialize(int(isz[0]),int(isz[1]),int(isz[2]),3); _derivs.setdims(float(idim[0]),float(idim[1]),float(idim[2]),1.0);
     _resampled = 0.0; _derivs = 0.0; _mask = 0;
-    general_transform_3partial(*_smooth,rb,df,_resampled,_derivs,_mask);
+    */
 
-    // Set a "frame" in the non-phase-encode directions of
-    // the mask to zero. This is to prevent small movements
-    // from incurring a great cost because of a new set of
-    // voxels being excluded.
-    for (int j=0; j<_mask.ysize(); j++) {
-      for (int i=0; i<_mask.xsize(); i++) {
-        _mask(i,j,0) = 0;
-        _mask(i,j,_mask.zsize()-1) = 0;
-      }
-    }
-    if (_pevec(1) && !_pevec(2)) {
-      for (int k=0; k<_mask.zsize(); k++) {
-	for (int i=0; i<_mask.xsize(); i++) {
-	  _mask(i,0,k) = 0;
-          _mask(i,_mask.ysize()-1,k) = 0;
-	}
-      }
-    }
-    else if (!_pevec(1) && _pevec(2)) {
-      for (int k=0; k<_mask.zsize(); k++) {
-	for (int j=0; j<_mask.ysize(); j++) {
-	  _mask(0,j,k) = 0;
-          _mask(_mask.xsize()-1,j,k) = 0;
-	}
-      }
-    }
+    tipl::par_for(2,[&](unsigned int i)
+    {
 
-    // Get Jacobian
-    BASISFIELD::splinefield xcomp = field;
-    BASISFIELD::splinefield ycomp = field;
-    BASISFIELD::splinefield zcomp = field;
-    xcomp.ScaleField(_rotime * _pevec(1) * _orig->xdim());
-    ycomp.ScaleField(_rotime * _pevec(2) * _orig->ydim());
-    zcomp.ScaleField(0.0);
-    _jac.reinitialize(int(isz[0]),int(isz[1]),int(isz[2])); _jac.setdims(float(idim[0]),float(idim[1]),float(idim[2]));
-    NEWIMAGE::deffield2jacobian(xcomp,ycomp,zcomp,_jac);
+        if(i == 0)
+        {
+            general_transform_3partial(*_smooth,rb,df,_resampled,_derivs,_mask);
 
+            // Set a "frame" in the non-phase-encode directions of
+            // the mask to zero. This is to prevent small movements
+            // from incurring a great cost because of a new set of
+            // voxels being excluded.
+            for (int j=0; j<_mask.ysize(); j++) {
+                for (int i=0; i<_mask.xsize(); i++) {
+                    _mask(i,j,0) = 0;
+                    _mask(i,j,_mask.zsize()-1) = 0;
+                }
+            }
+            if (_pevec(1) && !_pevec(2)) {
+                for (int k=0; k<_mask.zsize(); k++) {
+                    for (int i=0; i<_mask.xsize(); i++) {
+                        _mask(i,0,k) = 0;
+                        _mask(i,_mask.ysize()-1,k) = 0;
+                    }
+                }
+            }
+            else if (!_pevec(1) && _pevec(2)) {
+                for (int k=0; k<_mask.zsize(); k++) {
+                    for (int j=0; j<_mask.ysize(); j++) {
+                        _mask(0,j,k) = 0;
+                        _mask(_mask.xsize()-1,j,k) = 0;
+                    }
+                }
+            }
+        }
+
+        if(i == 1)
+        {
+            // Get Jacobian
+            BASISFIELD::splinefield xcomp = field;
+            BASISFIELD::splinefield ycomp = field;
+            BASISFIELD::splinefield zcomp = field;
+            xcomp.ScaleField(_rotime * _pevec(1) * _orig->xdim());
+            ycomp.ScaleField(_rotime * _pevec(2) * _orig->ydim());
+            zcomp.ScaleField(0.0);
+            _jac.reinitialize(int(isz[0]),int(isz[1]),int(isz[2])); _jac.setdims(float(idim[0]),float(idim[1]),float(idim[2]));
+            NEWIMAGE::deffield2jacobian(xcomp,ycomp,zcomp,_jac);
+        }
+    });
     _uptodate = true;
   }
 
@@ -888,15 +943,12 @@ void TopupScanManager::update(const BASISFIELD::splinefield& field) const
     if (TracePrint()) cout << "TopupScanManager::update: Things not up to date, proceeds with updating." << endl;
 
 
-  // TinyFSL
-  {
-    BASISFIELD::splinefield& tmpfield = const_cast<BASISFIELD::splinefield& >(field);
-    tmpfield.Update(BASISFIELD::FIELD);
-
-    for(auto scan : _scans)
-        scan->update(field);
-
+    // TinyFSL
     {
+        const_cast<BASISFIELD::splinefield& >(field).Update(BASISFIELD::FIELD);
+        for(size_t i = 0;i < _scans.size();++i)
+            _scans[i]->update(field);
+
         auto isz = ImageSize(Target);
         auto idim = ImageVxs(Target);
         _mean.reinitialize(int(isz[0]),int(isz[1]),int(isz[2]));
@@ -914,70 +966,70 @@ void TopupScanManager::update(const BASISFIELD::splinefield& field) const
             _mean_gamma.reinitialize(int(isz[0]),int(isz[1]),int(isz[2]));
             _mean_gamma.setdims(float(idim[0]),float(idim[1]),float(idim[2]));
         }
-    }
 
 
-    std::vector<float> beta_scale(_scans.size()),gamma_scale(_scans.size());
-    std::vector<float> alpha_scale0(_scans.size()),alpha_scale1(_scans.size());
-    for(unsigned int i = 0;i < _scans.size();++i)
-    {
-        std::vector<double> ovxs = _scans[i]->ImageVxs(Original);
-        std::vector<double> svxs = _scans[i]->ImageVxs(Subsampled);
-        std::vector<double> tvxs = _scans[i]->ImageVxs(Target);
-        double sf0 = svxs[0] / ovxs[0];
-        double sf1 = svxs[1] / ovxs[1];
-        double ss0 = tvxs[0] / ovxs[0];
-        double ss1 = tvxs[1] / ovxs[1];
-        alpha_scale0[i] = float(_scans[i]->_rotime / sf0 * _scans[i]->_pevec(1) / double(_scans.size()));
-        alpha_scale1[i] = float(_scans[i]->_rotime / sf1 * _scans[i]->_pevec(2) / double(_scans.size()));
-        beta_scale[i]    = float(_scans[i]->_rotime / ss0 * _scans[i]->_pevec(1) / double(_scans.size()));
-        gamma_scale[i]   = float(_scans[i]->_rotime / ss1 * _scans[i]->_pevec(2) / double(_scans.size()));
-    }
-
-    tipl::par_for(_mean.fend()-_mean.fbegin(),[&](unsigned int index){
-        auto& mean = _mean.at(index);
-        auto& mask = _mask.at(index);
-        auto& alpha = _mean_alpha.at(index);
-
-        mean = _scans[0]->GetResampled(index);
-        alpha = _scans[0]->GetAlpha(index,alpha_scale0[0],alpha_scale1[0]);
-        mask = _scans[0]->_mask.at(index);
-        for(unsigned int i =1;i < _scans.size();++i)
+        std::vector<float> beta_scale(_scans.size()),gamma_scale(_scans.size());
+        std::vector<float> alpha_scale0(_scans.size()),alpha_scale1(_scans.size());
+        for(unsigned int i = 0;i < _scans.size();++i)
         {
-            mean += _scans[i]->GetResampled(index);
-            alpha += _scans[i]->GetAlpha(index,alpha_scale0[i],alpha_scale1[i]);
-            mask &= _scans[i]->_mask.at(index);
+            std::vector<double> ovxs = _scans[i]->ImageVxs(Original);
+            std::vector<double> svxs = _scans[i]->ImageVxs(Subsampled);
+            std::vector<double> tvxs = _scans[i]->ImageVxs(Target);
+            double sf0 = svxs[0] / ovxs[0];
+            double sf1 = svxs[1] / ovxs[1];
+            double ss0 = tvxs[0] / ovxs[0];
+            double ss1 = tvxs[1] / ovxs[1];
+            alpha_scale0[i] = float(_scans[i]->_rotime / sf0 * _scans[i]->_pevec(1) / double(_scans.size()));
+            alpha_scale1[i] = float(_scans[i]->_rotime / sf1 * _scans[i]->_pevec(2) / double(_scans.size()));
+            beta_scale[i]    = float(_scans[i]->_rotime / ss0 * _scans[i]->_pevec(1) / double(_scans.size()));
+            gamma_scale[i]   = float(_scans[i]->_rotime / ss1 * _scans[i]->_pevec(2) / double(_scans.size()));
         }
-        mean /= float(_scans.size());
-        if (HasBeta())
-        {
-            auto& beta = _mean_beta.at(index);
-            beta = _scans[0]->GetBeta(index,beta_scale[0]);
-            for(unsigned int i = 1;i < _scans.size();++i)
-                beta += _scans[i]->GetBeta(index,beta_scale[i]);
-        }
-        if (HasGamma())
-        {
-            auto& gamma = _mean_gamma.at(index);
-            gamma = _scans[0]->GetGamma(index,gamma_scale[0]);
-            for(unsigned int i = 1;i < _scans.size();++i)
-                gamma += _scans[i]->GetGamma(index,gamma_scale[i]);
-        }
-    });
 
-  }
+        tipl::par_for(_mean.fend()-_mean.fbegin(),[&](unsigned int index){
+            auto& mean = _mean.at(index);
+            auto& mask = _mask.at(index);
+            auto& alpha = _mean_alpha.at(index);
+
+            mean = _scans[0]->GetResampled(index);
+            alpha = _scans[0]->GetAlpha(index,alpha_scale0[0],alpha_scale1[0]);
+            mask = _scans[0]->_mask.at(index);
+            for(unsigned int i =1;i < _scans.size();++i)
+            {
+                mean += _scans[i]->GetResampled(index);
+                alpha += _scans[i]->GetAlpha(index,alpha_scale0[i],alpha_scale1[i]);
+                mask &= _scans[i]->_mask.at(index);
+            }
+            mean /= float(_scans.size());
+            if (HasBeta())
+            {
+                auto& beta = _mean_beta.at(index);
+                beta = _scans[0]->GetBeta(index,beta_scale[0]);
+                for(unsigned int i = 1;i < _scans.size();++i)
+                    beta += _scans[i]->GetBeta(index,beta_scale[i]);
+            }
+            if (HasGamma())
+            {
+                auto& gamma = _mean_gamma.at(index);
+                gamma = _scans[0]->GetGamma(index,gamma_scale[0]);
+                for(unsigned int i = 1;i < _scans.size();++i)
+                    gamma += _scans[i]->GetGamma(index,gamma_scale[i]);
+            }
+        });
+
+    }//TinyFSL
+
     //_mean = _scans[0]->GetResampled(field);
     //_mask = _scans[0]->GetMask(field);
     //_mean_alpha = _scans[0]->GetAlpha(field);
     //if (HasBeta()) _mean_beta = _scans[0]->GetBeta(field);
     //if (HasGamma()) _mean_gamma = _scans[0]->GetGamma(field);
-    for (unsigned int i=1; i<_scans.size(); i++) {
-      //_mean += _scans[i]->GetResampled(field);
-      //_mask *= _scans[i]->GetMask(field);
-      //_mean_alpha += _scans[i]->GetAlpha(field);
-      //if (HasBeta(i)) _mean_beta += _scans[i]->GetBeta(field);
-      //if (HasGamma(i)) _mean_gamma += _scans[i]->GetGamma(field);
-    }
+    //for (unsigned int i=1; i<_scans.size(); i++) {
+    //_mean += _scans[i]->GetResampled(field);
+    //_mask *= _scans[i]->GetMask(field);
+    //_mean_alpha += _scans[i]->GetAlpha(field);
+    //if (HasBeta(i)) _mean_beta += _scans[i]->GetBeta(field);
+    //if (HasGamma(i)) _mean_gamma += _scans[i]->GetGamma(field);
+    //}
     //_mean /= _scans.size();
     //_mean_alpha /= _scans.size();
     //_mean_beta /= _scans.size();
@@ -1356,23 +1408,20 @@ double TopupCF::cf(const NEWMAT::ColumnVector& p) const
   double ssd = 0.0;
   unsigned int n = static_cast<unsigned int>(mask.sum());
   std::vector<double> ssd_(std::thread::hardware_concurrency());
-  std::vector<NEWIMAGE::volume<float> > sms(_sm.NoOfScans());
-  for (unsigned int s=0; s<_sm.NoOfScans(); s++)
-      sms[s] = _sm.GetScan(s,_field);
 
-  const auto* mean_ptr = mean.fbegin();
-  const auto* mask_ptr = mask.fbegin();
-
+  auto& _scans = _sm._scans;
   size_t plane_size = mean.xsize()*mean.ysize();
-  tipl::par_for(mean.zsize(),[&](size_t k,int thread){
-        for (unsigned int s=0; s< sms.size(); s++)
+  tipl::par_for(mean.zsize(),[&](size_t k,unsigned int thread){
+        for (unsigned int s=0; s< _sm.NoOfScans(); s++)
         {
             size_t pos = plane_size*k;
             size_t pos_end = pos + plane_size;
-            const auto* scan_ptr = sms[s].fbegin();
             for (;pos != pos_end; ++pos)
-               if (mask_ptr[pos])
-                  ssd_[thread] += SQR(mean_ptr[pos]-scan_ptr[pos]);
+               if (mask.at(pos))
+               {
+                   auto v = mean.at(pos)-_scans[s]->GetResampled(pos);
+                   ssd_[thread] += v*v;
+               }
         }
     });
   ssd = std::accumulate(ssd_.begin(),ssd_.end(),0.0)/double(n*(_sm.NoOfScans()-1));
