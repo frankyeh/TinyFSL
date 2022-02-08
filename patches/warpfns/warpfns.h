@@ -759,7 +759,7 @@ void raw_general_transform(// Input
     float M21=iM(2,1), M22=iM(2,2), M23=iM(2,3), M24=iM(2,4);
     float M31=iM(3,1), M32=iM(3,2), M33=iM(3,3), M34=iM(3,4);
 
-    float o1,o2,o3;
+    //float o1,o2,o3;
 
     // I have put some "outer if's" leading to code multiplication here.
     // I have done so to ensure that we don't pay a performance penalty
@@ -777,9 +777,9 @@ void raw_general_transform(// Input
             for (unsigned int k=0; k<slices.size(); k++) {
                 int z = static_cast<int>(slices[k]);
                 for (int x=0; x<out.xsize(); x++) {
-                    o1=x*A11 + z*A13 + A14;  // y=0
-                    o2=x*A21 + z*A23 + A24;  // y=0
-                    o3=x*A31 + z*A33 + A34;  // y=0
+                    float o1=x*A11 + z*A13 + A14;  // y=0
+                    float o2=x*A21 + z*A23 + A24;  // y=0
+                    float o3=x*A31 + z*A33 + A34;  // y=0
                     for (int y=0; y<out.ysize(); y++) {
                         out(x,y,z) = ((T) f.interpolate(o1,o2,o3));
                         if (valid) {
@@ -797,9 +797,9 @@ void raw_general_transform(// Input
             for (unsigned int k=0; k<slices.size(); k++) {
                 int z = static_cast<int>(slices[k]);
                 for (int x=0; x<out.xsize(); x++) {
-                    o1=x*A11 + z*A13 + A14;  // y=0
-                    o2=x*A21 + z*A23 + A24;  // y=0
-                    o3=x*A31 + z*A33 + A34;  // y=0
+                    float o1=x*A11 + z*A13 + A14;  // y=0
+                    float o2=x*A21 + z*A23 + A24;  // y=0
+                    float o3=x*A31 + z*A33 + A34;  // y=0
                     for (int y=0; y<out.ysize(); y++) {
                         if (derivdir.size() == 1) { // If we want a single partial
                             float tmp;
@@ -826,16 +826,21 @@ void raw_general_transform(// Input
         }
     }
     else { // We have displacements in at least one direction
-        float oo1,oo2,oo3;
         if (derivdir.size()) { // If we need to calculate derivatives in at least one direction
-            for (unsigned int k=0; k<slices.size(); k++) {
+            int64_t x_base = xp*deriv.xsize()*deriv.ysize()*deriv.zsize();
+            int64_t y_base = yp*deriv.xsize()*deriv.ysize()*deriv.zsize();
+            int64_t z_base = zp*deriv.xsize()*deriv.ysize()*deriv.zsize();
+            // make sure interpolator coefficients have been calculated
+            f.interpolate(0,0,0);
+            tipl::par_for (slices.size(),[&](unsigned int k){
                 int z = static_cast<int>(slices[k]);
-                for (int y=0; y<out.ysize(); y++) {
-                    for (int x=0; x<out.xsize(); x++) {
+                for (int y=0,index = z*out.ysize()*out.xsize(); y<out.ysize(); y++) {
+                    for (int x=0; x<out.xsize(); x++,++index) {
+                        float oo1,oo2,oo3;
                         if (useiT) {
-                            o1 = T11*x + T12*y + T13*z + T14;
-                            o2 = T21*x + T22*y + T23*z + T24;
-                            o3 = T31*x + T32*y + T33*z + T34;
+                            float o1 = T11*x + T12*y + T13*z + T14;
+                            float o2 = T21*x + T22*y + T23*z + T24;
+                            float o3 = T31*x + T32*y + T33*z + T34;
                             if (xd<0) oo1 = A11*o1 + A12*o2 + A13*o3 + A14;
                             else oo1 = A11*o1 + A12*o2 + A13*o3 + A14 + d[xd].interpolate(o1,o2,o3);
                             if (yd<0) oo2 = A21*o1 + A22*o2 + A23*o3 + A24;
@@ -843,51 +848,52 @@ void raw_general_transform(// Input
                             if (zd<0) oo3 = A31*o1 + A32*o2 + A33*o3 + A34;
                             else oo3 = A31*o1 + A32*o2 + A33*o3 + A34 + d[zd].interpolate(o1,o2,o3);
                             if (valid) {
-                                if (d.valid(o1,o2,o3)) { valid->operator()(x,y,z) = 1; }
-                                else { valid->operator()(x,y,z) = 0; } // Label as outside FOV if no info on warp
+                                if (d.valid(o1,o2,o3)) { valid->at(index)  = 1; }
+                                else { valid->at(index) = 0; } // Label as outside FOV if no info on warp
                             }
                         }
                         else {
-                            o1 = A11*x + A12*y + A13*z + A14;
-                            o2 = A21*x + A22*y + A23*z + A24;
-                            o3 = A31*x + A32*y + A33*z + A34;
-                            if (xd<0) {oo1=o1;} else {oo1=o1+d(x,y,z,xd);}
-                            if (yd<0) {oo2=o2;} else {oo2=o2+d(x,y,z,yd);}
-                            if (zd<0) {oo3=o3;} else {oo3=o3+d(x,y,z,zd);}
-                            if (valid) valid->operator()(x,y,z) = 1;  // So far, so good
+                            float o1 = A11*x + A12*y + A13*z + A14;
+                            float o2 = A21*x + A22*y + A23*z + A24;
+                            float o3 = A31*x + A32*y + A33*z + A34;
+                            if (xd<0) {oo1=o1;} else {oo1=o1+d.at(index+x_base);}
+                            if (yd<0) {oo2=o2;} else {oo2=o2+d.at(index+y_base);}
+                            if (zd<0) {oo3=o3;} else {oo3=o3+d.at(index+z_base);}
+                            if (valid) valid->at(index) = 1;  // So far, so good
                         }
-                        o1 = M11*oo1 + M12*oo2 + M13*oo3 + M14;
-                        o2 = M21*oo1 + M22*oo2 + M23*oo3 + M24;
-                        o3 = M31*oo1 + M32*oo2 + M33*oo3 + M34;
+                        float o1 = M11*oo1 + M12*oo2 + M13*oo3 + M14;
+                        float o2 = M21*oo1 + M22*oo2 + M23*oo3 + M24;
+                        float o3 = M31*oo1 + M32*oo2 + M33*oo3 + M34;
                         if (derivdir.size() == 1) { // If we want a single partial
                             float tmp;
-                            out(x,y,z) = ((T) f.interp1partial(o1,o2,o3,derivdir[0],&tmp));
-                            deriv(x,y,z,0) = ((T) tmp);
+                            out.at(index) = ((T) f.interp1partial(o1,o2,o3,derivdir[0],&tmp));
+                            deriv.at(index) = ((T) tmp);
                         }
                         else { // More than one derivative
                             float tmp1,tmp2,tmp3;
-                            out(x,y,z) = ((T) f.interp3partial(o1,o2,o3,&tmp1,&tmp2,&tmp3));
-                            if (!(xp<0)) {deriv(x,y,z,xp)=((T) tmp1);}
-                            if (!(yp<0)) {deriv(x,y,z,yp)=((T) tmp2);}
-                            if (!(zp<0)) {deriv(x,y,z,zp)=((T) tmp3);}
+                            out.at(index) = ((T) f.interp3partial(o1,o2,o3,&tmp1,&tmp2,&tmp3));
+                            if (!(xp<0)) {deriv.at(index+x_base) =((T) tmp1);}
+                            if (!(yp<0)) {deriv.at(index+y_base) =((T) tmp2);}
+                            if (!(zp<0)) {deriv.at(index+z_base) =((T) tmp3);}
                         }
                         if (valid) {
-                            if (f.valid(o1,o2,o3) && valid->operator()(x,y,z) != 0) { valid->operator()(x,y,z) = 1; }
-                            else { valid->operator()(x,y,z) = 0; } // Kosher only if valid in both d and s
+                            if (f.valid(o1,o2,o3) && valid->at(index)) { valid->at(index) = 1; }
+                            else { valid->at(index) = 0; } // Kosher only if valid in both d and s
                         }
                     }
                 }
-            }
+            });
         }
         else { // If we don't need derivatives
             for (unsigned int k=0; k<slices.size(); k++) {
                 int z = static_cast<int>(slices[k]);
                 for (int y=0; y<out.ysize(); y++) {
                     for (int x=0; x<out.xsize(); x++) {
+                        float oo1,oo2,oo3;
                         if (useiT) {
-                            o1 = T11*x + T12*y + T13*z + T14;
-                            o2 = T21*x + T22*y + T23*z + T24;
-                            o3 = T31*x + T32*y + T33*z + T34;
+                            float o1 = T11*x + T12*y + T13*z + T14;
+                            float o2 = T21*x + T22*y + T23*z + T24;
+                            float o3 = T31*x + T32*y + T33*z + T34;
                             if (xd<0) oo1 = A11*o1 + A12*o2 + A13*o3 + A14;
                             else oo1 = A11*o1 + A12*o2 + A13*o3 + A14 + d[xd].interpolate(o1,o2,o3);
                             if (yd<0) oo2 = A21*o1 + A22*o2 + A23*o3 + A24;
@@ -900,17 +906,17 @@ void raw_general_transform(// Input
                             }
                         }
                         else {
-                            o1 = A11*x + A12*y + A13*z + A14;
-                            o2 = A21*x + A22*y + A23*z + A24;
-                            o3 = A31*x + A32*y + A33*z + A34;
+                            float o1 = A11*x + A12*y + A13*z + A14;
+                            float o2 = A21*x + A22*y + A23*z + A24;
+                            float o3 = A31*x + A32*y + A33*z + A34;
                             if (xd<0) {oo1=o1;} else {oo1=o1+d(x,y,z,xd);}
                             if (yd<0) {oo2=o2;} else {oo2=o2+d(x,y,z,yd);}
                             if (zd<0) {oo3=o3;} else {oo3=o3+d(x,y,z,zd);}
                             if (valid) valid->operator()(x,y,z) = 1;  // So far, so good
                         }
-                        o1 = M11*oo1 + M12*oo2 + M13*oo3 + M14;
-                        o2 = M21*oo1 + M22*oo2 + M23*oo3 + M24;
-                        o3 = M31*oo1 + M32*oo2 + M33*oo3 + M34;
+                        float o1 = M11*oo1 + M12*oo2 + M13*oo3 + M14;
+                        float o2 = M21*oo1 + M22*oo2 + M23*oo3 + M24;
+                        float o3 = M31*oo1 + M32*oo2 + M33*oo3 + M34;
                         out(x,y,z) = ((T) f.interpolate(o1,o2,o3));
                         if (valid) {
                             if (f.valid(o1,o2,o3) && valid->operator()(x,y,z) != 0) { valid->operator()(x,y,z) = 1; }
