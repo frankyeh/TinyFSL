@@ -946,8 +946,10 @@ void TopupScanManager::update(const BASISFIELD::splinefield& field) const
     // TinyFSL
     {
         const_cast<BASISFIELD::splinefield& >(field).Update(BASISFIELD::FIELD);
-        for(size_t i = 0;i < _scans.size();++i)
+        tipl::par_for(_scans.size(),[&](unsigned int i)
+        {
             _scans[i]->update(field);
+        });
 
         auto isz = ImageSize(Target);
         auto idim = ImageVxs(Target);
