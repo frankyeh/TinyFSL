@@ -13,7 +13,7 @@ jobs:
       matrix:
         arch: [35,37,50,52,53,60,61,62,70,72,75,80,86]
       fail-fast: false
-    runs-on: windows-latest
+    runs-on: windows-2019
     steps: 
       - uses: actions/checkout@v2
       - name: Cache FSL 
