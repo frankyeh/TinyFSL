@@ -1,0 +1,19 @@
+package:
+  name: fsl-znzlib
+  version: '2111.0'
+source:
+  git_rev: '2111.0'
+  git_url: https://git.fmrib.ox.ac.uk/fsl/znzlib.git
+build:
+  number: '0'
+  run_exports:
+    strong:
+      - fsl-znzlib
+requirements:
+  build:
+    - gxx_linux-64
+    - make
+  host:
+    - fsl-base >=2101.5
+extra:
+  final: null

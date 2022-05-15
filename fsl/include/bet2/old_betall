@@ -1,0 +1,37 @@
+#!/bin/sh
+
+#   betall - get brain, skull and scalp surfaces
+#
+#   Mikael Pechaud, Stephen Smith and Mark Jenkinson
+#   FMRIB Image Analysis Group
+#
+#   Copyright (C) 1999-2004 University of Oxford
+#
+#   SHCOPYRIGHT
+
+
+Usage() {
+    echo "Usage: betall <t1_fileroot> <t2_fileroot>"
+    exit
+}
+
+[ "$2" = "" ] && Usage
+[ `${FSLDIR}/bin/imtest $1` = 0 ] && Usage
+[ `${FSLDIR}/bin/imtest $2` = 0 ] && Usage
+A1=`${FSLDIR}/bin/remove_ext $1`
+A2=`${FSLDIR}/bin/remove_ext $2`
+
+# register T2 to T1
+${FSLDIR}/bin/flirt -ref ${A1} -in ${A2} -out ${A2}_to_${A1} -interp sinc
+
+# register T1 to standard space
+${FSLDIR}/bin/flirt -ref ${FSLDIR}/data/standard/MNI152_T1_2mm -in ${A1} -omat ${A1}_to_tal.mat
+
+# run brain extraction and save brain mesh
+${FSLDIR}/bin/bet2 ${A1} ${A1}_brain -e
+
+# find other surfaces
+${FSLDIR}/bin/betsurf -o -m -s ${A1} ${A2}_to_${A1} ${A1}_brain_mesh.off ${A1}_to_tal.mat ${A1}_brain
+
+# clean up
+#/bin/rm ${A2}_to_${A1}.hdr* ${A2}_to_${A1}.img*

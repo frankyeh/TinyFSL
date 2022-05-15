@@ -1,0 +1,24 @@
+package:
+  name: fsl-miscmaths
+  version: '2111.1'
+source:
+  git_rev: '2111.1'
+  git_url: https://git.fmrib.ox.ac.uk/fsl/miscmaths.git
+build:
+  number: '0'
+  run_exports:
+    strong:
+      - fsl-miscmaths
+requirements:
+  build:
+    - gxx_linux-64
+    - make
+  host:
+    - fsl-base >=2101.5
+    - fsl-armawrap >=0.4.1
+    - fsl-cprob >=2006.0
+    - fsl-newnifti >=3.0.6
+    - fsl-utils >=2007.0
+    - fsl-znzlib >=2012.0
+extra:
+  final: null

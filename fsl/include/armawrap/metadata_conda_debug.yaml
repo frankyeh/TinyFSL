@@ -1,0 +1,29 @@
+package:
+  name: fsl-armawrap
+  version: 0.6.0
+source:
+  git_rev: 0.6.0
+  git_url: https://git.fmrib.ox.ac.uk/fsl/armawrap.git
+build:
+  number: '0'
+  run_exports:
+    strong:
+      - fsl-armawrap
+requirements:
+  build:
+    - gxx_linux-64
+    - make
+  host:
+    - fsl-base >=2106.1
+test:
+  commands:
+    - GCOV="$PREFIX"/bin/"$host_alias"-gcov ARMAWRAP_INCLUDE_DIR="$PREFIX"/include
+      tests/run_tests.sh
+  requires:
+    - gxx_linux-64
+    - make
+    - lcov
+  source_files:
+    - tests
+extra:
+  final: null

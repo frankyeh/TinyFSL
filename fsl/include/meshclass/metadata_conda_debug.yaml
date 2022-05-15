@@ -1,0 +1,25 @@
+package:
+  name: fsl-meshclass
+  version: '2111.0'
+source:
+  git_rev: '2111.0'
+  git_url: https://git.fmrib.ox.ac.uk/fsl/meshclass.git
+build:
+  number: '0'
+  run_exports:
+    strong:
+      - fsl-meshclass
+requirements:
+  build:
+    - gxx_linux-64
+    - make
+  host:
+    - fsl-base >=2101.5
+    - fsl-armawrap >=0.4.1
+    - fsl-miscmaths >=2010.0
+    - fsl-newimage >=2011.0
+    - fsl-newnifti >=3.0.6
+    - fsl-utils >=2007.0
+    - fsl-znzlib >=2012.0
+extra:
+  final: null

@@ -1,0 +1,20 @@
+package:
+  name: fsl-newnifti
+  version: 4.0.0
+source:
+  git_rev: 4.0.0
+  git_url: https://git.fmrib.ox.ac.uk/fsl/NewNifti.git
+build:
+  number: '0'
+  run_exports:
+    strong:
+      - fsl-newnifti
+requirements:
+  build:
+    - gxx_linux-64
+    - make
+  host:
+    - fsl-base >=2101.5
+    - fsl-znzlib >=2012.0
+extra:
+  final: null

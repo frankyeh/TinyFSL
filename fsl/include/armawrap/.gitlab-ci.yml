@@ -1,0 +1,29 @@
+include:
+ - file: .gitlab-ci.yml
+   project: fsl/fsl-ci-rules
+
+
+stages:
+ - test
+ - fsl-ci-pre
+ - fsl-ci-build
+ - fsl-ci-test
+ - fsl-ci-deploy
+
+test-cpp11:
+  stage: test
+  image: pauldmccarthy/armawrap-testing
+  tags:
+    - docker
+  script:
+    - bash ./tests/run_tests.sh -std=c++11 -Wall -pedantic
+    - bash ./tests/run_tests.sh -std=c++11 -Wall -pedantic -O3
+
+test-cpp17:
+  stage: test
+  image: pauldmccarthy/armawrap-testing
+  tags:
+    - docker
+  script:
+    - bash ./tests/run_tests.sh -std=c++17 -Wall -pedantic
+    - bash ./tests/run_tests.sh -std=c++17 -Wall -pedantic -O3

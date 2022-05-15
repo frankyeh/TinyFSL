@@ -1,0 +1,24 @@
+include:
+ - file: .gitlab-ci.yml
+   project: fsl/fsl-ci-rules
+
+
+stages:
+ - test
+ - fsl-ci-pre
+ - fsl-ci-build
+ - fsl-ci-test
+ - fsl-ci-deploy
+
+test:
+  stage: test
+  image: $FSL_CI_IMAGE_LINUX_64
+  tags:
+    - docker
+  script:
+    - conda install -y -c $FSLCONDA_PUBLIC_CHANNEL_URL -c conda-forge fsl-base fsl-miscmaths fsl-newnifti fsl-utils fsl-cprob fsl-znzlib cxx-compiler make
+    - export FSLDIR=$CONDA_PREFIX
+    - export PATH=$FSLDIR/bin:$PATH
+    - . $FSLDIR/etc/fslconf/fsl-devel.sh
+    - make -C test
+    - LD_LIBRARY_PATH=.:$FSLDIR/lib ./test/test-newimage -l all
