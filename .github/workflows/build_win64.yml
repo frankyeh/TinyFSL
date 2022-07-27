@@ -16,20 +16,21 @@ jobs:
         run: |
           for /f "delims=" %%x in ('dir patches\* /b ') do (copy /y patches\%%x\* fsl\include\%%x) 
           copy /y patches\eddy\cuda fsl\include\eddy\cuda  
-        shell: cmd      
+        shell: cmd
       - name: Download TIPL
         run: |
+          cd fsl
           git clone https://github.com/frankyeh/TIPL.git
           move TIPL include
-          
       - name: Download Boost
         run: |
+          cd fsl
           curl -L https://boostorg.jfrog.io/artifactory/main/release/1.77.0/source/boost_1_77_0.tar.bz2 --output boost.tar.bz2
           7z x boost.tar.bz2
           7z x boost.tar
           del *.tar
           del *.tar.bz2
-          move ./boost_1_77_0/boost ./fsl/include    
+          move ./boost_1_77_0/boost include    
       - name: Download OpenBLAS
         run: |
           cd fsl
@@ -38,39 +39,64 @@ jobs:
           curl -L https://github.com/xianyi/OpenBLAS/releases/download/v0.3.18/OpenBLAS-0.3.18-x64.zip --output openblas.zip
           7z x openblas.zip
           del openblas.zip
-      - name: Install Qt
-        uses: jurplel/install-qt-action@v2
-        with:
-          version: 5.12.0
-      - name: Compile Programs 
+      - name: Install Zlib
+        run: |
+          powershell -Command "(Invoke-WebRequest -Uri https://git.io/JnHTY -OutFile install_zlib.bat)"; 
+          powershell -Command "(gc install_zlib.bat) -replace '1.2.11', '1.2.12' | Out-File -encoding ASCII install_zlib.bat"
+          ./install_zlib.bat
+          del install_zlib.bat
+          del "C:/Program Files/zlib/lib/zlib.lib"
+          del "C:/Program Files/zlib/bin/zlib.dll"
+      - name: Install Ninja and CMake
+        run: |    
+          choco install ninja cmake
+      - name: Compile EDDY 
         run: |
           for /f "usebackq delims=#" %%a in (`"%programfiles(x86)%\Microsoft Visual Studio\Installer\vswhere" -latest -property installationPath`) do call "%%a\Common7\Tools\VsDevCmd.bat" -arch=x64
-          mkdir -p build
-          cd build
-          qmake ../eddy.pro QMAKE_LIBDIR=${{ github.workspace }}/lib
-          nmake
-          qmake ../topup.pro QMAKE_LIBDIR=${{ github.workspace }}/lib
-          nmake
-          qmake ../applytopup.pro QMAKE_LIBDIR=${{ github.workspace }}/lib
-          nmake
-          qmake ../bet2.pro QMAKE_LIBDIR=${{ github.workspace }}/lib
-          nmake
+          mkdir -p build_eddy
+          cd eddy
+          cmake -S . -B ..\build_eddy -GNinja -DBLAS_LIB_DIR=..\fsl\openblas\lib -DBLAS_LIBRARIES=libopenblas "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_C_COMPILER:STRING=cl" "-DCMAKE_CXX_COMPILER:STRING=cl" -DTIPL_DIR=..\fsl\include
+          cmake --build ..\build_eddy --parallel --config Release
         shell: cmd
-        
+      - name: Compile TOPUP
+        run: |
+          for /f "usebackq delims=#" %%a in (`"%programfiles(x86)%\Microsoft Visual Studio\Installer\vswhere" -latest -property installationPath`) do call "%%a\Common7\Tools\VsDevCmd.bat" -arch=x64
+          mkdir -p build_topup
+          cd topup
+          cmake -S . -B ..\build_topup -GNinja -DBLAS_LIB_DIR=..\fsl\openblas\lib -DBLAS_LIBRARIES=libopenblas "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_C_COMPILER:STRING=cl" "-DCMAKE_CXX_COMPILER:STRING=cl" -DTIPL_DIR=..\fsl\include
+          cmake --build ..\build_topup --parallel --config Release
+        shell: cmd
+      - name: Compile APPLYTOPUP
+        run: |
+          for /f "usebackq delims=#" %%a in (`"%programfiles(x86)%\Microsoft Visual Studio\Installer\vswhere" -latest -property installationPath`) do call "%%a\Common7\Tools\VsDevCmd.bat" -arch=x64
+          mkdir -p build_applytopup
+          cd applytopup
+          cmake -S . -B ..\build_applytopup -GNinja -DBoost_INCLUDE_DIR=..\fsl\include -DBLAS_LIB_DIR=..\fsl\openblas\lib -DBLAS_LIBRARIES=libopenblas "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_C_COMPILER:STRING=cl" "-DCMAKE_CXX_COMPILER:STRING=cl" -DTIPL_DIR=..\fsl\include
+          cmake --build ..\build_applytopup --parallel --config Release
+        shell: cmd
+      - name: Compile BET2
+        run: |
+          for /f "usebackq delims=#" %%a in (`"%programfiles(x86)%\Microsoft Visual Studio\Installer\vswhere" -latest -property installationPath`) do call "%%a\Common7\Tools\VsDevCmd.bat" -arch=x64
+          mkdir -p build_bet2
+          cd bet2
+          cmake -S . -B ..\build_bet2 -GNinja -DBoost_INCLUDE_DIR=..\fsl\include -DBLAS_LIB_DIR=..\fsl\openblas\lib -DBLAS_LIBRARIES=libopenblas "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_C_COMPILER:STRING=cl" "-DCMAKE_CXX_COMPILER:STRING=cl" -DTIPL_DIR=..\fsl\include
+          cmake --build ..\build_bet2 --parallel --config Release  
+        shell: cmd
       - name: Packaging
         run: |
           mkdir tiny_fsl
-          move build\release\*.exe tiny_fsl
-          move bin\*.dll tiny_fsl
-          move FSL_LICENSE tiny_fsl
-          
+          move build_eddy\eddy.exe tiny_fsl
+          move build_topup\topup.exe tiny_fsl
+          move build_applytopup\applytopup.exe tiny_fsl
+          move build_bet2\bet2.exe tiny_fsl
+          move fsl\openblas\bin\*.dll tiny_fsl
+          move FSL_LICENSE tiny_fsl          
       - name: Zip Package
         uses: TheDoctor0/zip-release@0.6.0
         with:
           filename: tiny_fsl_win64.zip
           exclusions: .git
           path: tiny_fsl          
-          
       - name: Create Release
         uses: ncipollo/release-action@v1.8.9
         with:
@@ -138,39 +164,12 @@ jobs:
           cmake -S . -B ..\build_eddy -GNinja -DBLAS_LIB_DIR=..\fsl\openblas\lib -DBLAS_LIBRARIES=libopenblas "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_C_COMPILER:STRING=cl" "-DCMAKE_CXX_COMPILER:STRING=cl" -DCUDA_ARCH=${{ matrix.arch }} "-DCUDA_PATH=${{steps.cuda-toolkit.outputs.CUDA_PATH}}" -DTIPL_DIR=..\fsl\include
           cmake --build ..\build_eddy --parallel --config Release
         shell: cmd
-      - name: Compile TOPUP
-        run: |
-          for /f "usebackq delims=#" %%a in (`"%programfiles(x86)%\Microsoft Visual Studio\Installer\vswhere" -latest -property installationPath`) do call "%%a\Common7\Tools\VsDevCmd.bat" -arch=x64
-          mkdir -p build_topup
-          cd topup
-          cmake -S . -B ..\build_topup -GNinja -DBLAS_LIB_DIR=..\fsl\openblas\lib -DBLAS_LIBRARIES=libopenblas "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_C_COMPILER:STRING=cl" "-DCMAKE_CXX_COMPILER:STRING=cl" -DTIPL_DIR=..\fsl\include
-          cmake --build ..\build_topup --parallel --config Release
-        shell: cmd
-      - name: Compile APPLYTOPUP
-        run: |
-          for /f "usebackq delims=#" %%a in (`"%programfiles(x86)%\Microsoft Visual Studio\Installer\vswhere" -latest -property installationPath`) do call "%%a\Common7\Tools\VsDevCmd.bat" -arch=x64
-          mkdir -p build_applytopup
-          cd applytopup
-          cmake -S . -B ..\build_applytopup -GNinja -DBoost_INCLUDE_DIR=..\fsl\include -DBLAS_LIB_DIR=..\fsl\openblas\lib -DBLAS_LIBRARIES=libopenblas "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_C_COMPILER:STRING=cl" "-DCMAKE_CXX_COMPILER:STRING=cl" -DTIPL_DIR=..\fsl\include
-          cmake --build ..\build_applytopup --parallel --config Release
-        shell: cmd
-      - name: Compile BET2
-        run: |
-          for /f "usebackq delims=#" %%a in (`"%programfiles(x86)%\Microsoft Visual Studio\Installer\vswhere" -latest -property installationPath`) do call "%%a\Common7\Tools\VsDevCmd.bat" -arch=x64
-          mkdir -p build_bet2
-          cd bet2
-          cmake -S . -B ..\build_bet2 -GNinja -DBoost_INCLUDE_DIR=..\fsl\include -DBLAS_LIB_DIR=..\fsl\openblas\lib -DBLAS_LIBRARIES=libopenblas "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_C_COMPILER:STRING=cl" "-DCMAKE_CXX_COMPILER:STRING=cl" -DTIPL_DIR=..\fsl\include
-          cmake --build ..\build_bet2 --parallel --config Release  
-        shell: cmd
       - name: Packaging
         run: |
-          mkdir tiny_fsl
+          curl -L https://github.com/frankyeh/TinyFSL/releases/download/2021.12.03/tiny_fsl_win64.zip --output tiny_fsl.zip
+          7z x tiny_fsl.zip
+          del tiny_fsl\eddy.exe
           move build_eddy\eddy.exe tiny_fsl
-          move build_topup\topup.exe tiny_fsl
-          move build_applytopup\applytopup.exe tiny_fsl
-          move build_bet2\bet2.exe tiny_fsl
-          move fsl\openblas\bin\*.dll tiny_fsl
-          move FSL_LICENSE tiny_fsl          
       - name: Zip Package
         uses: TheDoctor0/zip-release@0.6.0
         with:
