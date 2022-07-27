@@ -24,6 +24,7 @@
 #include "miscmaths/miscmaths.h"
 #include "EddyHelperClasses.h"
 #include "HyParEstimator.h"
+#include "TIPL/tipl.hpp"
 
 using namespace std;
 using namespace EDDY;
@@ -160,10 +161,28 @@ double CVHyParCF::cf(const NEWMAT::ColumnVector& p) const EddyTry
   if (!_K->IsValid()) return(std::numeric_limits<double>::max());
   NEWMAT::ColumnVector ssd_vec(_K->NoOfScans());
   ssd_vec = 0.0;
+  /*
   for (unsigned int i=0; i<_data.size(); i++) {
     NEWMAT::ColumnVector qn = _K->iKy(_data[i]);
     ssd_vec += NEWMAT::SP(qn,qn);
   }
+  */
+  // tinyFSL replaces the above with the following to boost the speed
+  {
+      std::vector<NEWMAT::ColumnVector> ssd_vecs;
+      for(size_t i = 0;i < std::thread::hardware_concurrency();++i)
+      {
+          ssd_vecs.push_back(NEWMAT::ColumnVector(_K->NoOfScans()));
+          ssd_vecs.back() = 0.0;
+      }
+      tipl::par_for(_data.size(),[&](size_t i,unsigned int thread){
+          NEWMAT::ColumnVector qn = _K->iKy(_data[i]);
+          ssd_vecs[thread] += NEWMAT::SP(qn,qn);
+      });
+      for(size_t i = 0;i < std::thread::hardware_concurrency();++i)
+          ssd_vec += ssd_vecs[i];
+  }
+
   NEWMAT::SymmetricMatrix iK = _K->iK();
   double ssd = 0.0;
   for (unsigned int i=0; i<_K->NoOfScans(); i++) ssd += ssd_vec(i+1) / sqr(iK(i+1,i+1));
