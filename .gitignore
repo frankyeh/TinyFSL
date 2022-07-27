@@ -1,4 +1,5 @@
 *.user*
 fsl/openblas/*
+fsl/include/boost/*
 test/*
 build/*
