@@ -27,78 +27,78 @@ LIBS += -lz /usr/local/opt/openblas/lib/libopenblas64_.0.3.0.dev.a \
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
 
-INCLUDEPATH += fsl fsl/include $$[QT_INSTALL_HEADERS]/QtZlib
+INCLUDEPATH += fsl/include $$[QT_INSTALL_HEADERS]/QtZlib
 # You can also make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    include/cprob/bdtr.cc \
-    include/cprob/btdtr.cc \
-    include/cprob/chdtr.cc \
-    include/cprob/const.cc \
-    include/cprob/drand.cc \
-    include/cprob/expx2.cc \
-    include/cprob/fdtr.cc \
-    include/cprob/gamma.cc \
-    include/cprob/gdtr.cc \
-    include/cprob/igam.cc \
-    include/cprob/igami.cc \
-    include/cprob/incbet.cc \
-    include/cprob/incbi.cc \
-    include/cprob/kolmogorov.cc \
-    include/cprob/mtherr.cc \
-    include/cprob/nbdtr.cc \
-    include/cprob/ndtr.cc \
-    include/cprob/ndtri.cc \
-    include/cprob/pdtr.cc \
-    include/cprob/polevl.cc \
-    include/cprob/stdtr.cc \
-    include/cprob/unity.cc \
-    include/cprob/xmath.cc \
-    include/miscmaths/base2z.cc \
-    include/miscmaths/bfmatrix.cpp \
-    include/miscmaths/cspline.cc \
-    include/miscmaths/f2z.cc \
-    include/miscmaths/histogram.cc \
-    include/miscmaths/kernel.cc \
-    include/miscmaths/minimize.cc \
-    include/miscmaths/miscmaths.cc \
-    include/miscmaths/miscprob.cc \
-    include/miscmaths/nonlin.cpp \
-    include/miscmaths/optimise.cc \
-    include/miscmaths/rungekutta.cc \
-    include/miscmaths/Simplex.cpp \
-    include/miscmaths/sparse_matrix.cc \
-    include/miscmaths/sparsefn.cc \
-    include/miscmaths/SpMatMatrices.cpp \
-    include/miscmaths/t2z.cc \
-    include/meshclass/mesh.cpp \
-    include/meshclass/mpoint.cpp \
-    include/meshclass/point.cpp \
-    include/meshclass/profile.cpp \
-    include/meshclass/pt_special.cpp \
-    include/meshclass/triangle.cpp \
-    include/newimage/complexvolume.cc \
-    include/newimage/imfft.cc \
-    include/newimage/lazy.cc \
-    include/newimage/newimage.cc \
-    include/newimage/newimagefns.cc \
-    include/newimage/costfns.cc \
-    include/newimage/generalio.cc \
-    include/newnifti/legacyFunctions.cc \
-    include/newnifti/NewNifti.cc \
-    include/utils/check.cc \
-    include/utils/functions.cc \
-    include/utils/log.cc \
-    include/utils/matches.cc \
-    include/utils/parse.cc \
-    include/utils/time_tracer.cc \
-    include/utils/usage.cc \
-    include/utils/FSLProfiler.cpp \
-    include/znzlib/znzlib.c \
-    include/bet2/bet2.cpp
+    fsl/include/cprob/bdtr.cc \
+    fsl/include/cprob/btdtr.cc \
+    fsl/include/cprob/chdtr.cc \
+    fsl/include/cprob/const.cc \
+    fsl/include/cprob/drand.cc \
+    fsl/include/cprob/expx2.cc \
+    fsl/include/cprob/fdtr.cc \
+    fsl/include/cprob/gamma.cc \
+    fsl/include/cprob/gdtr.cc \
+    fsl/include/cprob/igam.cc \
+    fsl/include/cprob/igami.cc \
+    fsl/include/cprob/incbet.cc \
+    fsl/include/cprob/incbi.cc \
+    fsl/include/cprob/kolmogorov.cc \
+    fsl/include/cprob/mtherr.cc \
+    fsl/include/cprob/nbdtr.cc \
+    fsl/include/cprob/ndtr.cc \
+    fsl/include/cprob/ndtri.cc \
+    fsl/include/cprob/pdtr.cc \
+    fsl/include/cprob/polevl.cc \
+    fsl/include/cprob/stdtr.cc \
+    fsl/include/cprob/unity.cc \
+    fsl/include/cprob/xmath.cc \
+    fsl/include/miscmaths/base2z.cc \
+    fsl/include/miscmaths/bfmatrix.cpp \
+    fsl/include/miscmaths/cspline.cc \
+    fsl/include/miscmaths/f2z.cc \
+    fsl/include/miscmaths/histogram.cc \
+    fsl/include/miscmaths/kernel.cc \
+    fsl/include/miscmaths/minimize.cc \
+    fsl/include/miscmaths/miscmaths.cc \
+    fsl/include/miscmaths/miscprob.cc \
+    fsl/include/miscmaths/nonlin.cpp \
+    fsl/include/miscmaths/optimise.cc \
+    fsl/include/miscmaths/rungekutta.cc \
+    fsl/include/miscmaths/Simplex.cpp \
+    fsl/include/miscmaths/sparse_matrix.cc \
+    fsl/include/miscmaths/sparsefn.cc \
+    fsl/include/miscmaths/SpMatMatrices.cpp \
+    fsl/include/miscmaths/t2z.cc \
+    fsl/include/meshclass/mesh.cpp \
+    fsl/include/meshclass/mpoint.cpp \
+    fsl/include/meshclass/point.cpp \
+    fsl/include/meshclass/profile.cpp \
+    fsl/include/meshclass/pt_special.cpp \
+    fsl/include/meshclass/triangle.cpp \
+    fsl/include/newimage/complexvolume.cc \
+    fsl/include/newimage/imfft.cc \
+    fsl/include/newimage/lazy.cc \
+    fsl/include/newimage/newimage.cc \
+    fsl/include/newimage/newimagefns.cc \
+    fsl/include/newimage/costfns.cc \
+    fsl/include/newimage/generalio.cc \
+    fsl/include/newnifti/legacyFunctions.cc \
+    fsl/include/newnifti/NewNifti.cc \
+    fsl/include/utils/check.cc \
+    fsl/include/utils/functions.cc \
+    fsl/include/utils/log.cc \
+    fsl/include/utils/matches.cc \
+    fsl/include/utils/parse.cc \
+    fsl/include/utils/time_tracer.cc \
+    fsl/include/utils/usage.cc \
+    fsl/include/utils/FSLProfiler.cpp \
+    fsl/include/znzlib/znzlib.c \
+    fsl/include/bet2/bet2.cpp
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
