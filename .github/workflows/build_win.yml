@@ -1,4 +1,4 @@
-name: BUILD WIN64
+name: BUILD WIN
 on:
   workflow_dispatch:
     inputs:
