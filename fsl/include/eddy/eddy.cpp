@@ -897,6 +897,8 @@ ReplacementManager *Register(// Input
       prof.EndEntry(predict_chunk_key);
       if (clo.VeryVerbose()) cout << "Finished making predictions for scans: " << c << endl;
       double update_chunk_key = prof.StartEntry("Updating parameters for chunk");
+
+      /*
       for (unsigned int i=0; i<si.size(); i++) {
         unsigned int global_indx = (st==EDDY::DWI) ? sm.GetDwi2GlobalIndexMapping(si[i]) : sm.Getb02GlobalIndexMapping(si[i]);
         if (clo.DebugLevel() && clo.DebugIndicies().IsAmongIndicies(global_indx)) {
@@ -905,6 +907,15 @@ ReplacementManager *Register(// Input
         else mss_tmp[si[i]] = EddyGpuUtils::MovAndECParamUpdate(pred[i],sm.GetSuscHzOffResField(si[i],st),sm.GetBiasField(),mask,true,fwhm[iter],sm.Scan(si[i],st));
         if (clo.VeryVerbose()) printf("Iter: %d, scan: %d, gpu_mss = %f\n",iter,si[i],mss_tmp[si[i]]);
       }
+      */
+      tipl::par_for(si.size(),[&](unsigned int i) {
+        unsigned int global_indx = (st==EDDY::DWI) ? sm.GetDwi2GlobalIndexMapping(si[i]) : sm.Getb02GlobalIndexMapping(si[i]);
+        if (clo.DebugLevel() && clo.DebugIndicies().IsAmongIndicies(global_indx)) {
+          mss_tmp[si[i]] = EddyGpuUtils::MovAndECParamUpdate(pred[i],sm.GetSuscHzOffResField(si[i],st),sm.GetBiasField(),mask,true,fwhm[iter],global_indx,iter,clo.DebugLevel(),sm.Scan(si[i],st));
+        }
+        else mss_tmp[si[i]] = EddyGpuUtils::MovAndECParamUpdate(pred[i],sm.GetSuscHzOffResField(si[i],st),sm.GetBiasField(),mask,true,fwhm[iter],sm.Scan(si[i],st));
+        if (clo.VeryVerbose()) printf("Iter: %d, scan: %d, gpu_mss = %f\n",iter,si[i],mss_tmp[si[i]]);
+      });
       prof.EndEntry(update_chunk_key);
     }
     #else
