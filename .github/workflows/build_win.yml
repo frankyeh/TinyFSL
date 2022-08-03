@@ -103,7 +103,7 @@ jobs:
           allowUpdates: true
           artifacts: "*.zip"
           tag: ${{ github.event.inputs.tag }}
-          name: "2021.12.03 Chen Release"
+          name: "2022.08.03 Chen Release"
           prerelease: false  
           
   windows_cuda_build:
@@ -178,6 +178,6 @@ jobs:
           allowUpdates: true
           artifacts: "*.zip"
           tag: ${{ github.event.inputs.tag }}
-          name: "2021.12.03 Chen Release"
+          name: "2022.08.03 Chen Release"
           prerelease: false  
   
