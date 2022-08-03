@@ -5,7 +5,7 @@ on:
       tag:
         description: 'Tag'
         required: true
-        default: '2021.12.03'
+        default: '2022.08.03'
         
 jobs:
   windows_build:
@@ -108,10 +108,6 @@ jobs:
           
   windows_cuda_build:
     needs: windows_build
-    strategy:
-      matrix:
-        arch: [35,37,50,52,53,60,61,62,70,72,75,80,86]
-      fail-fast: false
     runs-on: windows-2019
     steps: 
       - uses: actions/checkout@v2
@@ -161,7 +157,7 @@ jobs:
           for /f "usebackq delims=#" %%a in (`"%programfiles(x86)%\Microsoft Visual Studio\Installer\vswhere" -latest -property installationPath`) do call "%%a\Common7\Tools\VsDevCmd.bat" -arch=x64
           mkdir -p build_eddy
           cd eddy
-          cmake -S . -B ..\build_eddy -GNinja -DBLAS_LIB_DIR=..\fsl\openblas\lib -DBLAS_LIBRARIES=libopenblas "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_C_COMPILER:STRING=cl" "-DCMAKE_CXX_COMPILER:STRING=cl" -DCUDA_ARCH=${{ matrix.arch }} "-DCUDA_PATH=${{steps.cuda-toolkit.outputs.CUDA_PATH}}" -DTIPL_DIR=..\fsl\include
+          cmake -S . -B ..\build_eddy -GNinja -DBLAS_LIB_DIR=..\fsl\openblas\lib -DBLAS_LIBRARIES=libopenblas "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_C_COMPILER:STRING=cl" "-DCMAKE_CXX_COMPILER:STRING=cl" -DCUDA_ARCH=all "-DCUDA_PATH=${{steps.cuda-toolkit.outputs.CUDA_PATH}}" -DTIPL_DIR=..\fsl\include
           cmake --build ..\build_eddy --parallel --config Release
         shell: cmd
       - name: Packaging
@@ -173,7 +169,7 @@ jobs:
       - name: Zip Package
         uses: TheDoctor0/zip-release@0.6.0
         with:
-          filename: tiny_fsl_win64_cuda_sm${{ matrix.arch }}.zip
+          filename: tiny_fsl_win64_cuda.zip
           exclusions: .git
           path: tiny_fsl          
       - name: Create Release
