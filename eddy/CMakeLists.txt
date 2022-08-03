@@ -155,7 +155,8 @@ target_include_directories(eddy PUBLIC
   ${CMAKE_SOURCE_DIR}/../fsl/include/eddy
   ${CMAKE_SOURCE_DIR}/../fsl/include
   ${CMAKE_SOURCE_DIR}/../fsl
-  ${CMAKE_BINARY_DIR})
+  ${CMAKE_BINARY_DIR}
+  ${CUDA_INCLUDE_DIRS})
 
 if(EXISTS "${TIPL_DIR}")
   include_directories(eddy ${TIPL_DIR})
@@ -170,7 +171,7 @@ if(CUDA_ARCH)
   target_compile_definitions(eddy PUBLIC COMPILE_GPU)
   target_link_libraries(eddy ${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES} )
   include_directories(eddy ${CUDA_PATH}/include)
-  set_property(TARGET eddy PROPERTY CUDA_ARCHITECTURES ${CUDA_ARCH}-real)
+  set_property(TARGET eddy PROPERTY CUDA_ARCHITECTURES ${CUDA_ARCH})
   set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -allow-unsupported-compiler -Xcompiler /Zc:__cplusplus")
   set(CMAKE_CUDA_RUNTIME_LIBRARY "Static")
 endif()
