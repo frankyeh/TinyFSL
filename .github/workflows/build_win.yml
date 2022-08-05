@@ -164,12 +164,11 @@ jobs:
         run: |
           curl -L https://github.com/frankyeh/TinyFSL/releases/download/2021.12.03/tiny_fsl_win64.zip --output tiny_fsl.zip
           7z x tiny_fsl.zip
-          del tiny_fsl\eddy.exe
-          move build_eddy\eddy.exe tiny_fsl
+          move build_eddy\eddy.exe tiny_fsl\eddy_cuda.exe
       - name: Zip Package
         uses: TheDoctor0/zip-release@0.6.0
         with:
-          filename: tiny_fsl_win64_cuda.zip
+          filename: tiny_fsl_win64.zip
           exclusions: .git
           path: tiny_fsl          
       - name: Create Release
