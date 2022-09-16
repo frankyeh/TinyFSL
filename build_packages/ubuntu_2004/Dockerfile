@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:20.04 as builder-stage
 
 ENV DEBIAN_FRONTEND noninteractive
 
