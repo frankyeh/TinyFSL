@@ -26,7 +26,7 @@ jobs:
         context: .
         file: build_packages/${{ matrix.os }}/Dockerfile
         push: false
-        outputs: dsistudio/tinyfsl:latest
+        outputs: tinyfsl
     - name: Packaging
       run: |
         zip -r tinyfsl_${{ matrix.os }}.zip tinyfsl
