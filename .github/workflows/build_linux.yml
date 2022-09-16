@@ -1,5 +1,11 @@
 name: BUILD LINUX
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag'
+        required: true
+        default: '2021.12.03'        
 jobs:
   docker_build:
     strategy:
@@ -30,5 +36,5 @@ jobs:
         allowUpdates: true
         artifacts: "*.zip"
         tag: ${{ github.event.inputs.tag }}
-        name: ${{ github.event.inputs.release_name }}
-        prerelease: false
+        name: "2021.12.03 Chen Release"
+        prerelease: false  
