@@ -162,7 +162,7 @@ jobs:
         shell: cmd
       - name: Packaging
         run: |
-          curl -L https://github.com/frankyeh/TinyFSL/releases/download/2021.12.03/tiny_fsl_win.zip --output tiny_fsl.zip
+          curl -L https://github.com/frankyeh/TinyFSL/releases/download/${{ github.event.inputs.tag }}/tiny_fsl_win.zip --output tiny_fsl.zip
           7z x tiny_fsl.zip
           move build_eddy\eddy.exe tiny_fsl\eddy_cuda.exe
       - name: Zip Package
