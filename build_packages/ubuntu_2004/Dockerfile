@@ -16,8 +16,7 @@ RUN apt update && apt full-upgrade -y && \
   zlib1g-dev \
   ca-certificates \
   gcc \
-  g++ \
-  gfortran && \
+  g++ && \
   apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 
