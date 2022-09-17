@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.16)
 project(bet2 VERSION "2022.01.17" LANGUAGES CXX;C)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -88,7 +88,11 @@ target_compile_definitions(bet2 PUBLIC ARMA_NO_DEBUG)
 target_compile_definitions(bet2 PUBLIC BUILDSTRING=TinyFSL)
 
 if(MSVC)
-    target_compile_options(bet2 PUBLIC "$<$<COMPILE_LANGUAGE:CXX>:/Zc:__cplusplus>")
+    target_compile_options(topup PUBLIC "$<$<COMPILE_LANGUAGE:CXX>:/Zc:__cplusplus>")
+endif()
+
+if(UNIX AND NOT APPLE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 endif()
 
 target_include_directories(bet2 PUBLIC
