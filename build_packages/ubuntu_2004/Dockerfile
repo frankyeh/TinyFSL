@@ -44,7 +44,7 @@ RUN git clone https://github.com/frankyeh/TIPL.git \
 RUN mkdir -p /opt/tiny_fsl/build_topup \
   && cd /opt/tiny_fsl/topup \
   && cmake -S . -B ../build_topup -GNinja "-DCMAKE_BUILD_TYPE:STRING=Release" -DTIPL_DIR=../fsl \
-  && cmake --build ../build_topup --parallel --config Release
+  && cmake --build ../build_topup --parallel --config Release \
   && mv ../build_topup/topup /opt/tiny_fsl_bin
   
 FROM scratch
