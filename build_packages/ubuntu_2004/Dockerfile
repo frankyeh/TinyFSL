@@ -8,20 +8,17 @@ RUN apt update && apt full-upgrade -y && \
   libopenblas-dev \
   unzip \
   curl \
+  cmake \
+  ninja-build \
   make \
   git \
   libboost-all-dev \
   zlib1g-dev \
   ca-certificates \
-  qt5-qmake \
-  qt5-default \
   gcc \
   g++ && \
   apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Fix issues: Singularity container cannot load libQt5Core.so.5 on CentOS 7
-RUN strip --remove-section=.note.ABI-tag /usr/lib/x86_64-linux-gnu/libQt5Core.so.5
-RUN ldconfig
 
 ADD "https://api.github.com/repos/frankyeh/TinyFSL/commits?per_page=1" latest_commit
 ADD "https://api.github.com/repos/frankyeh/TIPL/commits?per_page=1" latest_commit
@@ -43,25 +40,10 @@ RUN git clone https://github.com/frankyeh/TIPL.git \
   && cp -fr /opt/tiny_fsl/patches/* /opt/tiny_fsl/fsl/include/
 
 
-RUN mkdir -p /opt/tiny_fsl/build \
-  && cd /opt/tiny_fsl/build \
-  && qmake ../eddy.pro \
-  && make \
-  && qmake ../topup.pro \
-  && make \
-  && qmake ../applytopup.pro \
-  && make \
-  && qmake ../bet2.pro \
-  && make \
-  && chmod 755 eddy \
-  && chmod 755 topup \
-  && chmod 755 applytopup \
-  && chmod 755 bet2 \
-  && mkdir -p /opt/tiny_fsl_bin \
-  && mv eddy /opt/tiny_fsl_bin \
-  && mv topup /opt/tiny_fsl_bin \
-  && mv applytopup /opt/tiny_fsl_bin \
-  && mv bet2 /opt/tiny_fsl_bin
+RUN mkdir -p /opt/tiny_fsl/build_topup \
+  && cd /opt/tiny_fsl/topup \
+  && cmake -S . -B ../build_topup -GNinja "-DCMAKE_BUILD_TYPE:STRING=Release" -DTIPL_DIR=../fsl \
+  && cmake --build ../build_topup --parallel --config Release
 
 
 RUN cd /opt \
