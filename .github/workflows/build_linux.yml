@@ -10,7 +10,7 @@ jobs:
   docker_build:
     strategy:
       matrix:
-        os: [ubuntu_2004]
+        os: [ubuntu_2004,ubuntu_2204]
       fail-fast: false
     runs-on: ubuntu-latest
     steps:
