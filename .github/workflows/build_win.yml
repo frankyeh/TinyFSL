@@ -168,7 +168,7 @@ jobs:
       - name: Zip Package
         uses: TheDoctor0/zip-release@0.6.0
         with:
-          filename: tiny_fsl_win64.zip
+          filename: tinyfsl_win.zip
           exclusions: .git
           path: tiny_fsl          
       - name: Create Release
