@@ -16,7 +16,8 @@ RUN apt update && apt full-upgrade -y && \
   zlib1g-dev \
   ca-certificates \
   gcc \
-  g++ && \
+  g++ \
+  gfortran && \
   apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ADD "https://api.github.com/repos/frankyeh/TinyFSL/commits?per_page=1" latest_commit
