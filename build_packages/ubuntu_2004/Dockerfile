@@ -51,14 +51,14 @@ RUN mkdir -p /opt/tiny_fsl/build_bet2 \
   && cd /opt/tiny_fsl/bet2 \
   && cmake -S . -B ../build_bet2 -GNinja "-DCMAKE_BUILD_TYPE:STRING=Release" -DTIPL_DIR=../fsl \
   && cmake --build ../build_bet2 --parallel --config Release \
-  && mv ../build_topup/bet2 /opt/tiny_fsl_bin
+  && mv ../build_bet2/bet2 /opt/tiny_fsl_bin
 
 
 RUN mkdir -p /opt/tiny_fsl/build_applytopup \
   && cd /opt/tiny_fsl/applytopup \
   && cmake -S . -B ../build_applytopup -GNinja "-DCMAKE_BUILD_TYPE:STRING=Release" -DTIPL_DIR=../fsl \
   && cmake --build ../build_applytopup --parallel --config Release \
-  && mv ../build_topup/applytopup /opt/tiny_fsl_bin
+  && mv ../build_applytopup/applytopup /opt/tiny_fsl_bin
 
 
 
