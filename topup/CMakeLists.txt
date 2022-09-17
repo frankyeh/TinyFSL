@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.16)
 project(topup VERSION "2022.01.17" LANGUAGES CXX;C)
 
 set(CMAKE_CXX_STANDARD 17)
