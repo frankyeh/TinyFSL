@@ -62,8 +62,8 @@ set(SOURCES
     ../fsl/include/newimage/newimagefns.cc
     ../fsl/include/newimage/costfns.cc
     ../fsl/include/newimage/generalio.cc
-    ../fsl/include/newnifti/legacyFunctions.cc
-    ../fsl/include/newnifti/NewNifti.cc
+    ../fsl/include/NewNifti/legacyFunctions.cc
+    ../fsl/include/NewNifti/NewNifti.cc
     ../fsl/include/utils/check.cc
     ../fsl/include/utils/functions.cc
     ../fsl/include/utils/log.cc
