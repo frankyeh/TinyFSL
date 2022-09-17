@@ -3,6 +3,7 @@ project(topup VERSION "2022.01.17" LANGUAGES CXX;C)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+enable_language(Fortran)
 
 if(MSVC)
     set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib")
