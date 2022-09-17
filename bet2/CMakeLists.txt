@@ -75,11 +75,6 @@ set(SOURCES
     ../fsl/include/znzlib/znzlib.c
     ../fsl/include/bet2/bet2.cpp)
 
-if(APPLE)
-    set(OTHER_EXEC
-        MACOSX_BUNDLE)
-endif()
-
 add_executable(bet2 ${SOURCES} ${OTHER_EXEC})
 
 set_target_properties(bet2 PROPERTIES CXX_STANDARD 17 CXX_EXTENSIONS NONE)

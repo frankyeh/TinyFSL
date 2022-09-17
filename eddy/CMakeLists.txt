@@ -130,12 +130,6 @@ set(SOURCES
     ../fsl/include/newimage/costfns.cc
     ../fsl/include/newimage/generalio.cc)
 
-if(APPLE)
-    set(OTHER_EXEC
-        MACOSX_BUNDLE)
-endif()
-
-
 add_executable(eddy ${SOURCES} ${OTHER_SOURCES} ${OTHER_EXEC})
 
 set_target_properties(eddy PROPERTIES CXX_STANDARD 17 CXX_EXTENSIONS NONE)

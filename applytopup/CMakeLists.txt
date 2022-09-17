@@ -87,10 +87,6 @@ set(SOURCES
     ../fsl/include/meshclass/pt_special.cpp
     ../fsl/include/meshclass/triangle.cpp)
 
-if(APPLE)
-    set(OTHER_EXEC
-        MACOSX_BUNDLE)
-endif()
 
 add_executable(applytopup ${SOURCES} ${OTHER_EXEC})
 
