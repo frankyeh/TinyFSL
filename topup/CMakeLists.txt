@@ -3,7 +3,6 @@ project(topup VERSION "2022.01.17" LANGUAGES CXX;C)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-enable_language(Fortran)
 
 set(BLA_VENDOR OpenBLAS)
 find_package(BLAS REQUIRED)
