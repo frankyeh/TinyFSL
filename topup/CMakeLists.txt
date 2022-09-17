@@ -5,14 +5,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 enable_language(Fortran)
 
-if(MSVC)
-    set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib")
-else()
-    set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
-    set(BUILD_SHARED_LIBS OFF)
-    set(CMAKE_EXE_LINKER_FLAGS "-static")
-endif()
-
 set(BLA_VENDOR OpenBLAS)
 find_package(BLAS REQUIRED)
 find_package(ZLIB REQUIRED)
@@ -113,7 +105,7 @@ if(MSVC)
 endif()
 
 if(UNIX AND NOT APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lgfortran -lpthread")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 endif()
 
 target_include_directories(topup PUBLIC
