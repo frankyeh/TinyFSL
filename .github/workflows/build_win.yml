@@ -39,7 +39,6 @@ jobs:
           curl -L https://github.com/xianyi/OpenBLAS/releases/download/v0.3.18/OpenBLAS-0.3.18-x64.zip --output openblas.zip
           7z x openblas.zip
           del openblas.zip
-          del .\lib\libopenblas.lib
       - name: Install Zlib
         run: |
           powershell -Command "(Invoke-WebRequest -Uri https://git.io/JnHTY -OutFile install_zlib.bat)"; 
@@ -56,7 +55,7 @@ jobs:
           for /f "usebackq delims=#" %%a in (`"%programfiles(x86)%\Microsoft Visual Studio\Installer\vswhere" -latest -property installationPath`) do call "%%a\Common7\Tools\VsDevCmd.bat" -arch=x64
           mkdir -p build_eddy
           cd eddy
-          cmake -S . -B ..\build_eddy -GNinja -DBLAS_LIB_DIR=..\fsl\openblas\lib -DBLAS_LIBRARIES=libopenblas.a "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_C_COMPILER:STRING=cl" "-DCMAKE_CXX_COMPILER:STRING=cl" -DTIPL_DIR=..\fsl\include
+          cmake -S . -B ..\build_eddy -GNinja -DBLAS_LIB_DIR=..\fsl\openblas\lib -DBLAS_LIBRARIES=libopenblas "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_C_COMPILER:STRING=cl" "-DCMAKE_CXX_COMPILER:STRING=cl" -DTIPL_DIR=..\fsl\include
           cmake --build ..\build_eddy --parallel --config Release
         shell: cmd
       - name: Compile TOPUP
@@ -64,7 +63,7 @@ jobs:
           for /f "usebackq delims=#" %%a in (`"%programfiles(x86)%\Microsoft Visual Studio\Installer\vswhere" -latest -property installationPath`) do call "%%a\Common7\Tools\VsDevCmd.bat" -arch=x64
           mkdir -p build_topup
           cd topup
-          cmake -S . -B ..\build_topup -GNinja -DBLAS_LIB_DIR=..\fsl\openblas\lib -DBLAS_LIBRARIES=libopenblas.a "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_C_COMPILER:STRING=cl" "-DCMAKE_CXX_COMPILER:STRING=cl" -DTIPL_DIR=..\fsl\include
+          cmake -S . -B ..\build_topup -GNinja -DBLAS_LIB_DIR=..\fsl\openblas\lib -DBLAS_LIBRARIES=libopenblas "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_C_COMPILER:STRING=cl" "-DCMAKE_CXX_COMPILER:STRING=cl" -DTIPL_DIR=..\fsl\include
           cmake --build ..\build_topup --parallel --config Release
         shell: cmd
       - name: Compile APPLYTOPUP
@@ -72,7 +71,7 @@ jobs:
           for /f "usebackq delims=#" %%a in (`"%programfiles(x86)%\Microsoft Visual Studio\Installer\vswhere" -latest -property installationPath`) do call "%%a\Common7\Tools\VsDevCmd.bat" -arch=x64
           mkdir -p build_applytopup
           cd applytopup
-          cmake -S . -B ..\build_applytopup -GNinja -DBoost_INCLUDE_DIR=..\fsl\include -DBLAS_LIB_DIR=..\fsl\openblas\lib -DBLAS_LIBRARIES=libopenblas.a "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_C_COMPILER:STRING=cl" "-DCMAKE_CXX_COMPILER:STRING=cl" -DTIPL_DIR=..\fsl\include
+          cmake -S . -B ..\build_applytopup -GNinja -DBoost_INCLUDE_DIR=..\fsl\include -DBLAS_LIB_DIR=..\fsl\openblas\lib -DBLAS_LIBRARIES=libopenblas "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_C_COMPILER:STRING=cl" "-DCMAKE_CXX_COMPILER:STRING=cl" -DTIPL_DIR=..\fsl\include
           cmake --build ..\build_applytopup --parallel --config Release
         shell: cmd
       - name: Compile BET2
@@ -80,7 +79,7 @@ jobs:
           for /f "usebackq delims=#" %%a in (`"%programfiles(x86)%\Microsoft Visual Studio\Installer\vswhere" -latest -property installationPath`) do call "%%a\Common7\Tools\VsDevCmd.bat" -arch=x64
           mkdir -p build_bet2
           cd bet2
-          cmake -S . -B ..\build_bet2 -GNinja -DBoost_INCLUDE_DIR=..\fsl\include -DBLAS_LIB_DIR=..\fsl\openblas\lib -DBLAS_LIBRARIES=libopenblas.a "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_C_COMPILER:STRING=cl" "-DCMAKE_CXX_COMPILER:STRING=cl" -DTIPL_DIR=..\fsl\include
+          cmake -S . -B ..\build_bet2 -GNinja -DBoost_INCLUDE_DIR=..\fsl\include -DBLAS_LIB_DIR=..\fsl\openblas\lib -DBLAS_LIBRARIES=libopenblas "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_C_COMPILER:STRING=cl" "-DCMAKE_CXX_COMPILER:STRING=cl" -DTIPL_DIR=..\fsl\include
           cmake --build ..\build_bet2 --parallel --config Release  
         shell: cmd
       - name: Packaging
@@ -138,7 +137,6 @@ jobs:
           curl -L https://github.com/xianyi/OpenBLAS/releases/download/v0.3.18/OpenBLAS-0.3.18-x64.zip --output openblas.zip
           7z x openblas.zip
           del openblas.zip
-          del .\lib\libopenblas.lib
       - name: Install Zlib
         run: |
           powershell -Command "(Invoke-WebRequest -Uri https://git.io/JnHTY -OutFile install_zlib.bat)"; 
@@ -158,7 +156,7 @@ jobs:
           for /f "usebackq delims=#" %%a in (`"%programfiles(x86)%\Microsoft Visual Studio\Installer\vswhere" -latest -property installationPath`) do call "%%a\Common7\Tools\VsDevCmd.bat" -arch=x64
           mkdir -p build_eddy
           cd eddy
-          cmake -S . -B ..\build_eddy -GNinja -DBLAS_LIB_DIR=..\fsl\openblas\lib -DBLAS_LIBRARIES=libopenblas.a "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_C_COMPILER:STRING=cl" "-DCMAKE_CXX_COMPILER:STRING=cl" -DCUDA_ARCH=all "-DCUDA_PATH=${{steps.cuda-toolkit.outputs.CUDA_PATH}}" -DTIPL_DIR=..\fsl\include
+          cmake -S . -B ..\build_eddy -GNinja -DBLAS_LIB_DIR=..\fsl\openblas\lib -DBLAS_LIBRARIES=libopenblas "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_C_COMPILER:STRING=cl" "-DCMAKE_CXX_COMPILER:STRING=cl" -DCUDA_ARCH=all "-DCUDA_PATH=${{steps.cuda-toolkit.outputs.CUDA_PATH}}" -DTIPL_DIR=..\fsl\include
           cmake --build ..\build_eddy --parallel --config Release
         shell: cmd
       - name: Packaging
