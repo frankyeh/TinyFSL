@@ -112,7 +112,7 @@ if(MSVC)
 endif()
 
 if(UNIX AND NOT APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static -static-libgcc -static-libstdc++ -lgfortran -lpthread")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lgfortran -lpthread")
 endif()
 
 target_include_directories(topup PUBLIC
