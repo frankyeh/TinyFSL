@@ -26,10 +26,10 @@ jobs:
         context: .
         file: build_packages/${{ matrix.os }}/Dockerfile
         push: false
-        outputs: tinyfsl
+        outputs: tiny_fsl
     - name: Packaging
       run: |
-        zip -r tinyfsl_${{ matrix.os }}.zip tinyfsl
+        zip -r tiny_fsl_${{ matrix.os }}.zip tiny_fsl
     - name: Create Release
       uses: ncipollo/release-action@v1.8.9
       with:
