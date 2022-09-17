@@ -4,7 +4,12 @@ project(bet2 VERSION "2022.01.17" LANGUAGES CXX;C)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(BLA_VENDOR OpenBLAS)
+if(APPLE)
+    set(BLA_VENDOR Apple)
+else()
+    set(BLA_VENDOR OpenBLAS)
+endif()
+
 find_package(BLAS REQUIRED)
 find_package(ZLIB REQUIRED)
 
@@ -106,11 +111,5 @@ else()
   find_package(TIPL REQUIRED)
   target_link_libraries(bet2 TIPL::tipl)
 endif()
-target_link_directories(bet2 PUBLIC ${BLAS_LIB_DIR})
-
-if(APPLE)
-  target_link_libraries(bet2 /usr/local/opt/openblas/lib/libopenblas64_.0.3.0.dylib ZLIB::ZLIB)
-else()
-  target_link_libraries(bet2 ${BLAS_LIBRARIES} ZLIB::ZLIB)
-endif()
-
+target_link_directories(topup PUBLIC ${BLAS_LIB_DIR})
+target_link_libraries(topup ${BLAS_LIBRARIES} ZLIB::ZLIB)
