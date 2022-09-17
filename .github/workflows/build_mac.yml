@@ -12,52 +12,23 @@ jobs:
     runs-on: macos-11
     steps:
       - uses: actions/checkout@v2
-      - name: Download FSL
-        run: |
-          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-armawrap-0.6.0-h2bc3f7f_0.tar.bz2 --output fsl-armawrap-0.6.0-h2bc3f7f_0.tar.bz2 
-          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-avwutils-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-avwutils-2111.0-h2bc3f7f_0.tar.bz2
-          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-bet2-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-bet2-2111.0-h2bc3f7f_0.tar.bz2
-          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-basisfield-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-basisfield-2111.0-h2bc3f7f_0.tar.bz2
-          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-cprob-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-cprob-2111.0-h2bc3f7f_0.tar.bz2
-          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-eddy-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-eddy-2111.0-h2bc3f7f_0.tar.bz2 
-          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-meshclass-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-meshclass-2111.0-h2bc3f7f_0.tar.bz2
-          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-miscmaths-2111.1-h2bc3f7f_0.tar.bz2 --output fsl-miscmaths-2111.1-h2bc3f7f_0.tar.bz2
-          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-newimage-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-newimage-2111.0-h2bc3f7f_0.tar.bz2
-          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-newimage-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-newimage-2111.0-h2bc3f7f_0.tar.bz2
-          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-newnifti-4.0.0-h2bc3f7f_0.tar.bz2 --output fsl-newnifti-4.0.0-h2bc3f7f_0.tar.bz2 
-          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-topup-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-topup-2111.0-h2bc3f7f_0.tar.bz2
-          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-utils-2111.1-h2bc3f7f_0.tar.bz2 --output fsl-utils-2111.1-h2bc3f7f_0.tar.bz2
-          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-warpfns-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-warpfns-2111.0-h2bc3f7f_0.tar.bz2
-          curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/linux-64/fsl-znzlib-2111.0-h2bc3f7f_0.tar.bz2 --output fsl-znzlib-2111.0-h2bc3f7f_0.tar.bz2
-          bunzip2 *.bz2
-          for i in *.tar;do tar -xf "$i";done
-          rm -fr *.bz2
-          rm -fr *.tar
       - name: Patch FSL
         run: |
-          cd src
-          for i in "fsl-"*;do mv -v -f "$i" "${i#"fsl-"}";done
-          for i in *;do cp -v -r -f "$i" ../include/;done
-          cd ..
-          cd patches
-          for i in *;do cp -v -r -f "$i" ../include/;done
-          cd ..
-          rm -fr bin
-          rm -fr info
-          rm -fr src
-          rm -fr tcl
-          rm -fr lib
+          cp -fr ./patches/* ./fsl/include/ 
       - name: Download TIPL
         run: |
           git clone https://github.com/frankyeh/TIPL.git
-          mv TIPL tipl
-          mv tipl include     
+          mv TIPL ./fsl
+      - name: Install boost ninja
+        run: |
+          brew update
+          brew install ninja
       - name: Download Boost
         run: |
           curl -L https://boostorg.jfrog.io/artifactory/main/release/1.77.0/source/boost_1_77_0.tar.bz2 --output boost.tar.bz2
           7z x boost.tar.bz2
           7z x boost.tar
-          mv -f ./boost_1_77_0/boost ./include    
+          mv -f ./boost_1_77_0/boost ./fsl    
           curl -L https://github.com/JuliaLinearAlgebra/OpenBLASBuilder/releases/download/v0.3.0-3/OpenBLAS.v0.3.0.x86_64-apple-darwin14-gcc8.tar.gz --output openblas.tar.gz
           7z e openblas.tar.gz
           7z e openblas.tar -o/usr/local/opt/openblas/lib/
@@ -65,30 +36,17 @@ jobs:
           rm -f *.tar
           rm -f *.tar.bz2
           rm -f *.tar.gz
-          
-      - name: Install Qt
+          mkdir tiny_fsl_bin
+      - name: Compile TOPUP 
         run: |
-          brew update
-          brew install qt5
-      - name: Compile Programs 
-        run: |
-          export PATH="/usr/local/opt/qt@5/bin:$PATH" && export LDFLAGS="-L/usr/local/opt/qt@5/lib" && export CPPFLAGS="-I/usr/local/opt/qt@5/include" && export PKG_CONFIG_PATH="/usr/local/opt/qt@5/lib/pkgconfig"
-          mkdir -p build
-          cd build
-          qmake ../eddy.pro
-          make
-          qmake ../topup.pro
-          make
-          qmake ../applytopup.pro
-          make
-          qmake ../bet2.pro
-          make
-          rm *.o
-          rm Makefile
+          mkdir -p build_topup
+          cd topup
+          cmake -S . -B ../build_topup -GNinja -DBLAS_LIB_DIR=/usr/local/opt/openblas/lib/ -DBLAS_LIBRARIES=libopenblas "-DCMAKE_BUILD_TYPE:STRING=Release" -DTIPL_DIR=../fsl
+          cmake --build ../build_topup --parallel --config Release
+          mv ../build_topup/topup ../tiny_fsl_bin
       - name: Packaging
         run: |
-          mkdir tiny_fsl
-          mv build/* tiny_fsl
+          mv tiny_fsl_bin tiny_fsl
           cp FSL_LICENSE tiny_fsl
       - name: Zip Package
         uses: TheDoctor0/zip-release@0.6.0
@@ -96,7 +54,6 @@ jobs:
           filename: tiny_fsl_mac.zip
           exclusions: .git
           path: tiny_fsl          
-          
       - name: Create Release
         uses: ncipollo/release-action@v1.8.9
         with:
