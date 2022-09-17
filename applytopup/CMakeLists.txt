@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.16)
 project(applytopup VERSION "2022.01.17" LANGUAGES CXX;C)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -102,6 +102,11 @@ target_compile_definitions(applytopup PUBLIC BUILDSTRING=TinyFSL)
 if(MSVC)
     target_compile_options(applytopup PUBLIC "$<$<COMPILE_LANGUAGE:CXX>:/Zc:__cplusplus>")
 endif()
+
+if(UNIX AND NOT APPLE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+endif()
+
 
 target_include_directories(applytopup PUBLIC
   ${CMAKE_SOURCE_DIR}/../fsl/include/applytopup
