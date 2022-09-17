@@ -9,7 +9,13 @@ on:
         
 jobs:
   mac_build:
-    runs-on: macos-11
+    strategy:
+      matrix:
+        os: [macos-12,macos-11,macos-10.15]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    env:
+      CFLAGS: -Werror
     steps:
       - uses: actions/checkout@v2
       - name: Patch FSL
@@ -72,7 +78,7 @@ jobs:
       - name: Zip Package
         uses: TheDoctor0/zip-release@0.6.0
         with:
-          filename: tiny_fsl_mac.zip
+          filename: tiny_fsl_${{ matrix.os }}.zip
           exclusions: .git
           path: tiny_fsl          
       - name: Create Release
