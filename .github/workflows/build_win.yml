@@ -84,19 +84,19 @@ jobs:
         shell: cmd
       - name: Packaging
         run: |
-          mkdir tinyfsl
-          move build_eddy\eddy.exe tinyfsl
-          move build_topup\topup.exe tinyfsl
-          move build_applytopup\applytopup.exe tinyfsl
-          move build_bet2\bet2.exe tinyfsl
-          move fsl\openblas\bin\*.dll tinyfsl
-          move FSL_LICENSE tinyfsl          
+          mkdir tiny_fsl
+          move build_eddy\eddy.exe tiny_fsl
+          move build_topup\topup.exe tiny_fsl
+          move build_applytopup\applytopup.exe tiny_fsl
+          move build_bet2\bet2.exe tiny_fsl
+          move fsl\openblas\bin\*.dll tiny_fsl
+          move FSL_LICENSE tiny_fsl          
       - name: Zip Package
         uses: TheDoctor0/zip-release@0.6.0
         with:
-          filename: tinyfsl_win.zip
+          filename: tiny_fsl_win.zip
           exclusions: .git
-          path: tinyfsl          
+          path: tiny_fsl          
       - name: Create Release
         uses: ncipollo/release-action@v1.8.9
         with:
@@ -162,15 +162,15 @@ jobs:
         shell: cmd
       - name: Packaging
         run: |
-          curl -L https://github.com/frankyeh/TinyFSL/releases/download/2021.12.03/tinyfsl_win.zip --output tinyfsl.zip
-          7z x tinyfsl.zip
-          move build_eddy\eddy.exe tinyfsl\eddy_cuda.exe
+          curl -L https://github.com/frankyeh/TinyFSL/releases/download/2021.12.03/tiny_fsl_win.zip --output tiny_fsl.zip
+          7z x tiny_fsl.zip
+          move build_eddy\eddy.exe tiny_fsl\eddy_cuda.exe
       - name: Zip Package
         uses: TheDoctor0/zip-release@0.6.0
         with:
-          filename: tinyfsl_win.zip
+          filename: tiny_fsl_win.zip
           exclusions: .git
-          path: tinyfsl          
+          path: tiny_fsl          
       - name: Create Release
         uses: ncipollo/release-action@v1.8.9
         with:
