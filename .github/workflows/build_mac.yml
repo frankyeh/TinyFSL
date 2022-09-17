@@ -60,7 +60,7 @@ jobs:
       - name: Compile eddy 
         run: |
           mkdir -p build_eddy
-          cd bet2
+          cd eddy
           cmake -S . -B ../build_eddy -GNinja -DCMAKE_BUILD_TYPE:STRING=Release -DTIPL_DIR=../fsl
           cmake --build ../build_eddy --parallel --config Release
           mv ../build_eddy/eddy ../tiny_fsl_bin          
