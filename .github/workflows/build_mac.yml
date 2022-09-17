@@ -35,13 +35,6 @@ jobs:
           7z x boost.tar.bz2
           7z x boost.tar
           mv -f ./boost_1_77_0/boost ./fsl    
-          curl -L https://github.com/JuliaLinearAlgebra/OpenBLASBuilder/releases/download/v0.3.0-3/OpenBLAS.v0.3.0.x86_64-apple-darwin14-gcc8.tar.gz --output openblas.tar.gz
-          7z e openblas.tar.gz
-          7z e openblas.tar -o/usr/local/opt/openblas/lib/
-          ls -l /usr/local/opt/openblas/lib/
-          rm -f *.tar
-          rm -f *.tar.bz2
-          rm -f *.tar.gz
           mkdir tiny_fsl_bin
       - name: Compile topup 
         run: |
