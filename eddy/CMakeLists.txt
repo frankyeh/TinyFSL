@@ -140,8 +140,13 @@ if(CUDA_ARCH)
 else()
     target_compile_definitions(eddy PUBLIC BUILDSTRING=TinyFSL)
 endif()
+
 if(MSVC)
     target_compile_options(eddy PUBLIC "$<$<COMPILE_LANGUAGE:CXX>:/Zc:__cplusplus>")
+endif()
+
+if(APPLE) 
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -framework Accelerate")
 endif()
 
 target_include_directories(eddy PUBLIC
@@ -172,7 +177,7 @@ endif()
 
 
 if(APPLE)
-  target_link_libraries(eddy /usr/local/opt/openblas/lib/libopenblas64_.0.3.0.dev.a /usr/local/opt/gcc/lib/gcc/11/libgfortran.a /usr/local/opt/gcc/lib/gcc/11/libquadmath.a /usr/local/opt/gcc/lib/gcc/11/libgomp.a /usr/local/opt/gcc/lib/gcc/11/libgcc_s.1.dylib ZLIB::ZLIB)
+  target_link_libraries(eddy /usr/local/opt/openblas/lib/libopenblas64_.0.3.0.dylib ZLIB::ZLIB)
 else()
   target_link_libraries(eddy ${BLAS_LIBRARIES} ZLIB::ZLIB)
 endif()

@@ -103,6 +103,9 @@ if(UNIX AND NOT APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 endif()
 
+if(APPLE) 
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -framework Accelerate")
+endif()
 
 target_include_directories(applytopup PUBLIC
   ${CMAKE_SOURCE_DIR}/../fsl/include/applytopup
@@ -120,7 +123,7 @@ target_link_directories(applytopup PUBLIC ${BLAS_LIB_DIR})
 
 
 if(APPLE)
-  target_link_libraries(applytopup /usr/local/opt/openblas/lib/libopenblas64_.0.3.0.dev.a /usr/local/opt/gcc/lib/gcc/11/libgfortran.a /usr/local/opt/gcc/lib/gcc/11/libquadmath.a /usr/local/opt/gcc/lib/gcc/11/libgomp.a /usr/local/opt/gcc/lib/gcc/11/libgcc_s.1.dylib ZLIB::ZLIB)
+  target_link_libraries(applytopup /usr/local/opt/openblas/lib/libopenblas64_.0.3.0.dev.dylib ZLIB::ZLIB)
 else()
   target_link_libraries(applytopup ${BLAS_LIBRARIES} ZLIB::ZLIB)
 endif()
