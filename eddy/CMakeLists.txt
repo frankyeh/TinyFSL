@@ -9,12 +9,7 @@ endif()
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-if(APPLE)
-    set(BLA_VENDOR Apple)
-else()
-    set(BLA_VENDOR OpenBLAS)
-endif()
-
+set(BLA_VENDOR OpenBLAS)
 find_package(BLAS REQUIRED)
 find_package(ZLIB REQUIRED)
 if(CUDA_ARCH)
@@ -169,7 +164,7 @@ else()
   target_link_libraries(eddy TIPL::tipl)
 endif()
 target_link_directories(eddy PUBLIC ${BLAS_LIB_DIR})
-target_link_libraries(eddy ZLIB::ZLIB)
+target_link_libraries(eddy ${BLAS_LIBRARIES} ZLIB::ZLIB)
 
 
 if(CUDA_ARCH)

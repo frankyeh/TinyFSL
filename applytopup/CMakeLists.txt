@@ -4,12 +4,7 @@ project(applytopup VERSION "2022.01.17" LANGUAGES CXX;C)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-if(APPLE)
-    set(BLA_VENDOR Apple)
-else()
-    set(BLA_VENDOR OpenBLAS)
-endif()
-
+set(BLA_VENDOR OpenBLAS)
 find_package(BLAS REQUIRED)
 find_package(ZLIB REQUIRED)
 
@@ -125,6 +120,6 @@ else()
   target_link_libraries(applytopup TIPL::tipl)
 endif()
 target_link_directories(applytopup PUBLIC ${BLAS_LIB_DIR})
-target_link_libraries(applytopup ZLIB::ZLIB)
+target_link_libraries(applytopup ${BLAS_LIBRARIES} ZLIB::ZLIB)
 
 
