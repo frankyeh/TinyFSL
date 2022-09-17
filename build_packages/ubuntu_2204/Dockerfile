@@ -16,8 +16,7 @@ RUN apt update && apt upgrade -y && \
   zlib1g-dev \
   ca-certificates \
   gcc \
-  g++ \ 
-  gfortran && \
+  g++ && \
   apt-get -y autoremove --purge && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 
