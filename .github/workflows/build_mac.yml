@@ -47,28 +47,28 @@ jobs:
         run: |
           mkdir -p build_topup
           cd topup
-          cmake -S . -B ../build_topup -GNinja -DBLAS_LIB_DIR=/usr/local/opt/openblas/lib/ -DBLAS_LIBRARIES=libopenblas64_ "-DCMAKE_BUILD_TYPE:STRING=Release" -DTIPL_DIR=../fsl
+          cmake -S . -B ../build_topup -GNinja -DBLAS_LIB_DIR=/usr/local/opt/openblas/lib/ -DBLAS_LIBRARIES=/usr/local/opt/openblas/lib/libopenblas64_.0.3.0.dev.a "-DCMAKE_BUILD_TYPE:STRING=Release" -DTIPL_DIR=../fsl
           cmake --build ../build_topup --parallel --config Release
           mv ../build_topup/topup ../tiny_fsl_bin
       - name: Compile applytopup 
         run: |
           mkdir -p build_applytopup
           cd applytopup
-          cmake -S . -B ../build_applytopup -GNinja -DBLAS_LIB_DIR=/usr/local/opt/openblas/lib/ -DBLAS_LIBRARIES=libopenblas64_ "-DCMAKE_BUILD_TYPE:STRING=Release" -DTIPL_DIR=../fsl
+          cmake -S . -B ../build_applytopup -GNinja -DBLAS_LIB_DIR=/usr/local/opt/openblas/lib/ -DBLAS_LIBRARIES=/usr/local/opt/openblas/lib/libopenblas64_.0.3.0.dev.a "-DCMAKE_BUILD_TYPE:STRING=Release" -DTIPL_DIR=../fsl
           cmake --build ../build_applytopup --parallel --config Release
           mv ../build_applytopup/applytopup ../tiny_fsl_bin
       - name: Compile bet2 
         run: |
           mkdir -p build_bet2
           cd bet2
-          cmake -S . -B ../build_bet2 -GNinja -DBLAS_LIB_DIR=/usr/local/opt/openblas/lib/ -DBLAS_LIBRARIES=libopenblas64_ "-DCMAKE_BUILD_TYPE:STRING=Release" -DTIPL_DIR=../fsl
+          cmake -S . -B ../build_bet2 -GNinja -DBLAS_LIB_DIR=/usr/local/opt/openblas/lib/ -DBLAS_LIBRARIES=/usr/local/opt/openblas/lib/libopenblas64_.0.3.0.dev.a "-DCMAKE_BUILD_TYPE:STRING=Release" -DTIPL_DIR=../fsl
           cmake --build ../build_bet2 --parallel --config Release
           mv ../build_bet2/bet2 ../tiny_fsl_bin
       - name: Compile eddy 
         run: |
           mkdir -p build_eddy
           cd bet2
-          cmake -S . -B ../build_eddy -GNinja -DBLAS_LIB_DIR=/usr/local/opt/openblas/lib/ -DBLAS_LIBRARIES=libopenblas64_ "-DCMAKE_BUILD_TYPE:STRING=Release" -DTIPL_DIR=../fsl
+          cmake -S . -B ../build_eddy -GNinja -DBLAS_LIB_DIR=/usr/local/opt/openblas/lib/ -DBLAS_LIBRARIES=/usr/local/opt/openblas/lib/libopenblas64_.0.3.0.dev.a "-DCMAKE_BUILD_TYPE:STRING=Release" -DTIPL_DIR=../fsl
           cmake --build ../build_eddy --parallel --config Release
           mv ../build_eddy/eddy ../tiny_fsl_bin          
       - name: Packaging
