@@ -28,7 +28,7 @@ jobs:
       - name: Install boost ninja
         run: |
           brew update
-          brew install ninja
+          brew install ninja gcc g++ gfortran
       - name: Download Boost
         run: |
           curl -L https://boostorg.jfrog.io/artifactory/main/release/1.77.0/source/boost_1_77_0.tar.bz2 --output boost.tar.bz2
