@@ -103,5 +103,10 @@ else()
   target_link_libraries(bet2 TIPL::tipl)
 endif()
 target_link_directories(bet2 PUBLIC ${BLAS_LIB_DIR})
-target_link_libraries(bet2 ${BLAS_LIBRARIES} ZLIB::ZLIB)
+
+if(APPLE)
+  target_link_libraries(bet2 /usr/local/opt/openblas/lib/libopenblas64_.0.3.0.dev.a /usr/local/opt/gcc/lib/gcc/11/libgfortran.a /usr/local/opt/gcc/lib/gcc/11/libquadmath.a /usr/local/opt/gcc/lib/gcc/11/libgomp.a /usr/local/opt/gcc/lib/gcc/11/libgcc_s.1.dylib ZLIB::ZLIB)
+else()
+  target_link_libraries(bet2 ${BLAS_LIBRARIES} ZLIB::ZLIB)
+end()
 

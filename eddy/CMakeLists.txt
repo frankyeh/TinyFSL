@@ -169,5 +169,11 @@ if(CUDA_ARCH)
   set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -allow-unsupported-compiler -Xcompiler /Zc:__cplusplus")
   set(CMAKE_CUDA_RUNTIME_LIBRARY "Static")
 endif()
-target_link_libraries(eddy ${BLAS_LIBRARIES} ZLIB::ZLIB)
+
+
+if(APPLE)
+  target_link_libraries(eddy /usr/local/opt/openblas/lib/libopenblas64_.0.3.0.dev.a /usr/local/opt/gcc/lib/gcc/11/libgfortran.a /usr/local/opt/gcc/lib/gcc/11/libquadmath.a /usr/local/opt/gcc/lib/gcc/11/libgomp.a /usr/local/opt/gcc/lib/gcc/11/libgcc_s.1.dylib ZLIB::ZLIB)
+else()
+  target_link_libraries(eddy ${BLAS_LIBRARIES} ZLIB::ZLIB)
+end()
 
