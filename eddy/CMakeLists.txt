@@ -107,8 +107,8 @@ set(SOURCES
     ../fsl/include/newimage/lazy.cc
     ../fsl/include/newimage/newimage.cc
     ../fsl/include/newimage/newimagefns.cc
-    ../fsl/include/newnifti/legacyFunctions.cc
-    ../fsl/include/newnifti/NewNifti.cc
+    ../fsl/include/NewNifti/legacyFunctions.cc
+    ../fsl/include/NewNifti/NewNifti.cc
     ../fsl/include/topup/displacement_vector.cpp
     ../fsl/include/topup/topup_costfunctions.cpp
     ../fsl/include/topup/topup_file_io.cpp
