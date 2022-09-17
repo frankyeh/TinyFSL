@@ -28,4 +28,4 @@ jobs:
         file: build_packages/Dockerfile
         push: true
         tags: |
-            dsistudio/tinyfsl:latest
+            dsistudio/tiny_fsl:latest
