@@ -124,7 +124,7 @@ else()
   find_package(TIPL REQUIRED)
   target_link_libraries(applytopup TIPL::tipl)
 endif()
-target_link_directories(topup PUBLIC ${BLAS_LIB_DIR})
-target_link_libraries(topup ${BLAS_LIBRARIES} ZLIB::ZLIB)
+target_link_directories(applytopup PUBLIC ${BLAS_LIB_DIR})
+target_link_libraries(applytopup ZLIB::ZLIB)
 
 

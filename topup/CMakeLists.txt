@@ -125,7 +125,7 @@ else()
   target_link_libraries(topup TIPL::tipl)
 endif()
 target_link_directories(topup PUBLIC ${BLAS_LIB_DIR})
-target_link_libraries(topup ${BLAS_LIBRARIES} ZLIB::ZLIB)
+target_link_libraries(topup ZLIB::ZLIB)
 
 
 

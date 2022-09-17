@@ -168,8 +168,8 @@ else()
   find_package(TIPL REQUIRED)
   target_link_libraries(eddy TIPL::tipl)
 endif()
-target_link_directories(topup PUBLIC ${BLAS_LIB_DIR})
-target_link_libraries(topup ${BLAS_LIBRARIES} ZLIB::ZLIB)
+target_link_directories(eddy PUBLIC ${BLAS_LIB_DIR})
+target_link_libraries(eddy ZLIB::ZLIB)
 
 
 if(CUDA_ARCH)
