@@ -103,6 +103,10 @@ if(MSVC)
     target_compile_options(topup PUBLIC "$<$<COMPILE_LANGUAGE:CXX>:/Zc:__cplusplus>")
 endif()
 
+if(UNIX AND NOT APPLE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+endif()
+
 target_include_directories(topup PUBLIC
   ${CMAKE_SOURCE_DIR}/../fsl/include/topup
   ${CMAKE_SOURCE_DIR}/../fsl/include
