@@ -103,7 +103,7 @@ if(UNIX AND NOT APPLE)
 endif()
 
 if(APPLE) 
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -framework Accelerate")
+    set(BLAS_LIBRARIES "-framework Accelerate")
 endif()
   
 
