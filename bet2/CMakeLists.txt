@@ -83,7 +83,7 @@ target_compile_definitions(bet2 PUBLIC ARMA_NO_DEBUG)
 target_compile_definitions(bet2 PUBLIC BUILDSTRING=TinyFSL)
 
 if(MSVC)
-    target_compile_options(topup PUBLIC "$<$<COMPILE_LANGUAGE:CXX>:/Zc:__cplusplus>")
+    target_compile_options(bet2 PUBLIC "$<$<COMPILE_LANGUAGE:CXX>:/Zc:__cplusplus>")
 endif()
 
 if(UNIX AND NOT APPLE)
@@ -105,7 +105,7 @@ endif()
 target_link_directories(bet2 PUBLIC ${BLAS_LIB_DIR})
 
 if(APPLE)
-  target_link_libraries(bet2 /usr/local/opt/openblas/lib/libopenblas64_.0.3.0.dev.a /usr/local/opt/gcc/lib/gcc/11/libgfortran.a /usr/local/opt/gcc/lib/gcc/11/libquadmath.a /usr/local/opt/gcc/lib/gcc/11/libgomp.a /usr/local/opt/gcc/lib/gcc/11/libgcc_s.1.dylib ZLIB::ZLIB)
+  target_link_libraries(bet2 /usr/local/opt/openblas/lib/libopenblas64_.0.3.0.dylib ZLIB::ZLIB)
 else()
   target_link_libraries(bet2 ${BLAS_LIBRARIES} ZLIB::ZLIB)
 endif()
