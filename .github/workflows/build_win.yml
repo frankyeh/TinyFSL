@@ -89,6 +89,7 @@ jobs:
           move build_topup\topup.exe tiny_fsl
           move build_applytopup\applytopup.exe tiny_fsl
           move build_bet2\bet2.exe tiny_fsl
+          move fsl\openblas\bin\*.dll tiny_fsl
           move FSL_LICENSE tiny_fsl          
       - name: Zip Package
         uses: TheDoctor0/zip-release@0.6.0
