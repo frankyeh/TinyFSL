@@ -832,13 +832,6 @@ void raw_general_transform(// Input
             int64_t z_base = zp*deriv.xsize()*deriv.ysize()*deriv.zsize();
             // make sure interpolator coefficients have been calculated
             f.interpolate(0,0,0);
-            if(xd>=0)
-                d[xd].interpolate(0,0,0);
-            if(yd>=0)
-                d[yd].interpolate(0,0,0);
-            if(zd>=0)
-                d[zd].interpolate(0,0,0);
-
             tipl::par_for (slices.size(),[&](unsigned int k){
                 int z = static_cast<int>(slices[k]);
                 for (int y=0,index = z*out.ysize()*out.xsize(); y<out.ysize(); y++) {
