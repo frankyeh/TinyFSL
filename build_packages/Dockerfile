@@ -37,7 +37,6 @@ RUN git clone https://github.com/frankyeh/TIPL.git \
   && mv TinyFSL tiny_fsl \
   && mv tiny_fsl /opt \
   && mv TIPL /opt/tiny_fsl/fsl \
-  && cp -fr /opt/tiny_fsl/patches/* /opt/tiny_fsl/fsl/include/ \
   && mkdir -p /opt/tiny_fsl_bin 
 
 
