@@ -20,12 +20,12 @@ std::string EddyCudaHelperFunctions::cudaError2String(const cudaError_t& ce) Edd
 
 void EddyCudaHelperFunctions::CudaSync(const std::string& msg) EddyTry
 {
-  /*cudaError_t err = cudaDeviceSynchronize();
+  cudaError_t err = cudaDeviceSynchronize();
   if (err!=cudaSuccess) {
     std::ostringstream os;
     os << "EddyKernels::CudaSync: CUDA error after call to " << msg << ", " << EddyCudaHelperFunctions::cudaError2String(err);
     throw EDDY::EddyException(os.str());
-  }*/
+  }
 } EddyCatch
 
 void EddyCudaHelperFunctions::InitGpu(bool verbose) EddyTry
