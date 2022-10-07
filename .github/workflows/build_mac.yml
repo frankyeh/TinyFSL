@@ -18,9 +18,6 @@ jobs:
       CFLAGS: -Werror
     steps:
       - uses: actions/checkout@v2
-      - name: Patch FSL
-        run: |
-          cp -fr ./patches/* ./fsl/include/ 
       - name: Download TIPL
         run: |
           git clone https://github.com/frankyeh/TIPL.git
