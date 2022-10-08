@@ -106,11 +106,6 @@ jobs:
     runs-on: windows-2019
     steps: 
       - uses: actions/checkout@v2
-      - name: Download FSL
-        run: |
-          for /f "delims=" %%x in ('dir patches\* /b ') do (copy /y patches\%%x\* fsl\include\%%x) 
-          copy /y patches\eddy\cuda fsl\include\eddy\cuda  
-        shell: cmd
       - name: Download TIPL
         run: |
           cd fsl
