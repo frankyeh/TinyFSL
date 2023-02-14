@@ -84,15 +84,15 @@ bool EddyUtils::get_groups(// Input
   bool is_shelled;
   if (EddyUtils::Isb0(EDDY::DiffPara(grpb[0]))) { // If it includes "b0"-shell
     is_shelled = grpb.size() < 7; // Don't trust more than 5 shells
-    unsigned int scans_per_shell = static_cast<unsigned int>((double(dpv.size() - grp_n[0]) / double(grpb.size() - 1)) + 0.5);
-    is_shelled &= bool(*std::max_element(grp_n.begin()+1,grp_n.end()) < 2 * scans_per_shell); // Don't trust too many scans in one shell
-    is_shelled &= bool(3 * *std::min_element(grp_n.begin()+1,grp_n.end()) > scans_per_shell); // Don't trust too few scans in one shell
+    //unsigned int scans_per_shell = static_cast<unsigned int>((double(dpv.size() - grp_n[0]) / double(grpb.size() - 1)) + 0.5);
+    //is_shelled &= bool(*std::max_element(grp_n.begin()+1,grp_n.end()) < 2 * scans_per_shell); // Don't trust too many scans in one shell
+    //is_shelled &= bool(3 * *std::min_element(grp_n.begin()+1,grp_n.end()) > scans_per_shell); // Don't trust too few scans in one shell
   }
   else { // If all scans are dwis
     is_shelled = grpb.size() < 6; // Don't trust more than 5 shells
-    unsigned int scans_per_shell = static_cast<unsigned int>((double(dpv.size()) / double(grpb.size())) + 0.5);
-    is_shelled &= bool(*std::max_element(grp_n.begin(),grp_n.end()) < 2 * scans_per_shell); // Don't trust too many scans in one shell
-    is_shelled &= bool(3 * *std::min_element(grp_n.begin(),grp_n.end()) > scans_per_shell); // Don't trust too few scans in one shell
+    //unsigned int scans_per_shell = static_cast<unsigned int>((double(dpv.size()) / double(grpb.size())) + 0.5);
+    //is_shelled &= bool(*std::max_element(grp_n.begin(),grp_n.end()) < 2 * scans_per_shell); // Don't trust too many scans in one shell
+    //is_shelled &= bool(3 * *std::min_element(grp_n.begin(),grp_n.end()) > scans_per_shell); // Don't trust too few scans in one shell
   }
   if (!is_shelled) return(false);
   // Final sanity check
