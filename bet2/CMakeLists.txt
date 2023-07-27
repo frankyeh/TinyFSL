@@ -8,6 +8,7 @@ set(CMAKE_EXE_LINKER_FLAGS "-static")
 
 if(APPLE) 
     set(BLA_VENDOR Apple)
+    set(BLAS_LIBRARIES "-framework Accelerate")
 else()
     set(BLA_VENDOR OpenBLAS)
 endif()
@@ -96,9 +97,6 @@ if(UNIX AND NOT APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 endif()
 
-if(APPLE) 
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -framework Accelerate")
-endif()
 
 target_include_directories(bet2 PUBLIC
   ${CMAKE_SOURCE_DIR}/../fsl/../fsl/include/bet2
