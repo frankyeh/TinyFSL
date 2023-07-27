@@ -8,9 +8,11 @@ set(CMAKE_EXE_LINKER_FLAGS "-static")
 
 if(APPLE) 
     set(BLA_VENDOR Apple)
+    set(BLAS_LIBRARIES "-framework Accelerate")
 else()
     set(BLA_VENDOR OpenBLAS)
 endif()
+  
 find_package(BLAS REQUIRED)
 find_package(ZLIB REQUIRED)
 
@@ -107,11 +109,6 @@ endif()
 if(UNIX AND NOT APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 endif()
-
-if(APPLE) 
-    set(BLAS_LIBRARIES "-framework Accelerate")
-endif()
-  
 
 target_include_directories(topup PUBLIC
   ${CMAKE_SOURCE_DIR}/../fsl/include/topup
