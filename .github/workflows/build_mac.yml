@@ -37,7 +37,7 @@ jobs:
         run: |
           mkdir -p build_topup
           cd topup
-          cmake -S . -B ../build_topup -GNinja -DCMAKE_BUILD_TYPE:STRING=Release -DBLA_VENDOR=Apple -DTIPL_DIR=../fsl
+          cmake -S . -B ../build_topup -GNinja -DCMAKE_BUILD_TYPE:STRING=Release -DTIPL_DIR=../fsl
           cmake --build ../build_topup --parallel --config Release
           mv ../build_topup/topup ../tiny_fsl_bin
       - name: Compile applytopup 
