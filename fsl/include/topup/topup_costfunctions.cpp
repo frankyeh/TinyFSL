@@ -1413,7 +1413,7 @@ double TopupCF::cf(const NEWMAT::ColumnVector& p) const
 
   auto& _scans = _sm._scans;
   size_t plane_size = mean.xsize()*mean.ysize();
-  tipl::par_for(mean.zsize(),[&](size_t k,unsigned int thread){
+  tipl::par_for<tipl::sequential_with_id>(mean.zsize(),[&](size_t k,unsigned int thread){
         for (unsigned int s=0; s< _sm.NoOfScans(); s++)
         {
             size_t pos = plane_size*k;
