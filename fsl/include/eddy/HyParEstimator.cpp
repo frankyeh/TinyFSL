@@ -175,7 +175,7 @@ double CVHyParCF::cf(const NEWMAT::ColumnVector& p) const EddyTry
           ssd_vecs.push_back(NEWMAT::ColumnVector(_K->NoOfScans()));
           ssd_vecs.back() = 0.0;
       }
-      tipl::par_for(_data.size(),[&](size_t i,unsigned int thread){
+      tipl::par_for<tipl::sequential_with_id>(_data.size(),[&](size_t i,unsigned int thread){
           NEWMAT::ColumnVector qn = _K->iKy(_data[i]);
           ssd_vecs[thread] += NEWMAT::SP(qn,qn);
       });
