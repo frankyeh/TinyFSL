@@ -5,12 +5,12 @@ on:
       tag:
         description: 'Tag'
         required: true
-        default: '2022.08.03'    
+        default: 2026.06.01  
 jobs:
   docker_build:
     strategy:
       matrix:
-        os: [ubuntu_2004,ubuntu_2204]
+        os: [ubuntu_2004,ubuntu_2204,,ubuntu_2404]
       fail-fast: false
     runs-on: ubuntu-latest
     steps:
@@ -36,5 +36,4 @@ jobs:
         allowUpdates: true
         artifacts: "*.zip"
         tag: ${{ github.event.inputs.tag }}
-        name: "2021.12.03 Chen Release"
         prerelease: false  
