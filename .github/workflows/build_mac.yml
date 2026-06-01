@@ -105,16 +105,9 @@ jobs:
           pattern: tiny_fsl_*
           merge-multiple: true
 
-      - name: Create or update release
+      - name: Upload release files
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ inputs.tag }}
         run: |
-          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1
-          then
-            gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --title "tiny_fsl $TAG"
-          else
-            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "tiny_fsl $TAG" --notes "Automated macOS build for $TAG"
-          fi
-
           gh release upload "$TAG" tiny_fsl_*.zip --repo "$GITHUB_REPOSITORY" --clobber
