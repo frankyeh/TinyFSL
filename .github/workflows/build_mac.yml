@@ -99,15 +99,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download artifacts
+      - name: Download arm64 artifact
         uses: actions/download-artifact@v4
         with:
-          pattern: tiny_fsl_*
-          merge-multiple: true
+          name: tiny_fsl_macos-14-arm64
+          path: release_assets
+
+      - name: Download Intel artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: tiny_fsl_macos-15-intel
+          path: release_assets
 
       - name: Upload release files
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ inputs.tag }}
+          TAG: ${{ github.event.inputs.tag }}
+          REPO: ${{ github.repository }}
         run: |
-          gh release upload "$TAG" tiny_fsl_*.zip --repo "$GITHUB_REPOSITORY" --clobber
+          set -euo pipefail
+          ls -lh release_assets/*.zip
+          gh release view "$TAG" --repo "$REPO"
+          gh release upload "$TAG" release_assets/*.zip --repo "$REPO" --clobber
