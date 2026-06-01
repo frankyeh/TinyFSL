@@ -160,11 +160,11 @@ target_include_directories(eddy PUBLIC
   ${CMAKE_BINARY_DIR}
   ${CUDA_INCLUDE_DIRS})
 
-if(EXISTS "${TIPL_DIR}")
-  include_directories(eddy ${TIPL_DIR})
+if(DEFINED TIPL_DIR AND EXISTS "${TIPL_DIR}")
+    target_include_directories(topup PUBLIC "${TIPL_DIR}")
 else()
-  find_package(TIPL REQUIRED)
-  target_link_libraries(eddy TIPL::tipl)
+    find_package(TIPL REQUIRED)
+    target_link_libraries(topup TIPL::tipl)
 endif()
 target_link_directories(eddy PUBLIC ${BLAS_LIB_DIR})
 target_link_libraries(eddy ${BLAS_LIBRARIES} ZLIB::ZLIB)
