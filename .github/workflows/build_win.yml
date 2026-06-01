@@ -50,27 +50,36 @@ jobs:
           Remove-Item fsl\include\boost -Recurse -Force -ErrorAction SilentlyContinue
           Move-Item boost_1_77_0\boost fsl\include\boost
 
-      - name: Install OpenBLAS and Zlib
+      - name: Install OpenBLAS, LAPACK, and Zlib
         shell: pwsh
         run: |
           git clone --depth 1 https://github.com/microsoft/vcpkg "$env:VCPKG_ROOT"
           & "$env:VCPKG_ROOT\bootstrap-vcpkg.bat"
-          & "$env:VCPKG_ROOT\vcpkg.exe" install openblas:${{ matrix.triplet }} zlib:${{ matrix.triplet }}
+          & "$env:VCPKG_ROOT\vcpkg.exe" install openblas:${{ matrix.triplet }} lapack-reference:${{ matrix.triplet }} zlib:${{ matrix.triplet }}
 
           $libdir = "$env:VCPKG_ROOT\installed\${{ matrix.triplet }}\lib"
           $incdir = "$env:VCPKG_ROOT\installed\${{ matrix.triplet }}\include"
           $bindir = "$env:VCPKG_ROOT\installed\${{ matrix.triplet }}\bin"
 
-          $blas = Get-ChildItem "$libdir\*openblas*.lib" | Select-Object -First 1
+          $blas = Get-ChildItem "$libdir\*.lib" | Where-Object { $_.Name -like "*openblas*.lib" -or $_.Name -eq "blas.lib" } | Select-Object -First 1
+          $lapack = Get-ChildItem "$libdir\*.lib" | Where-Object { $_.Name -like "*lapack*.lib" -or $_.Name -eq "tmglib.lib" } | Sort-Object Name
           $zlib = Get-ChildItem "$libdir\*.lib" | Where-Object { $_.Name -in @("z.lib","zlib.lib","zlibstatic.lib") -or $_.Name -like "zlib*.lib" } | Select-Object -First 1
 
-          if(!$blas) { throw "OpenBLAS lib not found" }
+          if(!$blas) {
+            Get-ChildItem "$libdir\*.lib" | Select-Object -ExpandProperty Name
+            throw "BLAS lib not found"
+          }
+          if(!$lapack) {
+            Get-ChildItem "$libdir\*.lib" | Select-Object -ExpandProperty Name
+            throw "LAPACK lib not found"
+          }
           if(!$zlib) {
             Get-ChildItem "$libdir\*.lib" | Select-Object -ExpandProperty Name
             throw "Zlib lib not found"
           }
 
-          "BLAS_LIB=$($blas.FullName)" >> $env:GITHUB_ENV
+          $blas_libs = @($lapack.FullName) + @($blas.FullName)
+          "BLAS_LIB=$($blas_libs -join ';')" >> $env:GITHUB_ENV
           "BLAS_LIB_DIR=$libdir" >> $env:GITHUB_ENV
           "ZLIB_LIB=$($zlib.FullName)" >> $env:GITHUB_ENV
           "ZLIB_INC=$incdir" >> $env:GITHUB_ENV
@@ -155,27 +164,36 @@ jobs:
           Remove-Item fsl\include\boost -Recurse -Force -ErrorAction SilentlyContinue
           Move-Item boost_1_77_0\boost fsl\include\boost
 
-      - name: Install OpenBLAS and Zlib
+      - name: Install OpenBLAS, LAPACK, and Zlib
         shell: pwsh
         run: |
           git clone --depth 1 https://github.com/microsoft/vcpkg "$env:VCPKG_ROOT"
           & "$env:VCPKG_ROOT\bootstrap-vcpkg.bat"
-          & "$env:VCPKG_ROOT\vcpkg.exe" install openblas:x64-windows zlib:x64-windows
+          & "$env:VCPKG_ROOT\vcpkg.exe" install openblas:x64-windows lapack-reference:x64-windows zlib:x64-windows
 
           $libdir = "$env:VCPKG_ROOT\installed\x64-windows\lib"
           $incdir = "$env:VCPKG_ROOT\installed\x64-windows\include"
           $bindir = "$env:VCPKG_ROOT\installed\x64-windows\bin"
 
-          $blas = Get-ChildItem "$libdir\*openblas*.lib" | Select-Object -First 1
+          $blas = Get-ChildItem "$libdir\*.lib" | Where-Object { $_.Name -like "*openblas*.lib" -or $_.Name -eq "blas.lib" } | Select-Object -First 1
+          $lapack = Get-ChildItem "$libdir\*.lib" | Where-Object { $_.Name -like "*lapack*.lib" -or $_.Name -eq "tmglib.lib" } | Sort-Object Name
           $zlib = Get-ChildItem "$libdir\*.lib" | Where-Object { $_.Name -in @("z.lib","zlib.lib","zlibstatic.lib") -or $_.Name -like "zlib*.lib" } | Select-Object -First 1
 
-          if(!$blas) { throw "OpenBLAS lib not found" }
+          if(!$blas) {
+            Get-ChildItem "$libdir\*.lib" | Select-Object -ExpandProperty Name
+            throw "BLAS lib not found"
+          }
+          if(!$lapack) {
+            Get-ChildItem "$libdir\*.lib" | Select-Object -ExpandProperty Name
+            throw "LAPACK lib not found"
+          }
           if(!$zlib) {
             Get-ChildItem "$libdir\*.lib" | Select-Object -ExpandProperty Name
             throw "Zlib lib not found"
           }
 
-          "BLAS_LIB=$($blas.FullName)" >> $env:GITHUB_ENV
+          $blas_libs = @($lapack.FullName) + @($blas.FullName)
+          "BLAS_LIB=$($blas_libs -join ';')" >> $env:GITHUB_ENV
           "BLAS_LIB_DIR=$libdir" >> $env:GITHUB_ENV
           "ZLIB_LIB=$($zlib.FullName)" >> $env:GITHUB_ENV
           "ZLIB_INC=$incdir" >> $env:GITHUB_ENV
