@@ -254,8 +254,36 @@ jobs:
           name: win-x64-cuda
           path: tiny_fsl_win_x64.zip
 
-  release:
-    needs: [windows_build, windows_cuda_build]
+  release_cpu:
+    needs: windows_build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download x64 artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: win-x64
+          path: release_assets/x64
+
+      - name: Download ARM64 artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: win-arm64
+          path: release_assets/arm64
+
+      - name: Upload CPU release files
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.inputs.tag }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          ls -lh release_assets/x64/*.zip release_assets/arm64/*.zip
+          gh release view "$TAG" --repo "$REPO"
+          gh release upload "$TAG" release_assets/x64/*.zip release_assets/arm64/*.zip --repo "$REPO" --clobber
+
+  release_cuda:
+    needs: windows_cuda_build
     runs-on: ubuntu-latest
 
     steps:
@@ -263,21 +291,15 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: win-x64-cuda
-          path: release_assets
+          path: release_assets/cuda
 
-      - name: Download ARM64 artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: win-arm64
-          path: release_assets
-
-      - name: Upload release files
+      - name: Upload CUDA release file
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.event.inputs.tag }}
           REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-          ls -lh release_assets/*.zip
+          ls -lh release_assets/cuda/*.zip
           gh release view "$TAG" --repo "$REPO"
-          gh release upload "$TAG" release_assets/*.zip --repo "$REPO" --clobber
+          gh release upload "$TAG" release_assets/cuda/*.zip --repo "$REPO" --clobber
