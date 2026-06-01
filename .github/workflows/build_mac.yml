@@ -11,7 +11,14 @@ jobs:
   mac_build:
     strategy:
       matrix:
-        os: [macos-14,macos-15-intel,macos-15]
+        include:
+          - runner: macos-14
+            name: macos-14-arm64
+            jobs: 3
+  
+          - runner: macos-15-intel
+            name: macos-15-intel
+            jobs: 4
       fail-fast: false
     runs-on: ${{ matrix.os }}
     env:
@@ -20,12 +27,19 @@ jobs:
       - uses: actions/checkout@v2
       - name: Download TIPL
         run: |
-          git clone https://github.com/frankyeh/TIPL.git
+          git clone --depth 1 https://github.com/frankyeh/TIPL.git
           mv TIPL ./fsl
+      - name: Check tools
+        run: |
+          cmake --version
+          ninja --version || brew install ninja
+          ccache --version || brew install ccache
+            
       - name: Install boost ninja
         run: |
           brew update
-          brew install ninja gcc gfortran cmake
+          brew install gcc gfortran cmake
+          
       - name: Download Boost
         run: |
           curl -L https://boostorg.jfrog.io/artifactory/main/release/1.77.0/source/boost_1_77_0.tar.bz2 --output boost.tar.bz2
@@ -33,33 +47,41 @@ jobs:
           7z x boost.tar
           mv -f ./boost_1_77_0/boost ./fsl    
           mkdir tiny_fsl_bin
+      - name: Cache ccache
+        uses: actions/cache@v4
+        with:
+          path: ~/.ccache
+          key: macos-ccache-${{ matrix.name }}-${{ github.ref_name }}
+          restore-keys: |
+            macos-ccache-${{ matrix.name }}-
+            
       - name: Compile topup 
         run: |
           mkdir -p build_topup
           cd topup
-          cmake -S . -B ../build_topup -GNinja -DCMAKE_BUILD_TYPE:STRING=Release -DBLAS_LIBRARIES="-framework Accelerate" -DTIPL_DIR=../fsl
-          cmake --build ../build_topup --parallel --config Release
+          cmake -S . -B ../build_topup -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=OFF -DCMAKE_OSX_DEPLOYMENT_TARGET=13.0 -DCMAKE_CXX_COMPILER_LAUNCHER=ccache   -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_FLAGS="-DGL_SILENCE_DEPRECATION -Wno-deprecated-declarations" -DBLAS_LIBRARIES="-framework Accelerate" -DTIPL_DIR=../fsl
+          cmake --build ../build_topup --parallel 8 --config Release
           mv ../build_topup/topup ../tiny_fsl_bin
       - name: Compile applytopup 
         run: |
           mkdir -p build_applytopup
           cd applytopup
-          cmake -S . -B ../build_applytopup -GNinja -DCMAKE_BUILD_TYPE:STRING=Release -DBLAS_LIBRARIES="-framework Accelerate" -DTIPL_DIR=../fsl
-          cmake --build ../build_applytopup --parallel --config Release
+          cmake -S . -B ../build_applytopup -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=OFF -DCMAKE_OSX_DEPLOYMENT_TARGET=13.0 -DCMAKE_CXX_COMPILER_LAUNCHER=ccache   -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_FLAGS="-DGL_SILENCE_DEPRECATION -Wno-deprecated-declarations"  -DBLAS_LIBRARIES="-framework Accelerate" -DTIPL_DIR=../fsl
+          cmake --build ../build_applytopup --parallel 8 --config Release
           mv ../build_applytopup/applytopup ../tiny_fsl_bin
       - name: Compile bet2 
         run: |
           mkdir -p build_bet2
           cd bet2
-          cmake -S . -B ../build_bet2 -GNinja -DCMAKE_BUILD_TYPE:STRING=Release -DBLAS_LIBRARIES="-framework Accelerate" -DTIPL_DIR=../fsl
-          cmake --build ../build_bet2 --parallel --config Release
+          cmake -S . -B ../build_bet2 -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=OFF -DCMAKE_OSX_DEPLOYMENT_TARGET=13.0 -DCMAKE_CXX_COMPILER_LAUNCHER=ccache   -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_FLAGS="-DGL_SILENCE_DEPRECATION -Wno-deprecated-declarations"  -DBLAS_LIBRARIES="-framework Accelerate" -DTIPL_DIR=../fsl
+          cmake --build ../build_bet2 --parallel 8 --config Release
           mv ../build_bet2/bet2 ../tiny_fsl_bin
       - name: Compile eddy 
         run: |
           mkdir -p build_eddy
           cd eddy
-          cmake -S . -B ../build_eddy -GNinja -DCMAKE_BUILD_TYPE:STRING=Release -DBLAS_LIBRARIES="-framework Accelerate" -DTIPL_DIR=../fsl
-          cmake --build ../build_eddy --parallel --config Release
+          cmake -S . -B ../build_eddy -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=OFF -DCMAKE_OSX_DEPLOYMENT_TARGET=13.0 -DCMAKE_CXX_COMPILER_LAUNCHER=ccache   -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_FLAGS="-DGL_SILENCE_DEPRECATION -Wno-deprecated-declarations"  -DBLAS_LIBRARIES="-framework Accelerate" -DTIPL_DIR=../fsl
+          cmake --build ../build_eddy --parallel 8 --config Release
           mv ../build_eddy/eddy ../tiny_fsl_bin          
       - name: Packaging
         run: |
