@@ -6,7 +6,7 @@ on:
       tag:
         description: Tag
         required: true
-        default: 2022.08.03
+        default: 2026.06.01
 
 permissions:
   contents: write
