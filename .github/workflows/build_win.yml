@@ -1,172 +1,239 @@
 name: BUILD WIN
+
 on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Tag'
+        description: Tag
         required: true
-        default: '2022.08.03'
-        
+        default: 2022.08.03
+
+permissions:
+  contents: write
+
 jobs:
   windows_build:
-    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: windows-latest
+            name: win-x64
+            suffix: x64
+            vs_arch: x64
+            triplet: x64-windows
+
+          - runner: windows-11-arm
+            name: win-arm64
+            suffix: arm64
+            vs_arch: ARM64
+            triplet: arm64-windows
+
+    runs-on: ${{ matrix.runner }}
+
+    env:
+      VCPKG_ROOT: ${{ github.workspace }}\vcpkg
+
     steps:
-      - uses: actions/checkout@v2
-      - name: Download TIPL
+      - uses: actions/checkout@v4
+
+      - name: Prepare TIPL and Boost
+        shell: pwsh
         run: |
-          cd fsl
-          git clone https://github.com/frankyeh/TIPL.git
-          move TIPL include
-      - name: Download Boost
+          New-Item -ItemType Directory -Force fsl\include | Out-Null
+
+          Remove-Item "$env:TEMP\TIPL" -Recurse -Force -ErrorAction SilentlyContinue
+          git clone --depth 1 https://github.com/frankyeh/TIPL.git "$env:TEMP\TIPL"
+          Copy-Item "$env:TEMP\TIPL\*" fsl\include -Recurse -Force
+
+          curl.exe -L https://archives.boost.io/release/1.77.0/source/boost_1_77_0.tar.bz2 -o boost.tar.bz2
+          tar -xjf boost.tar.bz2
+          Remove-Item fsl\include\boost -Recurse -Force -ErrorAction SilentlyContinue
+          Move-Item boost_1_77_0\boost fsl\include\boost
+
+      - name: Install OpenBLAS and Zlib
+        shell: pwsh
         run: |
-          cd fsl
-          curl -L https://boostorg.jfrog.io/artifactory/main/release/1.77.0/source/boost_1_77_0.tar.bz2 --output boost.tar.bz2
-          7z x boost.tar.bz2
-          7z x boost.tar
-          del *.tar
-          del *.tar.bz2
-          move ./boost_1_77_0/boost include    
-      - name: Download OpenBLAS
+          git clone --depth 1 https://github.com/microsoft/vcpkg "$env:VCPKG_ROOT"
+          & "$env:VCPKG_ROOT\bootstrap-vcpkg.bat"
+          & "$env:VCPKG_ROOT\vcpkg.exe" install openblas:${{ matrix.triplet }} zlib:${{ matrix.triplet }}
+
+          $libdir = "$env:VCPKG_ROOT\installed\${{ matrix.triplet }}\lib"
+          $incdir = "$env:VCPKG_ROOT\installed\${{ matrix.triplet }}\include"
+          $bindir = "$env:VCPKG_ROOT\installed\${{ matrix.triplet }}\bin"
+
+          $blas = Get-ChildItem "$libdir\*openblas*.lib" | Select-Object -First 1
+          $zlib = Get-ChildItem "$libdir\zlib*.lib" | Select-Object -First 1
+
+          if(!$blas) { throw "OpenBLAS lib not found" }
+          if(!$zlib) { throw "Zlib lib not found" }
+
+          "BLAS_LIB=$($blas.FullName)" >> $env:GITHUB_ENV
+          "BLAS_LIB_DIR=$libdir" >> $env:GITHUB_ENV
+          "ZLIB_LIB=$($zlib.FullName)" >> $env:GITHUB_ENV
+          "ZLIB_INC=$incdir" >> $env:GITHUB_ENV
+          "DLL_DIR=$bindir" >> $env:GITHUB_ENV
+
+      - name: Compile programs
+        shell: pwsh
         run: |
-          cd fsl
-          mkdir openblas
-          cd openblas
-          curl -L https://github.com/xianyi/OpenBLAS/releases/download/v0.3.18/OpenBLAS-0.3.18-x64.zip --output openblas.zip
-          7z x openblas.zip
-          del openblas.zip
-      - name: Install Zlib
+          $opts = @(
+            "-DBoost_INCLUDE_DIR=$env:GITHUB_WORKSPACE\fsl\include",
+            "-DBLAS_LIB_DIR=$env:BLAS_LIB_DIR",
+            "-DBLAS_LIBRARIES=$env:BLAS_LIB",
+            "-DZLIB_LIBRARY=$env:ZLIB_LIB",
+            "-DZLIB_INCLUDE_DIR=$env:ZLIB_INC",
+            "-DTIPL_DIR=$env:GITHUB_WORKSPACE\fsl\include",
+            "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake",
+            "-DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }}"
+          )
+
+          foreach($app in "eddy","topup","applytopup","bet2")
+          {
+            cmake -S $app -B "build_$app" -G "Visual Studio 17 2022" -A "${{ matrix.vs_arch }}" @opts
+            cmake --build "build_$app" --config Release --parallel
+          }
+
+      - name: Package
+        shell: pwsh
         run: |
-          powershell -Command "(Invoke-WebRequest -Uri https://git.io/JnHTY -OutFile install_zlib.bat)"; 
-          powershell -Command "(gc install_zlib.bat) -replace '1.2.11', '1.2.12' | Out-File -encoding ASCII install_zlib.bat"
-          ./install_zlib.bat
-          del install_zlib.bat
-          del "C:/Program Files/zlib/lib/zlib.lib"
-          del "C:/Program Files/zlib/bin/zlib.dll"
-      - name: Install Ninja and CMake
-        run: |    
-          choco install ninja cmake
-      - name: Compile EDDY 
-        run: |
-          for /f "usebackq delims=#" %%a in (`"%programfiles(x86)%\Microsoft Visual Studio\Installer\vswhere" -latest -property installationPath`) do call "%%a\Common7\Tools\VsDevCmd.bat" -arch=x64
-          mkdir -p build_eddy
-          cd eddy
-          cmake -S . -B ..\build_eddy -GNinja -DBLAS_LIB_DIR=..\fsl\openblas\lib -DBLAS_LIBRARIES=libopenblas "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_C_COMPILER:STRING=cl" "-DCMAKE_CXX_COMPILER:STRING=cl" -DTIPL_DIR=..\fsl\include
-          cmake --build ..\build_eddy --parallel --config Release
-        shell: cmd
-      - name: Compile TOPUP
-        run: |
-          for /f "usebackq delims=#" %%a in (`"%programfiles(x86)%\Microsoft Visual Studio\Installer\vswhere" -latest -property installationPath`) do call "%%a\Common7\Tools\VsDevCmd.bat" -arch=x64
-          mkdir -p build_topup
-          cd topup
-          cmake -S . -B ..\build_topup -GNinja -DBLAS_LIB_DIR=..\fsl\openblas\lib -DBLAS_LIBRARIES=libopenblas "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_C_COMPILER:STRING=cl" "-DCMAKE_CXX_COMPILER:STRING=cl" -DTIPL_DIR=..\fsl\include
-          cmake --build ..\build_topup --parallel --config Release
-        shell: cmd
-      - name: Compile APPLYTOPUP
-        run: |
-          for /f "usebackq delims=#" %%a in (`"%programfiles(x86)%\Microsoft Visual Studio\Installer\vswhere" -latest -property installationPath`) do call "%%a\Common7\Tools\VsDevCmd.bat" -arch=x64
-          mkdir -p build_applytopup
-          cd applytopup
-          cmake -S . -B ..\build_applytopup -GNinja -DBoost_INCLUDE_DIR=..\fsl\include -DBLAS_LIB_DIR=..\fsl\openblas\lib -DBLAS_LIBRARIES=libopenblas "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_C_COMPILER:STRING=cl" "-DCMAKE_CXX_COMPILER:STRING=cl" -DTIPL_DIR=..\fsl\include
-          cmake --build ..\build_applytopup --parallel --config Release
-        shell: cmd
-      - name: Compile BET2
-        run: |
-          for /f "usebackq delims=#" %%a in (`"%programfiles(x86)%\Microsoft Visual Studio\Installer\vswhere" -latest -property installationPath`) do call "%%a\Common7\Tools\VsDevCmd.bat" -arch=x64
-          mkdir -p build_bet2
-          cd bet2
-          cmake -S . -B ..\build_bet2 -GNinja -DBoost_INCLUDE_DIR=..\fsl\include -DBLAS_LIB_DIR=..\fsl\openblas\lib -DBLAS_LIBRARIES=libopenblas "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_C_COMPILER:STRING=cl" "-DCMAKE_CXX_COMPILER:STRING=cl" -DTIPL_DIR=..\fsl\include
-          cmake --build ..\build_bet2 --parallel --config Release  
-        shell: cmd
-      - name: Packaging
-        run: |
-          mkdir tiny_fsl
-          move build_eddy\eddy.exe tiny_fsl
-          move build_topup\topup.exe tiny_fsl
-          move build_applytopup\applytopup.exe tiny_fsl
-          move build_bet2\bet2.exe tiny_fsl
-          move fsl\openblas\bin\*.dll tiny_fsl
-          move FSL_LICENSE tiny_fsl          
-      - name: Zip Package
-        uses: TheDoctor0/zip-release@0.6.0
+          New-Item -ItemType Directory -Force tiny_fsl | Out-Null
+
+          Move-Item build_eddy\Release\eddy.exe tiny_fsl\
+          Move-Item build_topup\Release\topup.exe tiny_fsl\
+          Move-Item build_applytopup\Release\applytopup.exe tiny_fsl\
+          Move-Item build_bet2\Release\bet2.exe tiny_fsl\
+
+          Copy-Item "$env:DLL_DIR\*.dll" tiny_fsl\ -ErrorAction SilentlyContinue
+          Copy-Item FSL_LICENSE tiny_fsl\
+
+          Compress-Archive -Path tiny_fsl -DestinationPath tiny_fsl_win_${{ matrix.suffix }}.zip -Force
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
-          filename: tiny_fsl_win.zip
-          exclusions: .git
-          path: tiny_fsl          
-      - name: Create Release
-        uses: ncipollo/release-action@v1.8.9
-        with:
-          allowUpdates: true
-          artifacts: "*.zip"
-          tag: ${{ github.event.inputs.tag }}
-          name: "2022.08.03 Chen Release"
-          prerelease: false  
-          
+          name: ${{ matrix.name }}
+          path: tiny_fsl_win_${{ matrix.suffix }}.zip
+
   windows_cuda_build:
     needs: windows_build
     runs-on: windows-2019
-    steps: 
-      - uses: actions/checkout@v2
-      - name: Download TIPL
+
+    env:
+      VCPKG_ROOT: ${{ github.workspace }}\vcpkg
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download x64 package
+        uses: actions/download-artifact@v4
+        with:
+          name: win-x64
+
+      - name: Unzip x64 package
+        shell: pwsh
         run: |
-          cd fsl
-          git clone https://github.com/frankyeh/TIPL.git
-          move TIPL include
-      - name: Download Boost
+          Expand-Archive tiny_fsl_win_x64.zip -DestinationPath . -Force
+
+      - name: Install Ninja and CMake
+        shell: cmd
         run: |
-          cd fsl
-          curl -L https://boostorg.jfrog.io/artifactory/main/release/1.77.0/source/boost_1_77_0.tar.bz2 --output boost.tar.bz2
-          7z x boost.tar.bz2
-          7z x boost.tar
-          del *.tar
-          del *.tar.bz2
-          move ./boost_1_77_0/boost include    
-      - name: Download OpenBLAS
+          choco install ninja cmake -y
+
+      - name: Prepare TIPL and Boost
+        shell: pwsh
         run: |
-          cd fsl
-          mkdir openblas
-          cd openblas
-          curl -L https://github.com/xianyi/OpenBLAS/releases/download/v0.3.18/OpenBLAS-0.3.18-x64.zip --output openblas.zip
-          7z x openblas.zip
-          del openblas.zip
-      - name: Install Zlib
+          New-Item -ItemType Directory -Force fsl\include | Out-Null
+
+          Remove-Item "$env:TEMP\TIPL" -Recurse -Force -ErrorAction SilentlyContinue
+          git clone --depth 1 https://github.com/frankyeh/TIPL.git "$env:TEMP\TIPL"
+          Copy-Item "$env:TEMP\TIPL\*" fsl\include -Recurse -Force
+
+          curl.exe -L https://archives.boost.io/release/1.77.0/source/boost_1_77_0.tar.bz2 -o boost.tar.bz2
+          tar -xjf boost.tar.bz2
+          Remove-Item fsl\include\boost -Recurse -Force -ErrorAction SilentlyContinue
+          Move-Item boost_1_77_0\boost fsl\include\boost
+
+      - name: Install OpenBLAS and Zlib
+        shell: pwsh
         run: |
-          powershell -Command "(Invoke-WebRequest -Uri https://git.io/JnHTY -OutFile install_zlib.bat)"; 
-          powershell -Command "(gc install_zlib.bat) -replace '1.2.11', '1.2.12' | Out-File -encoding ASCII install_zlib.bat"
-          ./install_zlib.bat
-          del install_zlib.bat
-          del "C:/Program Files/zlib/lib/zlib.lib"
-          del "C:/Program Files/zlib/bin/zlib.dll"
-      - name: Install Cuda
+          git clone --depth 1 https://github.com/microsoft/vcpkg "$env:VCPKG_ROOT"
+          & "$env:VCPKG_ROOT\bootstrap-vcpkg.bat"
+          & "$env:VCPKG_ROOT\vcpkg.exe" install openblas:x64-windows zlib:x64-windows
+
+          $libdir = "$env:VCPKG_ROOT\installed\x64-windows\lib"
+          $incdir = "$env:VCPKG_ROOT\installed\x64-windows\include"
+          $bindir = "$env:VCPKG_ROOT\installed\x64-windows\bin"
+
+          $blas = Get-ChildItem "$libdir\*openblas*.lib" | Select-Object -First 1
+          $zlib = Get-ChildItem "$libdir\zlib*.lib" | Select-Object -First 1
+
+          if(!$blas) { throw "OpenBLAS lib not found" }
+          if(!$zlib) { throw "Zlib lib not found" }
+
+          "BLAS_LIB=$($blas.FullName)" >> $env:GITHUB_ENV
+          "BLAS_LIB_DIR=$libdir" >> $env:GITHUB_ENV
+          "ZLIB_LIB=$($zlib.FullName)" >> $env:GITHUB_ENV
+          "ZLIB_INC=$incdir" >> $env:GITHUB_ENV
+          "DLL_DIR=$bindir" >> $env:GITHUB_ENV
+
+      - name: Install CUDA
         id: cuda-toolkit
         uses: Jimver/cuda-toolkit@v0.2.5
-      - name: Install Ninja and CMake
-        run: |    
-          choco install ninja cmake
-      - name: Compile EDDY 
+
+      - name: Compile CUDA EDDY
+        shell: cmd
         run: |
           for /f "usebackq delims=#" %%a in (`"%programfiles(x86)%\Microsoft Visual Studio\Installer\vswhere" -latest -property installationPath`) do call "%%a\Common7\Tools\VsDevCmd.bat" -arch=x64
-          mkdir -p build_eddy
-          cd eddy
-          cmake -S . -B ..\build_eddy -GNinja -DBLAS_LIB_DIR=..\fsl\openblas\lib -DBLAS_LIBRARIES=libopenblas "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_C_COMPILER:STRING=cl" "-DCMAKE_CXX_COMPILER:STRING=cl" -DCUDA_ARCH=all "-DCUDA_PATH=${{steps.cuda-toolkit.outputs.CUDA_PATH}}" -DTIPL_DIR=..\fsl\include
-          cmake --build ..\build_eddy --parallel --config Release
-        shell: cmd
-      - name: Packaging
+
+          cmake -S eddy -B build_eddy -GNinja ^
+            -DBLAS_LIB_DIR="%BLAS_LIB_DIR%" ^
+            -DBLAS_LIBRARIES="%BLAS_LIB%" ^
+            -DZLIB_LIBRARY="%ZLIB_LIB%" ^
+            -DZLIB_INCLUDE_DIR="%ZLIB_INC%" ^
+            -DCMAKE_BUILD_TYPE=Release ^
+            -DCMAKE_C_COMPILER=cl ^
+            -DCMAKE_CXX_COMPILER=cl ^
+            -DCUDA_ARCH=all ^
+            "-DCUDA_PATH=${{ steps.cuda-toolkit.outputs.CUDA_PATH }}" ^
+            -DTIPL_DIR="%GITHUB_WORKSPACE%\fsl\include"
+
+          cmake --build build_eddy --parallel --config Release
+
+      - name: Add CUDA EDDY to x64 package
+        shell: pwsh
         run: |
-          curl -L https://github.com/frankyeh/TinyFSL/releases/download/${{ github.event.inputs.tag }}/tiny_fsl_win.zip --output tiny_fsl.zip
-          7z x tiny_fsl.zip
-          move build_eddy\eddy.exe tiny_fsl\eddy_cuda.exe
-      - name: Zip Package
-        uses: TheDoctor0/zip-release@0.6.0
+          Move-Item build_eddy\eddy.exe tiny_fsl\eddy_cuda.exe -Force
+          Copy-Item "$env:DLL_DIR\*.dll" tiny_fsl\ -ErrorAction SilentlyContinue
+          Remove-Item tiny_fsl_win_x64.zip -Force
+          Compress-Archive -Path tiny_fsl -DestinationPath tiny_fsl_win_x64.zip -Force
+
+      - name: Upload x64 CUDA package
+        uses: actions/upload-artifact@v4
         with:
-          filename: tiny_fsl_win.zip
-          exclusions: .git
-          path: tiny_fsl          
-      - name: Create Release
-        uses: ncipollo/release-action@v1.8.9
+          name: win-x64-cuda
+          path: tiny_fsl_win_x64.zip
+
+  release:
+    needs: [windows_build, windows_cuda_build]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download x64 package
+        uses: actions/download-artifact@v4
+        with:
+          name: win-x64-cuda
+
+      - name: Download ARM64 package
+        uses: actions/download-artifact@v4
+        with:
+          name: win-arm64
+
+      - name: Create or update release
+        uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
           artifacts: "*.zip"
           tag: ${{ github.event.inputs.tag }}
-          name: "2022.08.03 Chen Release"
-          prerelease: false  
-  
+          name: "TinyFSL ${{ github.event.inputs.tag }}"
+          prerelease: false
