@@ -145,6 +145,7 @@ jobs:
 
   windows_cuda_build:
     needs: windows_build
+    if: ${{ always() }}
     runs-on: windows-2019
 
     env:
@@ -256,6 +257,7 @@ jobs:
 
   release_cpu:
     needs: windows_build
+    if: ${{ always() }}
     runs-on: ubuntu-latest
 
     steps:
@@ -267,6 +269,7 @@ jobs:
 
       - name: Download ARM64 artifact
         uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           name: win-arm64
           path: release_assets/arm64
@@ -278,17 +281,21 @@ jobs:
           REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-          ls -lh release_assets/x64/*.zip release_assets/arm64/*.zip
+          files=$(find release_assets -name '*.zip' -print)
+          test -n "$files"
+          ls -lh $files
           gh release view "$TAG" --repo "$REPO"
-          gh release upload "$TAG" release_assets/x64/*.zip release_assets/arm64/*.zip --repo "$REPO" --clobber
+          gh release upload "$TAG" $files --repo "$REPO" --clobber
 
   release_cuda:
     needs: windows_cuda_build
+    if: ${{ always() }}
     runs-on: ubuntu-latest
 
     steps:
       - name: Download x64 CUDA artifact
         uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           name: win-x64-cuda
           path: release_assets/cuda
@@ -300,6 +307,11 @@ jobs:
           REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-          ls -lh release_assets/cuda/*.zip
+          files=$(find release_assets -name '*.zip' -print || true)
+          if [ -z "$files" ]; then
+            echo "No CUDA artifact to upload"
+            exit 0
+          fi
+          ls -lh $files
           gh release view "$TAG" --repo "$REPO"
-          gh release upload "$TAG" release_assets/cuda/*.zip --repo "$REPO" --clobber
+          gh release upload "$TAG" $files --repo "$REPO" --clobber
