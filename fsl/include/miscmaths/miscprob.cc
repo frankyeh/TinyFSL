@@ -203,9 +203,9 @@ ReturnMatrix mvnrnd(const RowVector& mu, const SymmetricMatrix& covar, int nsamp
 //   EigenValues(covar,eig_val,eig_vec);
 
 //   Matrix ret = ones(nsamp, 1)*mu + dnormrandm(nsamp,mu.Ncols())*sqrt(eig_val)*eig_vec.t();
-  Mvnormrandm mvn(mu, covar);
+  Mvnormrandm mvnorm_sampler(mu, covar);
 
-  return mvn.next(nsamp);
+  return mvnorm_sampler.next(nsamp);
 }
 
  float mvnpdf(const RowVector& vals, const RowVector& mu, const SymmetricMatrix& covar)
