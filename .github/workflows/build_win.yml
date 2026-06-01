@@ -63,10 +63,13 @@ jobs:
           $bindir = "$env:VCPKG_ROOT\installed\${{ matrix.triplet }}\bin"
 
           $blas = Get-ChildItem "$libdir\*openblas*.lib" | Select-Object -First 1
-          $zlib = Get-ChildItem "$libdir\zlib*.lib" | Select-Object -First 1
+          $zlib = Get-ChildItem "$libdir\*.lib" | Where-Object { $_.Name -in @("z.lib","zlib.lib","zlibstatic.lib") -or $_.Name -like "zlib*.lib" } | Select-Object -First 1
 
           if(!$blas) { throw "OpenBLAS lib not found" }
-          if(!$zlib) { throw "Zlib lib not found" }
+          if(!$zlib) {
+            Get-ChildItem "$libdir\*.lib" | Select-Object -ExpandProperty Name
+            throw "Zlib lib not found"
+          }
 
           "BLAS_LIB=$($blas.FullName)" >> $env:GITHUB_ENV
           "BLAS_LIB_DIR=$libdir" >> $env:GITHUB_ENV
@@ -166,10 +169,13 @@ jobs:
           $bindir = "$env:VCPKG_ROOT\installed\x64-windows\bin"
 
           $blas = Get-ChildItem "$libdir\*openblas*.lib" | Select-Object -First 1
-          $zlib = Get-ChildItem "$libdir\zlib*.lib" | Select-Object -First 1
+          $zlib = Get-ChildItem "$libdir\*.lib" | Where-Object { $_.Name -in @("z.lib","zlib.lib","zlibstatic.lib") -or $_.Name -like "zlib*.lib" } | Select-Object -First 1
 
           if(!$blas) { throw "OpenBLAS lib not found" }
-          if(!$zlib) { throw "Zlib lib not found" }
+          if(!$zlib) {
+            Get-ChildItem "$libdir\*.lib" | Select-Object -ExpandProperty Name
+            throw "Zlib lib not found"
+          }
 
           "BLAS_LIB=$($blas.FullName)" >> $env:GITHUB_ENV
           "BLAS_LIB_DIR=$libdir" >> $env:GITHUB_ENV
