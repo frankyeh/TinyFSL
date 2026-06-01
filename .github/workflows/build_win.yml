@@ -42,9 +42,8 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force fsl\include | Out-Null
 
-          Remove-Item "$env:TEMP\TIPL" -Recurse -Force -ErrorAction SilentlyContinue
-          git clone --depth 1 https://github.com/frankyeh/TIPL.git "$env:TEMP\TIPL"
-          Copy-Item "$env:TEMP\TIPL\*" fsl\include -Recurse -Force
+          Remove-Item fsl\include\TIPL -Recurse -Force -ErrorAction SilentlyContinue
+          git clone --depth 1 https://github.com/frankyeh/TIPL.git fsl\include\TIPL
 
           curl.exe -L https://archives.boost.io/release/1.77.0/source/boost_1_77_0.tar.bz2 -o boost.tar.bz2
           tar -xjf boost.tar.bz2
@@ -148,9 +147,8 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force fsl\include | Out-Null
 
-          Remove-Item "$env:TEMP\TIPL" -Recurse -Force -ErrorAction SilentlyContinue
-          git clone --depth 1 https://github.com/frankyeh/TIPL.git "$env:TEMP\TIPL"
-          Copy-Item "$env:TEMP\TIPL\*" fsl\include -Recurse -Force
+          Remove-Item fsl\include\TIPL -Recurse -Force -ErrorAction SilentlyContinue
+          git clone --depth 1 https://github.com/frankyeh/TIPL.git fsl\include\TIPL
 
           curl.exe -L https://archives.boost.io/release/1.77.0/source/boost_1_77_0.tar.bz2 -o boost.tar.bz2
           tar -xjf boost.tar.bz2
