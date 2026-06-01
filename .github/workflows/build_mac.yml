@@ -43,17 +43,15 @@ jobs:
 
       - name: Download TIPL
         run: |
-          rm -rf /tmp/TIPL
-          git clone --depth 1 https://github.com/frankyeh/TIPL.git /tmp/TIPL
-          mkdir -p fsl
-          rsync -a /tmp/TIPL/ fsl/
+          rm -rf fsl/include/TIPL
+          git clone --depth 1 https://github.com/frankyeh/TIPL.git fsl/include/TIPL
 
       - name: Download Boost
         run: |
           curl -fsSL https://archives.boost.io/release/1.77.0/source/boost_1_77_0.tar.bz2 -o boost.tar.bz2
           tar -xjf boost.tar.bz2
-          rm -rf fsl/boost
-          mv boost_1_77_0/boost fsl/
+          rm -rf fsl/include/boost
+          mv boost_1_77_0/boost fsl/include/
           mkdir -p tiny_fsl_bin
 
       - name: Cache ccache
@@ -77,7 +75,7 @@ jobs:
               -DCMAKE_C_COMPILER_LAUNCHER=ccache \
               -DCMAKE_CXX_FLAGS="$CXXFLAGS" \
               -DBLAS_LIBRARIES="-framework Accelerate" \
-              -DTIPL_DIR=../fsl
+              -DTIPL_DIR="${GITHUB_WORKSPACE}/fsl/include"
 
             cmake --build "build_$app" --parallel ${{ matrix.jobs }} --config Release
             mv "build_$app/$app" tiny_fsl_bin/
