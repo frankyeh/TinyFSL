@@ -117,10 +117,10 @@ target_include_directories(applytopup PUBLIC
   ${CMAKE_BINARY_DIR})
 
 if(DEFINED TIPL_DIR AND EXISTS "${TIPL_DIR}")
-    target_include_directories(topup PUBLIC "${TIPL_DIR}")
+    target_include_directories(applytopup PUBLIC "${TIPL_DIR}")
 else()
     find_package(TIPL REQUIRED)
-    target_link_libraries(topup TIPL::tipl)
+    target_link_libraries(applytopup TIPL::tipl)
 endif()
 target_link_directories(applytopup PUBLIC ${BLAS_LIB_DIR})
 target_link_libraries(applytopup ${BLAS_LIBRARIES} ZLIB::ZLIB)
