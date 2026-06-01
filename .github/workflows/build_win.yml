@@ -225,21 +225,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download x64 package
+      - name: Download x64 CUDA artifact
         uses: actions/download-artifact@v4
         with:
           name: win-x64-cuda
+          path: release_assets
 
-      - name: Download ARM64 package
+      - name: Download ARM64 artifact
         uses: actions/download-artifact@v4
         with:
           name: win-arm64
+          path: release_assets
 
-      - name: Create or update release
-        uses: ncipollo/release-action@v1
-        with:
-          allowUpdates: true
-          artifacts: "*.zip"
-          tag: ${{ github.event.inputs.tag }}
-          name: "TinyFSL ${{ github.event.inputs.tag }}"
-          prerelease: false
+      - name: Upload release files
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.inputs.tag }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          ls -lh release_assets/*.zip
+          gh release view "$TAG" --repo "$REPO"
+          gh release upload "$TAG" release_assets/*.zip --repo "$REPO" --clobber
