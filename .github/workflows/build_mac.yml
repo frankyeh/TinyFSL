@@ -43,14 +43,18 @@ jobs:
 
       - name: Download TIPL
         run: |
-          git clone --depth 1 https://github.com/frankyeh/TIPL.git fsl
+          rm -rf /tmp/TIPL
+          git clone --depth 1 https://github.com/frankyeh/TIPL.git /tmp/TIPL
+          mkdir -p fsl
+          rsync -a /tmp/TIPL/ fsl/
 
       - name: Download Boost
         run: |
           curl -fsSL https://archives.boost.io/release/1.77.0/source/boost_1_77_0.tar.bz2 -o boost.tar.bz2
           tar -xjf boost.tar.bz2
+          rm -rf fsl/boost
           mv boost_1_77_0/boost fsl/
-          mkdir tiny_fsl_bin
+          mkdir -p tiny_fsl_bin
 
       - name: Cache ccache
         uses: actions/cache@v4
