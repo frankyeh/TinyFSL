@@ -388,7 +388,7 @@ void TopupScan::SubSample(unsigned int ss)
 
     double inv_ss3 = 1.0/double(ss*ss*ss);
     tipl::shape<3> sp(_subsamp->xsize(),_subsamp->ysize(),_subsamp->zsize());
-    tipl::par_for(tipl::begin_index(sp),tipl::end_index(sp),[&](const tipl::pixel_index<3>& index)
+    tipl::par_for(sp,[&](const tipl::pixel_index<3>& index)
     {
         float v = 0.0f;
         unsigned int i_ss = index[0]*ss;
