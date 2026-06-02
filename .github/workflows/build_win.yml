@@ -45,8 +45,8 @@ jobs:
           Remove-Item fsl\include\TIPL -Recurse -Force -ErrorAction SilentlyContinue
           git clone --depth 1 https://github.com/frankyeh/TIPL.git fsl\include\TIPL
 
-          curl.exe -L https://archives.boost.io/release/1.77.0/source/boost_1_77_0.tar.bz2 -o boost.tar.bz2
-          tar -xjf boost.tar.bz2
+          curl.exe -L https://archives.boost.io/release/1.77.0/source/boost_1_77_0.zip -o boost.zip
+          Expand-Archive boost.zip -DestinationPath . -Force
           Remove-Item fsl\include\boost -Recurse -Force -ErrorAction SilentlyContinue
           Move-Item boost_1_77_0\boost fsl\include\boost
 
@@ -177,8 +177,8 @@ jobs:
           Remove-Item fsl\include\TIPL -Recurse -Force -ErrorAction SilentlyContinue
           git clone --depth 1 https://github.com/frankyeh/TIPL.git fsl\include\TIPL
 
-          curl.exe -L https://archives.boost.io/release/1.77.0/source/boost_1_77_0.tar.bz2 -o boost.tar.bz2
-          tar -xjf boost.tar.bz2
+          curl.exe -L https://archives.boost.io/release/1.77.0/source/boost_1_77_0.zip -o boost.zip
+          Expand-Archive boost.zip -DestinationPath . -Force
           Remove-Item fsl\include\boost -Recurse -Force -ErrorAction SilentlyContinue
           Move-Item boost_1_77_0\boost fsl\include\boost
 
