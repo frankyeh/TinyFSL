@@ -146,7 +146,7 @@ jobs:
   windows_cuda_build:
     needs: windows_build
     if: ${{ always() }}
-    runs-on: windows-2019
+    runs-on: windows-2022
 
     env:
       VCPKG_ROOT: ${{ github.workspace }}\vcpkg
