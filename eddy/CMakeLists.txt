@@ -126,6 +126,7 @@ set(SOURCES
     ../fsl/include/utils/matches.cc
     ../fsl/include/utils/parse.cc
     ../fsl/include/utils/time_tracer.cc
+    ../fsl/include/utils/usage.cc
     ../fsl/include/warpfns/fnirt_file_reader.cpp
     ../fsl/include/warpfns/fnirt_file_writer.cpp
     ../fsl/include/warpfns/point_list.cpp
