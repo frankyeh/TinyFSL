@@ -230,6 +230,7 @@ jobs:
         shell: cmd
         run: |
           for /f "usebackq delims=#" %%a in (`"%programfiles(x86)%\Microsoft Visual Studio\Installer\vswhere" -latest -property installationPath`) do call "%%a\Common7\Tools\VsDevCmd.bat" -arch=x64
+          set NVCC_PREPEND_FLAGS=-allow-unsupported-compiler
 
           cmake -S eddy -B build_eddy -GNinja ^
             -DBLAS_LIB_DIR="%BLAS_LIB_DIR%" ^
