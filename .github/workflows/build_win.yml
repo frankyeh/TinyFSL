@@ -222,7 +222,7 @@ jobs:
         id: cuda-toolkit
         uses: Jimver/cuda-toolkit@v0.2.5
 
-      - name: Compile CUDA EDDY
+      - name: Compile and verify static CUDA EDDY
         shell: cmd
         run: |
           for /f "usebackq delims=#" %%a in (`"%programfiles(x86)%\Microsoft Visual Studio\Installer\vswhere" -latest -property installationPath`) do call "%%a\Common7\Tools\VsDevCmd.bat" -arch=x64
@@ -236,10 +236,16 @@ jobs:
             -DCMAKE_C_COMPILER=cl ^
             -DCMAKE_CXX_COMPILER=cl ^
             -DCUDA_ARCH=all ^
-            "-DCUDA_PATH=${{ steps.cuda-toolkit.outputs.CUDA_PATH }}" ^
+            "-DCUDAToolkit_ROOT=${{ steps.cuda-toolkit.outputs.CUDA_PATH }}" ^
             -DTIPL_DIR="%GITHUB_WORKSPACE%\fsl\include"
+          if errorlevel 1 exit /b 1
 
           cmake --build build_eddy --parallel --config Release
+          if errorlevel 1 exit /b 1
+
+          dumpbin /dependents build_eddy\eddy.exe > build_eddy\cuda_dependencies.txt
+          type build_eddy\cuda_dependencies.txt
+          findstr /I /R /C:"cudart64_" /C:"cublas64_" /C:"cublasLt64_" /C:"cufft64_" /C:"curand64_" /C:"cusolver64_" /C:"cusparse64_" /C:"nvrtc64_" /C:"npp.*64_" build_eddy\cuda_dependencies.txt && exit /b 1 || ver >nul
 
       - name: Add CUDA EDDY to x64 package
         shell: pwsh
