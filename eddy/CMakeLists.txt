@@ -5,12 +5,11 @@ else()
     project(eddy VERSION "2022.01.17" LANGUAGES CXX;C)
 endif()
 
-
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(BUILD_SHARED_LIBS OFF)
 
-if(APPLE) 
+if(APPLE)
     set(BLA_VENDOR Apple)
     set(BLAS_LIBRARIES "-framework Accelerate")
 else()
@@ -20,7 +19,7 @@ endif()
 find_package(BLAS REQUIRED)
 find_package(ZLIB REQUIRED)
 if(CUDA_ARCH)
-    find_package(CUDA REQUIRED)
+    find_package(CUDAToolkit REQUIRED)
     set(OTHER_SOURCES
         ../fsl/include/eddy/cuda/CudaVolume.cu
         ../fsl/include/eddy/cuda/GpuPredictorChunk.cu
@@ -127,7 +126,6 @@ set(SOURCES
     ../fsl/include/utils/matches.cc
     ../fsl/include/utils/parse.cc
     ../fsl/include/utils/time_tracer.cc
-    ../fsl/include/utils/usage.cc
     ../fsl/include/warpfns/fnirt_file_reader.cpp
     ../fsl/include/warpfns/fnirt_file_writer.cpp
     ../fsl/include/warpfns/point_list.cpp
@@ -157,8 +155,10 @@ target_include_directories(eddy PUBLIC
   ${CMAKE_SOURCE_DIR}/../fsl/include/eddy
   ${CMAKE_SOURCE_DIR}/../fsl/include
   ${CMAKE_SOURCE_DIR}/../fsl
-  ${CMAKE_BINARY_DIR}
-  ${CUDA_INCLUDE_DIRS})
+  ${CMAKE_BINARY_DIR})
+if(CUDA_ARCH)
+    target_include_directories(eddy PUBLIC ${CUDAToolkit_INCLUDE_DIRS})
+endif()
 
 if(DEFINED TIPL_DIR AND EXISTS "${TIPL_DIR}")
     target_include_directories(eddy PUBLIC "${TIPL_DIR}")
@@ -169,14 +169,12 @@ endif()
 target_link_directories(eddy PUBLIC ${BLAS_LIB_DIR})
 target_link_libraries(eddy ${BLAS_LIBRARIES} ZLIB::ZLIB)
 
-
 if(CUDA_ARCH)
-  target_compile_definitions(eddy PUBLIC COMPILE_GPU)
-  target_link_libraries(eddy ${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES} )
-  include_directories(eddy ${CUDA_PATH}/include)
-  set_property(TARGET eddy PROPERTY CUDA_ARCHITECTURES ${CUDA_ARCH})
-  set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -allow-unsupported-compiler -Xcompiler /Zc:__cplusplus")
-  set(CMAKE_CUDA_RUNTIME_LIBRARY "Static")
+    target_compile_definitions(eddy PUBLIC COMPILE_GPU)
+    target_link_libraries(eddy CUDA::cudart_static CUDA::cublas_static)
+    set_property(TARGET eddy PROPERTY CUDA_RUNTIME_LIBRARY Static)
+    set_property(TARGET eddy PROPERTY CUDA_ARCHITECTURES ${CUDA_ARCH})
+    if(MSVC)
+        target_compile_options(eddy PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-allow-unsupported-compiler -Xcompiler=/Zc:__cplusplus>)
+    endif()
 endif()
-
-
