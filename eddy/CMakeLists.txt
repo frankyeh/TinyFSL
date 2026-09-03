@@ -136,7 +136,6 @@ set(SOURCES
     ../fsl/include/newimage/generalio.cc)
 
 add_executable(eddy ${SOURCES} ${OTHER_SOURCES} ${OTHER_EXEC})
-
 set_target_properties(eddy PROPERTIES CXX_STANDARD 17 CXX_EXTENSIONS NONE)
 
 target_compile_definitions(eddy PUBLIC ARMA_NO_DEBUG)
@@ -175,6 +174,8 @@ if(CUDA_ARCH)
     set_property(TARGET eddy PROPERTY CUDA_RUNTIME_LIBRARY Static)
     set_property(TARGET eddy PROPERTY CUDA_ARCHITECTURES ${CUDA_ARCH})
     if(MSVC)
-        target_compile_options(eddy PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-allow-unsupported-compiler -Xcompiler=/Zc:__cplusplus>)
+        target_compile_options(eddy PRIVATE
+            $<$<COMPILE_LANGUAGE:CUDA>:-allow-unsupported-compiler>
+            $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=/Zc:__cplusplus>)
     endif()
 endif()
