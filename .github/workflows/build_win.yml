@@ -119,7 +119,9 @@ jobs:
           foreach($app in "eddy","topup","applytopup","bet2")
           {
             cmake -S $app -B "build_$app" -G "Visual Studio 17 2022" -A "${{ matrix.vs_arch }}" @opts
+            if($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
             cmake --build "build_$app" --config Release --parallel
+            if($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           }
 
       - name: Package
