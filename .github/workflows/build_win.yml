@@ -17,7 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - runner: windows-latest
+          - runner: windows-2022
             name: win-x64
             suffix: x64
             vs_arch: x64
@@ -218,9 +218,11 @@ jobs:
           "ZLIB_INC=$incdir" >> $env:GITHUB_ENV
           "DLL_DIR=$bindir" >> $env:GITHUB_ENV
 
-      - name: Install CUDA
+      - name: Install CUDA 11.8
         id: cuda-toolkit
-        uses: Jimver/cuda-toolkit@v0.2.5
+        uses: Jimver/cuda-toolkit@v0.2.23
+        with:
+          cuda: '11.8.0'
 
       - name: Compile and verify static CUDA EDDY
         shell: cmd
