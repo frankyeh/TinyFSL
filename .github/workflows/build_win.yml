@@ -129,10 +129,15 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force tiny_fsl | Out-Null
 
-          Move-Item build_eddy\Release\eddy.exe tiny_fsl\
-          Move-Item build_topup\Release\topup.exe tiny_fsl\
-          Move-Item build_applytopup\Release\applytopup.exe tiny_fsl\
-          Move-Item build_bet2\Release\bet2.exe tiny_fsl\
+          foreach($app in "eddy","topup","applytopup","bet2") {
+            $exe = Get-ChildItem "build_$app" -Recurse -Filter "$app.exe" | Select-Object -First 1
+            if(!$exe) {
+              Get-ChildItem "build_$app" -Recurse | Select-Object -ExpandProperty FullName
+              throw "$app.exe not found"
+            }
+            Write-Host "Packaging $($exe.FullName)"
+            Move-Item $exe.FullName "tiny_fsl\$app.exe" -Force
+          }
 
           Copy-Item "$env:DLL_DIR\*.dll" tiny_fsl\ -ErrorAction SilentlyContinue
           Copy-Item FSL_LICENSE tiny_fsl\
@@ -147,7 +152,6 @@ jobs:
 
   windows_cuda_build:
     needs: windows_build
-    if: ${{ always() }}
     runs-on: windows-2022
 
     env:
@@ -268,7 +272,6 @@ jobs:
 
   release_cpu:
     needs: windows_build
-    if: ${{ always() }}
     runs-on: ubuntu-latest
 
     steps:
@@ -300,13 +303,11 @@ jobs:
 
   release_cuda:
     needs: windows_cuda_build
-    if: ${{ always() }}
     runs-on: ubuntu-latest
 
     steps:
       - name: Download x64 CUDA artifact
         uses: actions/download-artifact@v4
-        continue-on-error: true
         with:
           name: win-x64-cuda
           path: release_assets/cuda
@@ -318,11 +319,8 @@ jobs:
           REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-          files=$(find release_assets -name '*.zip' -print || true)
-          if [ -z "$files" ]; then
-            echo "No CUDA artifact to upload"
-            exit 0
-          fi
+          files=$(find release_assets -name '*.zip' -print)
+          test -n "$files"
           ls -lh $files
           gh release view "$TAG" --repo "$REPO"
           gh release upload "$TAG" $files --repo "$REPO" --clobber
