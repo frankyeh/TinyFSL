@@ -141,6 +141,7 @@ jobs:
 
           Copy-Item "$env:DLL_DIR\*.dll" tiny_fsl\ -ErrorAction SilentlyContinue
           Copy-Item FSL_LICENSE tiny_fsl\
+          Remove-Item tiny_fsl\eddy_cuda.exe,tiny_fsl\cublas64_*.dll,tiny_fsl\cublasLt64_*.dll -Force -ErrorAction SilentlyContinue
 
           Compress-Archive -Path tiny_fsl -DestinationPath tiny_fsl_win_${{ matrix.suffix }}.zip -Force
 
@@ -278,14 +279,13 @@ jobs:
           Copy-Item "$env:DLL_DIR\*.dll" tiny_fsl\ -ErrorAction SilentlyContinue
           $cuda = "${{ steps.cuda-toolkit.outputs.CUDA_PATH }}"
           Copy-Item "$cuda\bin\cublas64_11.dll","$cuda\bin\cublasLt64_11.dll" tiny_fsl\
-          Remove-Item tiny_fsl_win_x64.zip -Force
-          Compress-Archive -Path tiny_fsl -DestinationPath tiny_fsl_win_x64.zip -Force
+          Compress-Archive -Path tiny_fsl -DestinationPath tiny_fsl_win_x64_cuda.zip -Force
 
       - name: Upload x64 CUDA package
         uses: actions/upload-artifact@v4
         with:
           name: win-x64-cuda
-          path: tiny_fsl_win_x64.zip
+          path: tiny_fsl_win_x64_cuda.zip
 
   release_cpu:
     needs: windows_build
