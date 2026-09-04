@@ -243,7 +243,7 @@ jobs:
           if(!$toolset) { throw "MSVC 14.39 was not installed" }
           Write-Host "Installed CUDA-compatible MSVC toolset $($toolset.Name)"
 
-      - name: Compile and verify static CUDA EDDY
+      - name: Compile CUDA EDDY with static CUDA runtime
         shell: cmd
         run: |
           for /f "usebackq delims=#" %%a in (`"%programfiles(x86)%\Microsoft Visual Studio\Installer\vswhere" -latest -property installationPath`) do call "%%a\Common7\Tools\VsDevCmd.bat" -arch=x64 -vcvars_ver=14.39
@@ -268,13 +268,16 @@ jobs:
 
           dumpbin /dependents build_eddy\eddy.exe > build_eddy\cuda_dependencies.txt
           type build_eddy\cuda_dependencies.txt
-          findstr /I /R /C:"cudart64_" /C:"cublas64_" /C:"cublasLt64_" /C:"cufft64_" /C:"curand64_" /C:"cusolver64_" /C:"cusparse64_" /C:"nvrtc64_" /C:"npp.*64_" build_eddy\cuda_dependencies.txt && exit /b 1 || ver >nul
+          findstr /I /R /C:"cudart64_" /C:"cufft64_" /C:"curand64_" /C:"cusolver64_" /C:"cusparse64_" /C:"nvrtc64_" /C:"npp.*64_" build_eddy\cuda_dependencies.txt && exit /b 1 || ver >nul
+          findstr /I /C:"cublas64_11.dll" build_eddy\cuda_dependencies.txt >nul || (echo cublas64_11.dll dependency not found & exit /b 1)
 
       - name: Add CUDA EDDY to x64 package
         shell: pwsh
         run: |
           Move-Item build_eddy\eddy.exe tiny_fsl\eddy_cuda.exe -Force
           Copy-Item "$env:DLL_DIR\*.dll" tiny_fsl\ -ErrorAction SilentlyContinue
+          $cuda = "${{ steps.cuda-toolkit.outputs.CUDA_PATH }}"
+          Copy-Item "$cuda\bin\cublas64_11.dll","$cuda\bin\cublasLt64_11.dll" tiny_fsl\
           Remove-Item tiny_fsl_win_x64.zip -Force
           Compress-Archive -Path tiny_fsl -DestinationPath tiny_fsl_win_x64.zip -Force
 
