@@ -230,11 +230,25 @@ jobs:
         with:
           cuda: '11.8.0'
 
+      - name: Install CUDA-compatible MSVC 14.39
+        shell: pwsh
+        run: |
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $installer = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vs_installer.exe"
+          $vs = & $vswhere -latest -property installationPath
+          $arguments = "modify --installPath `"$vs`" --add Microsoft.VisualStudio.Component.VC.14.39.17.9.x86.x64 --quiet --norestart --nocache"
+          $process = Start-Process -FilePath $installer -ArgumentList $arguments -Wait -PassThru
+          if($process.ExitCode -ne 0) { exit $process.ExitCode }
+          $toolset = Get-ChildItem "$vs\VC\Tools\MSVC" -Directory | Where-Object { $_.Name -like "14.39.*" } | Sort-Object Name -Descending | Select-Object -First 1
+          if(!$toolset) { throw "MSVC 14.39 was not installed" }
+          Write-Host "Installed CUDA-compatible MSVC toolset $($toolset.Name)"
+
       - name: Compile and verify static CUDA EDDY
         shell: cmd
         run: |
-          for /f "usebackq delims=#" %%a in (`"%programfiles(x86)%\Microsoft Visual Studio\Installer\vswhere" -latest -property installationPath`) do call "%%a\Common7\Tools\VsDevCmd.bat" -arch=x64
-          set NVCC_PREPEND_FLAGS=-allow-unsupported-compiler
+          for /f "usebackq delims=#" %%a in (`"%programfiles(x86)%\Microsoft Visual Studio\Installer\vswhere" -latest -property installationPath`) do call "%%a\Common7\Tools\VsDevCmd.bat" -arch=x64 -vcvars_ver=14.39
+          where cl
+          where cl | findstr /I /C:"\14.39." >nul || (echo MSVC 14.39 not active & exit /b 1)
 
           cmake -S eddy -B build_eddy -GNinja ^
             -DBLAS_LIB_DIR="%BLAS_LIB_DIR%" ^
