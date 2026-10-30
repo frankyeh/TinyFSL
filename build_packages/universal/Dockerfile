@@ -3,11 +3,14 @@ ARG BASE_IMAGE
 FROM ${BASE_IMAGE} AS builder
 
 ARG CUDA_BUILD=0
+ARG FORTRAN_DEV
 ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /opt/tiny_fsl
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libopenblas-dev libboost-all-dev zlib1g-dev gfortran git file binutils \
+# Keep the compilers configured by the DSI Studio base image.
+RUN test -n "$FORTRAN_DEV" \
+    && apt-get update && apt-get install -y --no-install-recommends \
+       libopenblas-dev libboost-dev zlib1g-dev "$FORTRAN_DEV" git file binutils \
     && rm -rf /var/lib/apt/lists/*
 
 COPY . .
@@ -17,13 +20,17 @@ RUN rm -rf fsl/include/TIPL \
 RUN set -eu; \
     blas="$(find /usr/lib -name libopenblas.a -print -quit)"; \
     zlib="$(find /usr/lib -name libz.a -print -quit)"; \
-    test -s "$blas" && test -s "$zlib"; \
+    fortran="$(find /usr/lib/gcc -name libgfortran.a -print -quit)"; \
+    quadmath="$(find /usr/lib/gcc -name libquadmath.a -print -quit)"; \
+    test -s "$blas" && test -s "$zlib" && test -s "$fortran"; \
+    blas_libs="$blas;$fortran"; \
+    if [ -n "$quadmath" ]; then blas_libs="$blas_libs;$quadmath"; fi; \
     mkdir -p /opt/tiny_fsl_bin; \
     for app in topup applytopup eddy; do \
       cmake -S "$app" -B "/opt/build_$app" -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DTIPL_DIR=/opt/tiny_fsl/fsl/include \
-        -DBLAS_LIBRARIES="$blas" -DZLIB_LIBRARY="$zlib"; \
+        -DBLAS_LIBRARIES="$blas_libs" -DZLIB_LIBRARY="$zlib"; \
       cmake --build "/opt/build_$app" --parallel 4; \
       if [ "$app" = eddy ]; then \
         cp "/opt/build_$app/eddy" /opt/tiny_fsl_bin/eddy_cpu; \
@@ -37,7 +44,7 @@ RUN set -eu; \
       cmake -S eddy -B /opt/build_eddy_cuda -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DTIPL_DIR=/opt/tiny_fsl/fsl/include \
-        -DBLAS_LIBRARIES="$blas" -DZLIB_LIBRARY="$zlib" \
+        -DBLAS_LIBRARIES="$blas_libs" -DZLIB_LIBRARY="$zlib" \
         -DCUDA_ARCH=all; \
       cmake --build /opt/build_eddy_cuda --parallel 4; \
       cp /opt/build_eddy_cuda/eddy /opt/tiny_fsl_bin/eddy_cuda; \
