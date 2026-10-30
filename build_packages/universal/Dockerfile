@@ -42,7 +42,7 @@ RUN set -eu; \
       cmake --build /opt/build_eddy_cuda --parallel 4; \
       cp /opt/build_eddy_cuda/eddy /opt/tiny_fsl_bin/eddy_cuda; \
       test -x /opt/tiny_fsl_bin/eddy_cuda; \
-      ! ldd /opt/tiny_fsl_bin/eddy_cuda 2>&1 | grep -Eq 'lib(cudart|cublas|cufft|curand|cusolver|cusparse|nvrtc)[^ ]*\\.so'; \
+      ! ldd /opt/tiny_fsl_bin/eddy_cuda 2>&1 | grep -Eq 'lib(cudart|cublas|cufft|curand|cusolver|cusparse|nvrtc)[^ ]*\.so'; \
     fi; \
     cp FSL_LICENSE /opt/tiny_fsl_bin/; \
     chmod 755 /opt/tiny_fsl_bin/eddy /opt/tiny_fsl_bin/eddy_cpu /opt/tiny_fsl_bin/topup /opt/tiny_fsl_bin/applytopup; \
