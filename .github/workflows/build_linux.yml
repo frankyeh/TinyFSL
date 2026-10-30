@@ -1,39 +1,102 @@
 name: BUILD LINUX
+
 on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Tag'
+        description: Existing release tag
         required: true
-        default: 2026.06.01  
+        default: 2026.06.01
+
+permissions:
+  contents: write
+
 jobs:
-  docker_build:
+  universal_build:
     strategy:
-      matrix:
-        os: [ubuntu_2004,ubuntu_2204,ubuntu_2404]
       fail-fast: false
+      matrix:
+        include:
+          - { arch: x64, variant: cpu, runner: ubuntu-latest, platform: linux/amd64, base: 'dsistudio/ubuntu1804_qt6:latest', cuda: '0', expected: 'x86-64' }
+          - { arch: x64, variant: cuda, runner: ubuntu-latest, platform: linux/amd64, base: 'dsistudio/ubuntu1804_qt6_cuda:latest', cuda: '1', expected: 'x86-64' }
+          - { arch: arm64, variant: cpu, runner: ubuntu-24.04-arm, platform: linux/arm64, base: 'dsistudio/ubuntu1804_qt6_arm:latest', cuda: '0', expected: 'ARM aarch64' }
+          - { arch: arm64, variant: cuda, runner: ubuntu-24.04-arm, platform: linux/arm64, base: 'dsistudio/ubuntu2204_qt6_cuda_arm:latest', cuda: '1', expected: 'ARM aarch64' }
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build portable TinyFSL
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: build_packages/universal/Dockerfile
+          platforms: ${{ matrix.platform }}
+          build-args: |
+            BASE_IMAGE=${{ matrix.base }}
+            CUDA_BUILD=${{ matrix.cuda }}
+          push: false
+          outputs: type=local,dest=./package
+
+      - name: Verify and package
+        env:
+          EXPECTED: ${{ matrix.expected }}
+          CUDA_BUILD: ${{ matrix.cuda }}
+          ARCH: ${{ matrix.arch }}
+          VARIANT: ${{ matrix.variant }}
+        run: |
+          set -euo pipefail
+          pkg=package/tiny_fsl
+          for app in eddy eddy_cpu topup applytopup; do
+            test -x "$pkg/$app"
+            file "$pkg/$app" | grep -F "$EXPECTED"
+            if ldd "$pkg/$app" 2>&1 | grep -q 'not found'; then
+              echo "Missing runtime dependency in $app"
+              exit 1
+            fi
+            if readelf -d "$pkg/$app" | grep -Eq 'lib(cudart|cublas|cufft|curand|cusolver|cusparse|nvrtc)[^ ]*\\.so'; then
+              echo "Unexpected dynamically linked CUDA toolkit library in $app"
+              exit 1
+            fi
+          done
+          if [ "$CUDA_BUILD" = 1 ]; then
+            test -x "$pkg/eddy_cuda"
+            file "$pkg/eddy_cuda" | grep -F "$EXPECTED"
+            if ldd "$pkg/eddy_cuda" 2>&1 | grep -q 'not found'; then
+              echo "Missing CUDA EDDY runtime dependency"
+              exit 1
+            fi
+            if readelf -d "$pkg/eddy_cuda" | grep -Eq 'lib(cudart|cublas|cufft|curand|cusolver|cusparse|nvrtc)[^ ]*\\.so'; then
+              echo "CUDA EDDY requires a CUDA toolkit library at runtime"
+              exit 1
+            fi
+          else
+            test ! -e "$pkg/eddy_cuda"
+          fi
+          test -s "$pkg/FSL_LICENSE"
+          mv "$pkg" tiny_fsl
+          zip -qr "tiny_fsl_linux_universal_${VARIANT}_${ARCH}.zip" tiny_fsl
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tiny-fsl-${{ matrix.variant }}-${{ matrix.arch }}
+          path: tiny_fsl_linux_universal_${{ matrix.variant }}_${{ matrix.arch }}.zip
+          if-no-files-found: error
+
+  release:
+    needs: universal_build
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v1
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
-    - name: Build and push
-      uses: docker/build-push-action@v2
-      with:
-        context: .
-        file: build_packages/${{ matrix.os }}/Dockerfile
-        push: false
-        outputs: tiny_fsl
-    - name: Packaging
-      run: |
-        zip -r tiny_fsl_${{ matrix.os }}.zip tiny_fsl
-    - name: Create Release
-      uses: ncipollo/release-action@v1.8.9
-      with:
-        allowUpdates: true
-        artifacts: "*.zip"
-        tag: ${{ github.event.inputs.tag }}
-        prerelease: false  
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: tiny-fsl-*
+          path: release_assets
+          merge-multiple: true
+      - name: Upload to existing release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          test "$(find release_assets -maxdepth 1 -name '*.zip' | wc -l)" -eq 4
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY"
+          gh release upload "$TAG" release_assets/*.zip --clobber --repo "$GITHUB_REPOSITORY"
