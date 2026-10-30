@@ -53,7 +53,7 @@ jobs:
               echo "Missing runtime dependency in $app"
               exit 1
             fi
-            if readelf -d "$pkg/$app" | grep -Eq 'lib(cudart|cublas|cufft|curand|cusolver|cusparse|nvrtc)[^ ]*\\.so'; then
+            if readelf -d "$pkg/$app" | grep -Eq 'lib(cudart|cublas|cufft|curand|cusolver|cusparse|nvrtc)[^ ]*\.so'; then
               echo "Unexpected dynamically linked CUDA toolkit library in $app"
               exit 1
             fi
@@ -65,7 +65,7 @@ jobs:
               echo "Missing CUDA EDDY runtime dependency"
               exit 1
             fi
-            if readelf -d "$pkg/eddy_cuda" | grep -Eq 'lib(cudart|cublas|cufft|curand|cusolver|cusparse|nvrtc)[^ ]*\\.so'; then
+            if readelf -d "$pkg/eddy_cuda" | grep -Eq 'lib(cudart|cublas|cufft|curand|cusolver|cusparse|nvrtc)[^ ]*\.so'; then
               echo "CUDA EDDY requires a CUDA toolkit library at runtime"
               exit 1
             fi
