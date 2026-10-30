@@ -17,10 +17,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { arch: x64, variant: cpu, runner: ubuntu-latest, platform: linux/amd64, base: 'dsistudio/ubuntu1804_qt6:latest', cuda: '0', expected: 'x86-64' }
-          - { arch: x64, variant: cuda, runner: ubuntu-latest, platform: linux/amd64, base: 'dsistudio/ubuntu1804_qt6_cuda:latest', cuda: '1', expected: 'x86-64' }
-          - { arch: arm64, variant: cpu, runner: ubuntu-24.04-arm, platform: linux/arm64, base: 'dsistudio/ubuntu1804_qt6_arm:latest', cuda: '0', expected: 'ARM aarch64' }
-          - { arch: arm64, variant: cuda, runner: ubuntu-24.04-arm, platform: linux/arm64, base: 'dsistudio/ubuntu2204_qt6_cuda_arm:latest', cuda: '1', expected: 'ARM aarch64' }
+          - { arch: x64, variant: cpu, runner: ubuntu-latest, platform: linux/amd64, base: 'dsistudio/ubuntu1804_qt6:latest', cuda: '0', fortran: 'libgfortran-7-dev', expected: 'x86-64' }
+          - { arch: x64, variant: cuda, runner: ubuntu-latest, platform: linux/amd64, base: 'dsistudio/ubuntu1804_qt6_cuda:latest', cuda: '1', fortran: 'libgfortran-7-dev', expected: 'x86-64' }
+          - { arch: arm64, variant: cpu, runner: ubuntu-24.04-arm, platform: linux/arm64, base: 'dsistudio/ubuntu1804_qt6_arm:latest', cuda: '0', fortran: 'libgfortran-8-dev', expected: 'ARM aarch64' }
+          - { arch: arm64, variant: cuda, runner: ubuntu-24.04-arm, platform: linux/arm64, base: 'dsistudio/ubuntu2204_qt6_cuda_arm:latest', cuda: '1', fortran: 'libgfortran-11-dev', expected: 'ARM aarch64' }
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
@@ -34,6 +34,7 @@ jobs:
           build-args: |
             BASE_IMAGE=${{ matrix.base }}
             CUDA_BUILD=${{ matrix.cuda }}
+            FORTRAN_DEV=${{ matrix.fortran }}
           push: false
           outputs: type=local,dest=./package
 
