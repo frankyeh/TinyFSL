@@ -25,6 +25,7 @@ RUN set -eu; \
     test -s "$blas" && test -s "$zlib" && test -s "$fortran"; \
     blas_libs="$blas;$fortran"; \
     if [ -n "$quadmath" ]; then blas_libs="$blas_libs;$quadmath"; fi; \
+    blas_libs="$blas_libs;-pthread;-ldl"; \
     mkdir -p /opt/tiny_fsl_bin; \
     for app in topup applytopup eddy; do \
       cmake -S "$app" -B "/opt/build_$app" -GNinja \
