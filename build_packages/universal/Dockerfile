@@ -7,7 +7,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /opt/tiny_fsl
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libopenblas-dev libboost-all-dev zlib1g-dev gfortran file binutils \
+    libopenblas-dev libboost-all-dev zlib1g-dev gfortran git file binutils \
     && rm -rf /var/lib/apt/lists/*
 
 COPY . .
@@ -45,7 +45,7 @@ RUN set -eu; \
       ! ldd /opt/tiny_fsl_bin/eddy_cuda 2>&1 | grep -Eq 'lib(cudart|cublas|cufft|curand|cusolver|cusparse|nvrtc)[^ ]*\\.so'; \
     fi; \
     cp FSL_LICENSE /opt/tiny_fsl_bin/; \
-    chmod 755 /opt/tiny_fsl_bin/{eddy,eddy_cpu,topup,applytopup}; \
+    chmod 755 /opt/tiny_fsl_bin/eddy /opt/tiny_fsl_bin/eddy_cpu /opt/tiny_fsl_bin/topup /opt/tiny_fsl_bin/applytopup; \
     test -x /opt/tiny_fsl_bin/eddy_cpu
 
 FROM scratch
