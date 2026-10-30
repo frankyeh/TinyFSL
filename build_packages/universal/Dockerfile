@@ -13,6 +13,18 @@ RUN test -n "$FORTRAN_DEV" \
        libopenblas-dev libboost-dev zlib1g-dev "$FORTRAN_DEV" git file binutils \
     && rm -rf /var/lib/apt/lists/*
 
+# The x64 DSI Studio CUDA builder has nvcc/cudart but not cuBLAS development files.
+# Extract NVIDIA's CUDA 11.8 package without reinstalling its compiler dependencies.
+RUN if [ "$CUDA_BUILD" = 1 ] && [ "$(uname -m)" = x86_64 ]; then \
+      mkdir -p /tmp/cublas && cd /tmp/cublas \
+      && apt-get update && apt-get download libcublas-dev-11-8 \
+      && for deb in *.deb; do dpkg-deb -x "$deb" /; done \
+      && test -s /usr/local/cuda-11.8/targets/x86_64-linux/lib/libcublas_static.a \
+      && test -s /usr/local/cuda-11.8/targets/x86_64-linux/lib/libcublasLt_static.a \
+      && test -f /usr/local/cuda-11.8/targets/x86_64-linux/include/cublas_v2.h \
+      && rm -rf /tmp/cublas /var/lib/apt/lists/*; \
+    fi
+
 COPY . .
 RUN rm -rf fsl/include/TIPL \
     && git clone --depth 1 https://github.com/frankyeh/TIPL.git fsl/include/TIPL
