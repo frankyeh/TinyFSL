@@ -17,7 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - runner: macos-14
+          - runner: macos-15
             name: macos-14-arm64
             arch: arm64
             jobs: 3
@@ -36,10 +36,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install tools
+      - name: Check build tools
         run: |
-          brew update
-          brew install cmake ninja ccache gcc
+          command -v cmake >/dev/null || HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 brew install cmake
+          cmake --version
+          clang++ --version
+          if command -v ninja >/dev/null; then
+            echo "CMAKE_GEN=Ninja" >> "$GITHUB_ENV"
+            ninja --version
+          else
+            echo "CMAKE_GEN=Unix Makefiles" >> "$GITHUB_ENV"
+          fi
 
       - name: Download TIPL
         run: |
@@ -54,25 +61,15 @@ jobs:
           mv boost_1_77_0/boost fsl/include/
           mkdir -p tiny_fsl_bin
 
-      - name: Cache ccache
-        uses: actions/cache@v4
-        with:
-          path: ~/.ccache
-          key: macos-ccache-${{ matrix.name }}-${{ github.ref_name }}
-          restore-keys: |
-            macos-ccache-${{ matrix.name }}-
-
       - name: Compile programs
         run: |
           for app in topup applytopup bet2 eddy
           do
-            cmake -S "$app" -B "build_$app" -GNinja \
+            cmake -S "$app" -B "build_$app" -G "$CMAKE_GEN" \
               -DCMAKE_BUILD_TYPE=Release \
               -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=OFF \
               -DCMAKE_OSX_DEPLOYMENT_TARGET=13.0 \
               -DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }} \
-              -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-              -DCMAKE_C_COMPILER_LAUNCHER=ccache \
               -DCMAKE_CXX_FLAGS="$CXXFLAGS" \
               -DBLAS_LIBRARIES="-framework Accelerate" \
               -DTIPL_DIR="${GITHUB_WORKSPACE}/fsl/include"
