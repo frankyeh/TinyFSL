@@ -27,9 +27,9 @@ namespace EDDY {
 class EddyInputError: public std::exception
 {
 public:
-  EddyInputError(const std::string& msg) noexcept : m_msg(msg) {}
+  EddyInputError(const std::string& msg) noexcept : m_msg("EddyInputError:  " + msg) {}
   ~EddyInputError() noexcept {}
-  virtual const char * what() const noexcept { return std::string("EddyInputError:  " + m_msg).c_str(); }
+  virtual const char * what() const noexcept { return m_msg.c_str(); }
 private:
   std::string m_msg;
 };

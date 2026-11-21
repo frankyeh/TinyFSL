@@ -57,17 +57,26 @@ splinefield::splinefield(const std::vector<unsigned int>& psz,
 }
 
 // Copy constructor
-splinefield::splinefield(const splinefield& inf) : basisfield(inf), _sp(inf._sp), _nthr(inf._nthr)
+splinefield::splinefield(const splinefield& inf) : basisfield(inf), _sp(inf._sp), _dsp(inf._dsp.size()), _nthr(inf._nthr)
 {
-  // basisfield::assign(inf);
-  // splinefield::assign(inf);
+  for (unsigned int i=0; i<inf._dsp.size(); i++) {
+    if (inf._dsp[i]) {
+      _dsp[i] = std::shared_ptr<Spline3D<double> >(new Spline3D<double>(*(inf._dsp[i])));
+    }
+  }
 }
 
 void splinefield::assign_splinefield(const splinefield& inf)
 {
   _sp = inf._sp;
-  for (unsigned int i=0; i<3; i++) {
-    _dsp[i] = std::shared_ptr<Spline3D<double> >(new Spline3D<double>(*(inf._dsp[i])));
+  _dsp.resize(inf._dsp.size());
+  for (unsigned int i=0; i<inf._dsp.size(); i++) {
+    if (inf._dsp[i]) {
+      _dsp[i] = std::shared_ptr<Spline3D<double> >(new Spline3D<double>(*(inf._dsp[i])));
+    }
+    else {
+      _dsp[i].reset();
+    }
   }
   _nthr = inf._nthr;
 }

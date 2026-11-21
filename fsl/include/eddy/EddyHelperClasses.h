@@ -76,9 +76,9 @@ enum FinalResampling { JAC, LSR, UNKNOWN_RESAMPLING};
 class EddyException: public std::exception
 {
 public:
-  EddyException(const std::string& msg) noexcept : message(msg) {}
+  EddyException(const std::string& msg) noexcept : message("EDDY:::  " + msg) {}
   ~EddyException() noexcept {}
-  virtual const char * what() const noexcept { return std::string("EDDY:::  " + message).c_str(); }
+  virtual const char * what() const noexcept { return message.c_str(); }
 private:
   std::string message;
 };
