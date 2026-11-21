@@ -68,7 +68,7 @@ jobs:
           $bindir = "$env:VCPKG_ROOT\installed\${{ matrix.triplet }}\bin"
 
           $blas = Get-ChildItem "$libdir\*.lib" | Where-Object { $_.Name -like "*openblas*.lib" -or $_.Name -eq "blas.lib" } | Select-Object -First 1
-          $zlib = Get-ChildItem "$libdir\*.lib" | Where-Object { $_.Name -in @("z.lib","zlib.lib","zlibstatic.lib") -or $_.Name -like "zlib*.lib" } | Select-Object -First 1
+          $zlib = Get-ChildItem "$libdir\*.lib" | Where-Object { $_.Name -in @("z.lib","libz.lib","zlib.lib","zlibstatic.lib") -or $_.Name -like "zlib*.lib" } | Select-Object -First 1
           $lapack = @()
           if("${{ matrix.triplet }}" -ne "arm64-windows") {
             $lapack = Get-ChildItem "$libdir\*.lib" | Where-Object { $_.Name -like "*lapack*.lib" -or $_.Name -eq "tmglib.lib" } | Sort-Object Name
@@ -203,7 +203,7 @@ jobs:
 
           $blas = Get-ChildItem "$libdir\*.lib" | Where-Object { $_.Name -like "*openblas*.lib" -or $_.Name -eq "blas.lib" } | Select-Object -First 1
           $lapack = Get-ChildItem "$libdir\*.lib" | Where-Object { $_.Name -like "*lapack*.lib" -or $_.Name -eq "tmglib.lib" } | Sort-Object Name
-          $zlib = Get-ChildItem "$libdir\*.lib" | Where-Object { $_.Name -in @("z.lib","zlib.lib","zlibstatic.lib") -or $_.Name -like "zlib*.lib" } | Select-Object -First 1
+          $zlib = Get-ChildItem "$libdir\*.lib" | Where-Object { $_.Name -in @("z.lib","libz.lib","zlib.lib","zlibstatic.lib") -or $_.Name -like "zlib*.lib" } | Select-Object -First 1
 
           if(!$blas) {
             Get-ChildItem "$libdir\*.lib" | Select-Object -ExpandProperty Name
